@@ -1,0 +1,11 @@
+@{
+    ViewData["Title"] = "Home Page";
+}
+<!-- prerenders the app UI from the compiled version in the dist directory-->
+<app asp-prerender-module="ClientApp/dist/main-server">Loading...</app>
+
+<script src="~/dist/vendor.js" asp-append-version="true"></script>
+<!-- uses the main-client.js scripts-->
+@section scripts {
+    <script src="~/dist/main-client.js" asp-append-version="true"></script>
+}

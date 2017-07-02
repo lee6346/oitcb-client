@@ -1,0 +1,28 @@
+<!-- NOTE: the navbar component changes the right-side body component based the which button is clicked-->
+
+<div class='nav navbar-inverse'>
+    <div class="container-fluid">
+
+        <!--<div class="clearfix"></div>-->
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li [routerLinkActive]="['link-active']">
+                    <a [routerLink]="['/home']">
+                        <span class='glyphicon glyphicon-home'></span> Home
+                    </a>
+                </li>
+                <li [routerLinkActive]="['link-active']">
+                    <a [routerLink]="['/login']">
+                        <span class='glyphicon glyphicon-user'></span> Agent Login
+                    </a> 
+                </li>
+                <li [routerLinkActive]="['link-active']">
+                    <a [routerLink]="['/contact']">
+                        <span class='glyphicon glyphicon-earphone'></span> Contact Us
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
