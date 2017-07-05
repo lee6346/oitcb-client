@@ -5,15 +5,20 @@ const CheckerPlugin = require('awesome-typescript-loader').CheckerPlugin;
 
 module.exports = (env) => {
     // Configuration in common to both client-side and server-side bundles
+
+    // check if it is development build stage
     const isDevBuild = !(env && env.prod);
+    // shared in the client side. 
     const sharedConfig = {
         stats: { modules: false },
         context: __dirname,
-        resolve: { extensions: [ '.js', '.ts' ] },
+        resolve: { extensions: ['.js', '.ts'] },
+        //the bundled/compiled file will go in the /dist directory
         output: {
             filename: '[name].js',
             publicPath: '/dist/' // Webpack dev middleware, if enabled, handles requests for this URL prefix
         },
+        //transforms ts, html, css, and image files into modules that js can read using loaders
         module: {
             rules: [
                 { test: /\.ts$/, include: /ClientApp/, use: ['awesome-typescript-loader?silent=true', 'angular2-template-loader'] },
@@ -22,14 +27,20 @@ module.exports = (env) => {
                 { test: /\.(png|jpg|jpeg|gif|svg)$/, use: 'url-loader?limit=25000' }
             ]
         },
+        //used 
         plugins: [new CheckerPlugin()]
     };
 
     // Configuration for client-side bundle suitable for running in browsers
+    // output the bundled code in the /wwwroot/dist directory
+    //Note: this is what we see in the main-server.js file
     const clientBundleOutputDir = './wwwroot/dist';
     const clientBundleConfig = merge(sharedConfig, {
+        //specify the entry point for depedencies in the client bundle
         entry: { 'main-client': './ClientApp/boot-client.ts' },
+        //the file is output into /wwwroot/dist
         output: { path: path.join(__dirname, clientBundleOutputDir) },
+        // uses the following
         plugins: [
             new webpack.DllReferencePlugin({
                 context: __dirname,

@@ -39,7 +39,8 @@ namespace chatbot_portal
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
-
+            //if we are in development stage, use the webpack dev middleware configration (webpack.config.js)
+            // and set HMR to true
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -53,7 +54,7 @@ namespace chatbot_portal
             }
 
             app.UseStaticFiles();
-
+            // we are integrating the MVC for SSR with a fall back SPA rout
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

@@ -5,4 +5,12 @@
     templateUrl: './contact.component.html'
 })
 export class ContactComponent {
+    contact_info = {
+        phone: '111-111-1111',
+        email: 'testing@gmail.com',
+        location: '1',
+        available_hours: '0800-1500'
+    }
+    
+
 }

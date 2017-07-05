@@ -1,0 +1,26 @@
+﻿<div bsModal #chatModal="bs-modal" class="modal fade" id="chatModal" tabindex="-1" role="dialog" aria-labelledby="chatModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close pull-right" data-dismiss="modal" (click)="chatModal.hide()" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="chatModalLabel">OIT Chatbot</h4>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="recipient-name" class="control-label"></label>
+                        <textarea type="text" class="form-control" rows="20" id="chatMessages" readonly></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="message-text" class="control-label">Message:</label>
+                        <textarea class="form-control" rows="3" id="chatInput"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" (click)="chatModal.hide()">Close</button>
+                <button type="button" class="btn btn-primary" (click)="chatModal.hide()">Send message</button>
+            </div>
+        </div>
+    </div>
+</div>
