@@ -8,10 +8,24 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
 export class ChatModalComponent {
     @ViewChild('chatModal') public chatModal: ModalDirective;
 
+
     constructor() {
     
     }
+    msg: string;
 
+    public sendMessages(msg: string): void {
+        this.msg = msg;
+        
+    }
+
+    public receiveMessages(): void {
+
+    }
+
+    public intializeConnection(): void {
+
+    }
     public showChatModal(): void {
         this.chatModal.show();
     }

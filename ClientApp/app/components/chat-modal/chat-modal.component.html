@@ -7,19 +7,25 @@
             </div>
             <div class="modal-body">
                 <form>
-                    <div class="form-group">
-                        <label for="recipient-name" class="control-label"></label>
-                        <textarea type="text" class="form-control" rows="20" id="chatMessages" readonly></textarea>
+                    <div class="form-control chat-display" id="chatMessages">
+                        
+                        
+                             <ul>
+                                 <li *ngFor="">
+                                     <pre>{{msg}}</pre>
+                                 </li>
+                             </ul>
+                     
                     </div>
                     <div class="form-group">
                         <label for="message-text" class="control-label">Message:</label>
-                        <textarea class="form-control" rows="3" id="chatInput"></textarea>
+                        <textarea #msg class="form-control" rows="3" id="chatInput" (keyup.enter)="chatModal.sendMessages(msg)"></textarea>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal" (click)="chatModal.hide()">Close</button>
-                <button type="button" class="btn btn-primary" (click)="chatModal.hide()">Send message</button>
+                <button type="button" class="btn btn-primary" (click)="chatModal.sendMessages(msg)">Send message</button>
             </div>
         </div>
     </div>
