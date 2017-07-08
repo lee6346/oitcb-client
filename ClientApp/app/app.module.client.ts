@@ -7,6 +7,7 @@ import { sharedConfig } from './app.module.shared';
 //register services
 import { ChatService } from './services/chat.service';
 import { ChatConnectionService } from './services/chat-connection.service';
+import { UserService } from './services/user.service';
 
 @NgModule({
     bootstrap: sharedConfig.bootstrap,
@@ -21,6 +22,7 @@ import { ChatConnectionService } from './services/chat-connection.service';
         { provide: 'ORIGIN_URL', useValue: location.origin },
         ChatService,
         ChatConnectionService,
+        UserService,
     ]
 })
 export class AppModule {

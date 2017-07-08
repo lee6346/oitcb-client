@@ -1,6 +1,8 @@
-﻿import { DirectLine } from 'botframework-directlinejs';
-import { ConnectionStatus } from 'botframework-directlinejs';
-import { UUID } from 'uuid/v1';
+﻿// direct line
+import { DirectLine, ConnectionStatus } from 'botframework-directlinejs';
+// chat connection service (DI)
+import { ChatConnectionService } from './chat-connection.service';
+
 import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
 import 'rxjs/add/operator/catch';
@@ -8,28 +10,34 @@ import 'rxjs/add/operator/map';
 import * as uuid from 'uuid/v1';
 
 
+/* this service is responsible for sending/receiving activities between a user and chatbot via DirectLine */
+
 @Injectable()
 export class ChatService {
-    
-    constructor() {}
+
+   
+ 
+    constructor() { }
+
     //send a message to the bot
-    sendMessage(directLine: DirectLine, msg:string, uuid:string,  user_name = '') {
-            directLine.postActivity({
+    public sendMessage(directLine: DirectLine, msg: string, uuid: string, user_name = '') {
+        directLine.postActivity({
             from: { id: uuid },
             type: 'message',
             text: msg
-        }).subscribe(
+            }).subscribe(
             id => console.log("posted activity, assigned ID ", id),
             error => console.log("Error posting activity", error));
     }
 
    //receive an activity from the bot
-    receiveActivity(directLine : DirectLine){
+    public receiveActivity(directLine: DirectLine){
         return directLine.activity$.subscribe(
             activity => console.log("Received and activity", activity));
     }
+
     //receive activities of a specified type
-    receiveFilterActivity(directLine: DirectLine, filter: string = '') {
+    public receiveFilterActivity(directLine: DirectLine, filter: string = '') {
         
         if (!filter) {
           return this.receiveActivity(directLine);
@@ -42,8 +50,6 @@ export class ChatService {
 
         }
     }
-
-    //should use rxjs to genereate different types of activies to send and receives
 
 }
 

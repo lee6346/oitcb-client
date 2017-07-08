@@ -34,7 +34,9 @@
     <None Remove="wwwroot\NewFolder\**" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="ClientApp\app\services\" />
+    <Folder Include="ClientApp\app\core\action-cards\" />
+    <Folder Include="ClientApp\app\core\attachments\" />
+    <Folder Include="ClientApp\app\core\activities\" />
     <Folder Include="Data\" />
     <Folder Include="Models\" />
     <Folder Include="ViewModel\" />

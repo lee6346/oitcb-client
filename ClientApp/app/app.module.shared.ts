@@ -7,8 +7,7 @@ import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 
 //Web/HTTP modules
 import { HttpModule, JsonpModule } from '@angular/http';
-import { ChatService } from './services/chat.service';
-import { ChatConnectionService } from './services/chat-connection.service';
+
 
 
 //import the classes to use in declarations

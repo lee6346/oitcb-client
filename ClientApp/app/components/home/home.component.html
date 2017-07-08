@@ -3,14 +3,18 @@
 <h1>OIT Chatbot Services</h1>
 <p>Click the ChatBot icon for assistance</p>
 <div class="wrapper">
+    <!-- upon clicking the button, we invoke the child component's method to show the modal-->
     <button type="button" (click)="chatModal.showChatModal()">Talk to our Chatbot</button>
     <chat-modal #chatModal >
     </chat-modal>
 
 </div>
 <br />
+<div #see >zzz</div>
 <p>Services Provided</p>
-<button type="button" (click)="doSomething()">Testing...</button>
+<input #mystr type="text" />
+<button type="button" (click)="doSomething(mystr.value)">Testing...</button>
+<button type="button" (click)="showConver()">SHOWWW</button>
 <test></test>
 <ul>
     <li><strong>Prinspot Services:</strong> (Installing the driver on personal computer, using our app, sending to via emial)</li>
