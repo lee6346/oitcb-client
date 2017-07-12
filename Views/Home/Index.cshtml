@@ -1,11 +1,11 @@
 @{
     ViewData["Title"] = "Home Page";
 }
-<!-- prerenders the app UI from the compiled version in the dist directory-->
+<!-- references the 'app.component.ts' selector, prerenders the transpiled/bundled/minified js file: main-server-->
 <app asp-prerender-module="ClientApp/dist/main-server">Loading...</app>
 
 <script src="~/dist/vendor.js" asp-append-version="true"></script>
-<!-- uses the main-client.js scripts-->
+<!-- launch the transpiled/bundled/minfied JS file (webpack: sharedConfig + boot-client.ts ==> main-client.js)-->
 @section scripts {
     <script src="~/dist/main-client.js" asp-append-version="true"></script>
 }

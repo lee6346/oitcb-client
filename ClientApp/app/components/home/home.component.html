@@ -1,22 +1,18 @@
 
+<div class="container-fluid">
+    <div>
+    <h1 class="home-title">OIT Chatbot Services</h1>
+        <section>
+            
+            <a>
+                Start Chat
+                <img src="../../../../wwwroot/images/roadrunner.png" (click)="showConver()" style="position:relative; top:-20px;" />
 
-<h1>OIT Chatbot Services</h1>
-<p>Click the ChatBot icon for assistance</p>
-<div class="wrapper">
-    <!-- upon clicking the button, we invoke the child component's method to show the modal-->
-    <button type="button" (click)="chatModal.showChatModal()">Talk to our Chatbot</button>
-    <chat-modal #chatModal >
-    </chat-modal>
-
+            </a>
+                
+        </section>
+    </div>
+    <div>
+        <test-modal *ngIf="showModal" (deleteModal)="removeConver($event)"></test-modal>
+    </div>
 </div>
-<br />
-<div #see >zzz</div>
-<p>Services Provided</p>
-<input #mystr type="text" />
-<button type="button" (click)="doSomething(mystr.value)">Testing...</button>
-<button type="button" (click)="showConver()">SHOWWW</button>
-<test></test>
-<ul>
-    <li><strong>Prinspot Services:</strong> (Installing the driver on personal computer, using our app, sending to via emial)</li>
-    <li><strong>More to come...</strong></li>
-</ul>

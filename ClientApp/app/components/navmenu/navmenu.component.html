@@ -1,28 +1,12 @@
-<!-- NOTE: the navbar component changes the right-side body component based the which button is clicked-->
 
-<div class='nav navbar-inverse'>
-    <div class="container-fluid">
 
-        <!--<div class="clearfix"></div>-->
-        <div class="navbar-collapse collapse">
-            <ul class="nav navbar-nav">
-                <li [routerLinkActive]="['link-active']">
-                    <a [routerLink]="['/home']">
-                        <span class='glyphicon glyphicon-home'></span> Home
-                    </a>
-                </li>
-                <li [routerLinkActive]="['link-active']">
-                    <a [routerLink]="['/home']">
-                        <span class='glyphicon glyphicon-user'></span> Agent Login
-                    </a> 
-                </li>
-                <li [routerLinkActive]="['link-active']">
-                    <a [routerLink]="['/contact']">
-                        <span class='glyphicon glyphicon-earphone'></span> Contact Us
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<div class="icon-bar">
+    <a [routerLink]="['/home']">Home<i class="fa fa-home"></i></a>
+    <a [routerLink]="['/agent']">Admin<i class="fa fa-user-circle-o"></i></a>
+    <a [routerLink]="['/comments']">Leave Comments<i class="fa fa-comments"></i></a>
+    <a [routerLink]="['/contact']">Contact Info<i class="fa fa-phone"></i></a>
 </div>
 

@@ -1,0 +1,118 @@
+﻿.modal {
+    outline: none;
+    width: 45%;
+    margin: 0 auto;
+
+
+}
+.custom {
+    outline: none;
+    width: 45%;
+    margin: 0 auto;
+}
+
+.modal-dialog {
+    width: 45%;
+    margin: 0 auto;
+
+
+}
+
+.body {
+    display: inline-block;
+
+}
+
+.modal-content {
+    border-color: #0c2340;
+    border: 2px, solid
+}
+
+.chat-display {
+    height: 300px;
+    border: 1px solid DimGray;
+    overflow-y: auto;
+    background-color: white;
+    
+}
+
+.modal-header {
+    background-color: #f15a22;
+}
+.modal-body {
+    background-color: #0c2340;
+}
+
+.modal-footer {
+    background-color: #f15a22;
+    
+}
+.input-display {
+    background-color: white;
+    overflow-y: auto;
+    
+    
+}
+.chatmessages {
+    overflow: auto;
+    position: absolute;
+    bottom: 0;
+    max-height: 400px;
+}
+.msg-bubble {
+    border: 1px solid;
+    border-color: #0c2340;
+    border-radius: 15px;
+    background-color: orange;
+    display: inline-block;
+    padding: 5px 11px 5px 11px;
+    text-align: justify;
+    position: relative;
+    margin: auto;
+    left: -25px;
+    width: 100%
+}
+
+
+ul {
+    list-style-type: none;
+
+    flex-direction: column-reverse;
+}
+.text-frame {
+    border-top: 15px, solid, #0c2340;
+}
+.modal-title {
+    font-family: sans-serif;
+    font-weight: 900;
+    font-size: 2.00rem;
+    text-shadow: 1px 1px 1px #0c2340;
+    text-align: left;
+    color: #0c2340;
+}
+
+.btn-primary::before,
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary.active {
+    color: #ffffff;
+    background-color: #0c2340;
+    border-color: #0c2340;
+}
+
+.submit-button {
+    color: #ffffff;
+    background-color: #0c2340;
+    border-color: #0c2340;
+}
+
+.exit-button{
+
+}
+
+.close {
+    color: #0c2340;
+    opacity: 0.6;
+}

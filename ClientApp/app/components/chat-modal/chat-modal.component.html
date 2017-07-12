@@ -1,27 +1,23 @@
-﻿<div bsModal #chatModal="bs-modal" class="modal fade" id="chatModal" tabindex="-1" role="dialog" aria-labelledby="chatModalLabel" aria-hidden="true">
+﻿<div class="body modal custom modal-dialog" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close pull-right" data-dismiss="modal" (click)="chatModal.hide()" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="chatModalLabel">OIT Chatbot</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="closeModal()"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">OIT CHAT BOT</h4>
             </div>
             <div class="modal-body">
                 <form>
-                    <div class="form-control chat-display" id="chatMessages">
-                        
-                        
-                           
-                     
+                    <div class="form-group chat-display">
+
                     </div>
                     <div class="form-group">
-                        <label for="message-text" class="control-label">Message:</label>
-                        <textarea #msg class="form-control" rows="3" id="chatInput" (keyup.enter)="sendMessages(msg.value)"></textarea>
+                        <textarea class="form-control input-display" rows="2" id="message-text"></textarea>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal" (click)="chatModal.hide()">Close</button>
-                <button type="button" class="btn btn-primary" (click)="sendMessages(msg.value)">Send message</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" (click)="closeModal()">Close</button>
+                <button type="button" class="btn btn-primary">Send message</button>
             </div>
         </div>
     </div>

@@ -8,7 +8,8 @@ module.exports = (env) => {
 
     // check if it is development build stage
     const isDevBuild = !(env && env.prod);
-    // shared in the client side. 
+    // shared configuration (server and client)
+    // transforms .ts, .html, .css, and image files, bundles, and outputs into the [name].js file in the /dist/ directory
     const sharedConfig = {
         stats: { modules: false },
         context: __dirname,
@@ -31,9 +32,10 @@ module.exports = (env) => {
         plugins: [new CheckerPlugin()]
     };
 
-    // Configuration for client-side bundle suitable for running in browsers
-    // output the bundled code in the /wwwroot/dist directory
-    //Note: this is what we see in the main-server.js file
+    // Configuration for client-side files, merges with the shharedConfig
+    // 1. gets the depedency graph from the /boot-client.ts file (includes the app module, HMR config, etc)
+    // 2. determines the plugins required based on dev or prod build
+    // 3. transpiles/bundles the dependencies, then outputs it in the wwwroot/dist/ directory (main-client.js)
     const clientBundleOutputDir = './wwwroot/dist';
     const clientBundleConfig = merge(sharedConfig, {
         //specify the entry point for depedencies in the client bundle
@@ -59,6 +61,9 @@ module.exports = (env) => {
     });
 
     // Configuration for server-side (prerendering) bundle suitable for running in Node
+    // 1. gets the dependency graph from the /boot-server.ts file
+    // 2. retrieves the plugins
+    // 3. outputs to the /ClientApp/dist/ directory (main-server.js)
     const serverBundleConfig = merge(sharedConfig, {
         resolve: { mainFields: ['main'] },
         entry: { 'main-server': './ClientApp/boot-server.ts' },

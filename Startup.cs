@@ -54,13 +54,13 @@ namespace chatbot_portal
             }
 
             app.UseStaticFiles();
-            // we are integrating the MVC for SSR with a fall back SPA rout
+            
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
-
+                //everything not defined in the MVC gets default routed back to the angular application
                 routes.MapSpaFallbackRoute(
                     name: "spa-fallback",
                     defaults: new { controller = "Home", action = "Index" });

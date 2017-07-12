@@ -6,6 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace chatbot_portal.Controllers
 {
+
+    /**
+     * Renders views for home and agent
+     */
+
     public class HomeController : Controller
     {
         public IActionResult Index()
@@ -17,5 +22,10 @@ namespace chatbot_portal.Controllers
         {
             return View();
         }
+        /*
+        public async Task<IActionResult> Agent()
+        {
+            return View();
+        } */
     }
 }

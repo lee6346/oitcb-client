@@ -1,14 +1,11 @@
-﻿import { Component, Input, ViewChild } from '@angular/core';
+﻿import { Component, Input, Output, EventEmitter } from '@angular/core';
 
-//ngx bootstrap modal
-import { ModalDirective } from 'ngx-bootstrap/modal';
-
-//direct line 3.0 
-import { DirectLine } from 'botframework-directlinejs';
-import { ConnectionStatus } from 'botframework-directlinejs';
 
 //ng2 life cycle hooks
-import { OnInit } from '@angular/core';
+import { OnInit, OnChanges, OnDestroy } from '@angular/core';
+
+//direct line 3.0 
+import { DirectLine, ConnectionStatus } from 'botframework-directlinejs';
 
 //chat connection services
 import { ChatService } from '../../services/chat.service';
@@ -18,14 +15,31 @@ import { ChatConnectionService } from '../../services/chat-connection.service';
 @Component({
     selector: 'chat-modal',
     templateUrl: './chat-modal.component.html',
+    styleUrls: ['/chat-modal.component.css'],
 })
-    
-export class ChatModalComponent{
-    @ViewChild('chatModal') public chatModal: ModalDirective;
+ 
+export class ChatModalComponent implements OnInit, OnDestroy{
+    //This class is responsible for making initial connection, loading child components (text/display)
+    //and closing when user ends connection
+
+    @Output() deleteModal: EventEmitter<boolean>;
 
 
-    constructor() {}
+    constructor() {
+        this.deleteModal = new EventEmitter<boolean>();
+    }
 
+    ngOnInit() {
+        window.alert("initialized");
+    }
+
+    ngOnDestroy() {
+        window.alert("removed");
+    }
+
+    closeModal() {
+        this.deleteModal.emit(false);
+    }
 
     // connect / send message
     public sendMessages(msg: string) {
@@ -40,11 +54,5 @@ export class ChatModalComponent{
     public intializeConnection(): void {
 
     }
-    public showChatModal(): void {
-        this.chatModal.show();
-    }
 
-    public hideChatModal(): void {
-        this.chatModal.hide();
-    }
 }

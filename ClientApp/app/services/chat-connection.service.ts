@@ -86,10 +86,7 @@ export class ChatConnectionService {
         return this.http.post(this.tokenUri, undefined, options).map(data => data.json());
     }
 
-    // so other services can access properties of the direct line
-    public getDirectLineObject() {
-        return this.directLine;
-    }
+
 
 
     //(later) store the ConversationID inside the local cache in the browser

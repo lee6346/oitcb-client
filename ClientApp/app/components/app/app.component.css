@@ -1,11 +1,7 @@
-@media (max-width: 767px) {
-    /* On small screens, the nav menu spans the full width of the screen. Leave a space for it. */
-    .body-content {
-        padding-top: 50px;
-    }
-}
 
-
-.body {
+.body, body {
     height: 100%;
+    width: 100%;
+
+    background-color: rgb(237, 150, 64);
 }

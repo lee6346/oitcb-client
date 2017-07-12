@@ -1,0 +1,30 @@
+﻿
+
+<div class="body modal custom modal-dialog" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="closeModal()"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">OIT CHAT BOT</h4>
+            </div>
+            <div class="modal-body">
+                
+                    <div class="chat-display">
+                        <ul>
+                            <li class="msg-bubble chatmessages" *ngFor="let msg of Messages">{{msg}}</li>
+                        </ul>
+
+                    </div>
+        
+                    <div>
+                        <textarea #msgref [(ngModel)]="defaultVal" class="form-control input-display" rows="2" id="message-text"  (keyup.enter)="submitMessage(msgref.value)"></textarea>
+                    </div>
+     
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="exit-button" data-dismiss="modal" (click)="closeModal()">Close</button>
+                <button type="button" class="submit-button" (click)="submitMessage(msgref.value)">Send</button>
+            </div>
+        </div>
+    </div>
+</div>

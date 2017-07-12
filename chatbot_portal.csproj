@@ -25,18 +25,22 @@
   <ItemGroup>
     <!-- Files not to show in IDE -->
     <None Remove="yarn.lock" />
+    <Compile Remove="ClientApp\app\components\chat-modal\**" />
     <Compile Remove="wwwroot\NewFolder\**" />
 
     <!-- Files not to publish (note that the 'dist' subfolders are re-added below) -->
     <Content Remove="ClientApp\**" />
     <Content Remove="wwwroot\NewFolder\**" />
+    <EmbeddedResource Remove="ClientApp\app\components\chat-modal\**" />
     <EmbeddedResource Remove="wwwroot\NewFolder\**" />
+    <None Remove="ClientApp\app\components\chat-modal\**" />
     <None Remove="wwwroot\NewFolder\**" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ClientApp\app\core\action-cards\" />
     <Folder Include="ClientApp\app\core\attachments\" />
     <Folder Include="ClientApp\app\core\activities\" />
+    <Folder Include="ClientApp\app\shared\" />
     <Folder Include="Data\" />
     <Folder Include="Models\" />
     <Folder Include="ViewModel\" />
