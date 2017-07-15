@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { FormsModule } from '@angular/forms';
-import { HttpModule } from '@angular/http';
+import { HttpModule} from '@angular/http';
 import { sharedConfig } from './app.module.shared';
-
 //register services
 import { ChatService } from './services/chat.service';
 import { ChatConnectionService } from './services/chat-connection.service';
+import { ChatAuthenticationService } from './services/chat-authentication.service';
+import { StateStorageService } from './services/state-storage.service';
 import { UserService } from './services/user.service';
 
 @NgModule({
@@ -14,7 +14,6 @@ import { UserService } from './services/user.service';
     declarations: sharedConfig.declarations,
     imports: [
         BrowserModule,
-        FormsModule,
         HttpModule,
         ...sharedConfig.imports
     ],
@@ -22,7 +21,10 @@ import { UserService } from './services/user.service';
         { provide: 'ORIGIN_URL', useValue: location.origin },
         ChatService,
         ChatConnectionService,
+        ChatAuthenticationService,
+        StateStorageService,
         UserService,
+        
     ]
 })
 export class AppModule {

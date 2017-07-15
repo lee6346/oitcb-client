@@ -59,7 +59,26 @@ module.exports = (env) => {
             new webpack.optimize.UglifyJsPlugin()
         ])
     });
+    /*
+    const clientAdminBundleOutputDir = './wwwroot/dist';
+    const clientAdminBundleConfig = merge(sharedConfig, {
+        entry: { 'admin-client': './ClientApp/boot-admin.ts' },
+        output: { path: path.join(__dirname, clientAdminBundleOutputDir) },
+        plugins: [
+            new webpack.DllReferencePlugin({
+                context: __dirname,
+                manifest: require('./wwwroot/dist/vendor-manifest.json')
+            })
+        ].concat(isDevBuild ? [
+            new webpack.SourceMapDevToolPlugin({
+                filename: '[file].map',
+                moduleFilenameTemplate: path.relative(clientAdminBundleOutputDir, '[resourcePath]')
+            })
 
+        ] : [
+                new webpack.optimize.UglifyJsPlugin()
+            ])
+    }); */
     // Configuration for server-side (prerendering) bundle suitable for running in Node
     // 1. gets the dependency graph from the /boot-server.ts file
     // 2. retrieves the plugins

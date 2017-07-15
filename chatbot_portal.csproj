@@ -41,10 +41,11 @@
     <Folder Include="ClientApp\app\core\attachments\" />
     <Folder Include="ClientApp\app\core\activities\" />
     <Folder Include="ClientApp\app\shared\" />
-    <Folder Include="Data\" />
-    <Folder Include="Models\" />
     <Folder Include="ViewModel\" />
     <Folder Include="Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="wwwroot\dist\vendor.js" />
   </ItemGroup>
   <Target Name="RunWebpack" AfterTargets="ComputeFilesToPublish">
     <!-- As part of publishing, ensure the JS resources are freshly built in production mode -->

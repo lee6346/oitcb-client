@@ -1,31 +1,27 @@
-﻿// direct line
+﻿// directline lib
 import { DirectLine, ConnectionStatus, IActivity } from 'botframework-directlinejs';
-// chat connection service (DI)
+
+// services
 import { ChatConnectionService } from './chat-connection.service';
 
+// rxjs lib
 import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
 
+//ang lib
 import { Injectable } from '@angular/core';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/operator/map';
-import * as uuid from 'uuid/v1';
 
 
-/* this service is responsible for sending/receiving activities between a user and chatbot via DirectLine */
+
 
 @Injectable()
 export class ChatService {
 
-    newMessages: Subject<IActivity> = new Subject<IActivity>();
 
-    messages: Observable<IActivity[]>;
-
+    //wtf is this??
     botHandle: string = 'AskRowdy';
 
     constructor() { }
 
-    retMessage;
 
     //send a text message to the bot
     public sendMessage(directLine: DirectLine, msg: string, uuid: string, user_name = '') {
@@ -33,38 +29,36 @@ export class ChatService {
             from: { id: uuid },
             type: 'message',
             text: msg
-            }).subscribe(
+        }).subscribe(
             id => console.log("posted activity, assigned ID ", id),
-            error => console.log("Error posting activity", error));
+            error => console.log("Error posting activity", error)); 
     }
 
-   //receive and activity and return an activity observable
-    public receiveActivity(directLine: DirectLine){
+   //return observable of activity object
+    public receiveActivity$(directLine: DirectLine): Observable<IActivity>{
         return directLine.activity$;
     }
 
-    //receive activities of a specified type
-    public receiveFilterActivity(directLine: DirectLine, filter: string = '') {
+    //receive observable of activity object filtered for a specific type
+    public receiveFilterActivity$(directLine: DirectLine, filter: string = ''): Observable<IActivity> {
         
         if (!filter) {
-          return this.receiveActivity(directLine);
+          return this.receiveActivity$(directLine);
         } 
         else {
             return directLine.activity$.filter(
-                activity => activity.type === filter)
-                .subscribe(
-                message => console.log("receives a message", message));
-
+                activity => activity.type === filter);
         }
     }
-    // receive only activities from the bot (not ones sent by user)
-    public receiveBotActivity(directLine: DirectLine) {
+    // receive observable of activity object only from the bot
+    public receiveBotActivity$(directLine: DirectLine): Observable<IActivity> {
         return directLine.activity$.filter(
             activity => activity.from.id === this.botHandle
-        ).map(act => act['text']);
-
+        );
     }
-    
+    /*
+    Need to create functions for rendering activity cards when receiving
+    */
 
 }
 

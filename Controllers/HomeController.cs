@@ -22,10 +22,10 @@ namespace chatbot_portal.Controllers
         {
             return View();
         }
-        /*
-        public async Task<IActionResult> Agent()
+        // will have to change to async Task<IActionResult> Agent()
+        public IActionResult Agent()
         {
             return View();
-        } */
+        } 
     }
 }
