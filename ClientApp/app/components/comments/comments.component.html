@@ -1,1 +1,8 @@
-﻿
+﻿<div>
+    <button (click)="addtoList()">CLick me</button>
+</div>
+<div *ngIf="users?.length > 0">
+    <ul>
+        <li *ngFor="let user of users">{{user.conversationId}}</li>
+    </ul>
+</div>

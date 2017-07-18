@@ -12,6 +12,7 @@ import { ChatConnectionService } from '../../services/chat-connection.service';
 import { UserService } from '../../services/user.service';
 import { StateStorageService } from '../../services/state-storage.service';
 import * as uuid from 'uuid/v1';
+import { DraggableElementDirective } from './test.directive';
 
 @Component({
     selector: 'test-modal',

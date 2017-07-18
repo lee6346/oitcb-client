@@ -16,8 +16,6 @@
     "@angular/platform-server": "4.1.2",
     "@angular/router": "4.1.2",
     "@types/node": "7.0.18",
-    "angular2-draggable": "^1.0.4",
-    "angular2-modal": "^3.0.1",
     "angular2-platform-node": "^2.1.0-rc.1",
     "angular2-template-loader": "0.6.2",
     "angular2-universal": "^2.1.0-rc.1",

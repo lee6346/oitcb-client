@@ -2,6 +2,12 @@
 <div class="container-fluid">
     <div>
     <h1 class="home-title">OIT Chatbot Services</h1>
+        <button (click)="clickMe()">Click Me</button>
+        <div *ngIf="users?.length > 0">
+            <ul>
+                <li *ngFor="let user of users">{{user.conversationId}}</li>
+            </ul>
+        </div>
         <section>
             
             <a>

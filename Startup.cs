@@ -32,7 +32,11 @@ namespace chatbot_portal
             services.AddDbContext<DatabaseContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             // Add framework services.
-            services.AddMvc();
+            // services.AddCors();
+            services.AddMvc();/*.AddJsonOptions(options =>
+            {
+                options.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver();
+            }); */
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -53,18 +57,24 @@ namespace chatbot_portal
             {
                 app.UseExceptionHandler("/Home/Error");
             }
-
+            //app.UseDefaultFiles();
             app.UseStaticFiles();
-            
+            /*
+            app.UseCors(builder =>
+                builder.AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod());
+                */
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
                 //everything not defined in the MVC gets default routed back to the angular application
+                /*
                 routes.MapSpaFallbackRoute(
                     name: "spa-fallback",
-                    defaults: new { controller = "Home", action = "Index" });
+                    defaults: new { controller = "Home", action = "Index" });  */
             });
 
         }

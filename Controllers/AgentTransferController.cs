@@ -9,25 +9,27 @@ using chatbot_portal.Models;
 
 namespace chatbot_portal.Controllers
 {
-    [Route("api/[controller]")]
-    public class LiveChatController
+    [Produces("application/json")]
+    [Route("api/AgentTransfer")]
+    public class AgentTransferController : Controller 
     {
 
         private readonly DatabaseContext _context;
 
-        public LiveChatController(DatabaseContext context)
+        public AgentTransferController(DatabaseContext context)
         {
             this._context = context;
         }
 
 
-        [HttpGet("[action]")]
-        public IList<UserQueue> PendingRequests()
+        [HttpGet("PendingRequests")]
+        public IActionResult PendingRequests()
         {
+
             List<UserQueue> requestList = new List<UserQueue>();
             requestList.Add(new UserQueue { ID = "123345", RequestTime = DateTime.Now });
             requestList.Add(new UserQueue { ID = "123444", RequestTime = DateTime.Now });
-            return requestList;
+            return Json(requestList);
         }
 
  
