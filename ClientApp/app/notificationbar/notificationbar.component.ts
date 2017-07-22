@@ -9,6 +9,7 @@ import * as Rx from 'rxjs/Rx';
 import { LiveRequestService } from '../core/live-request.service';
 import { LiveRequest } from '../model/LiveRequest';
 import { WebsocketService } from '../core/websocket.service';
+import { StateStorageService } from '../core/state-storage.service';
 
 @Component({
     selector: "notification-bar",
@@ -29,7 +30,8 @@ export class NotificationBarComponent implements OnInit, OnDestroy, OnChanges{
     @Output() onAccepted = new EventEmitter<string>();
 
 
-    constructor(private liveRequestService : LiveRequestService, private webSocketService: WebsocketService) {
+    constructor(private liveRequestService: LiveRequestService, private webSocketService: WebsocketService,
+        private stateStorageService: StateStorageService) {
     }
     
     ngOnInit() {
@@ -39,7 +41,7 @@ export class NotificationBarComponent implements OnInit, OnDestroy, OnChanges{
             .subscribe(res => this.requests = res);
         this.request_obs = this.webSocketService.connectWebSocket$();
 
-        this.request_obs.first().subscribe(res => { this.sock_id = res["data"] });
+        this.request_obs.first().subscribe(res => { this.sock_id = res["data"], this.stateStorageService.storeSocketId(this.sock_id) });
 
         this.wsSubscriber = this.webSocketService.mergeDeleter$(this.request_obs.skip(1))
             .subscribe(res => { this.requests = res });

@@ -1,16 +1,42 @@
 ﻿
 import * as Rx from 'rxjs/Rx';
-import { Component , OnInit, OnDestroy} from '@angular/core';
+import { Component , OnInit, OnDestroy, ElementRef} from '@angular/core';
 import { WebsocketService } from '../../services/websocket.service';
 import { LiveRequest } from '../../model/LiveRequest';
 import { ISubscription } from "rxjs/Subscription";
+import { PendingRequestComponent } from './pendrequest.component';
+
 @Component({
     selector: 'agent',
     templateUrl: './agent.component.html',
-    providers: [WebsocketService]
+    styleUrls: ['./agent.component.html'],
+    //providers: [WebsocketService]
 })
 export class AgentComponent implements OnInit, OnDestroy {
 
+    public buttonclicked: boolean = false; 
+    constructor(private elref: ElementRef) { }
+    ngOnInit() { }
+    ngOnDestroy() { }
+
+    public openNav() {
+        this.buttonclicked = this.buttonclicked? false : true;
+    }
+
+    public pullOff(): void {
+        this.elref.nativeElement.getId("mySidenav").style.width = "250px";
+        this.elref.nativeElement.getId("main").style.width = "250px";
+
+    }
+
+
+
+    public pushOn(): void {
+        this.elref.nativeElement.getId("mySidenav").style.width = "0x";
+        this.elref.nativeElement.getId("main").style.width = "0px";
+    }
+
+    /*
     private liveQueue: LiveRequest[];
     private sock_id: string;
     private request_obs: Rx.Observable<LiveRequest[]>;
@@ -29,7 +55,7 @@ export class AgentComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         this.mysubscription.unsubscribe();
-    }
+    }*/
     /*
     public getReq() {
         console.log("it worked");

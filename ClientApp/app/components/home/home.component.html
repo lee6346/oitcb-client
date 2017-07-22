@@ -3,6 +3,7 @@
     <div>
     <h1 class="home-title">OIT Chatbot Services</h1>
         <button (click)="clickMe()">Click Me</button>
+        <chat-window *ngIf="shownext"></chat-window>
         <div *ngIf="users?.length > 0">
             <ul>
                 <li *ngFor="let user of users">{{user}}</li>
@@ -22,3 +23,4 @@
         <test-modal *ngIf="showModal" (deleteModal)="removeConver($event)"></test-modal>
     </div>
 </div>
+

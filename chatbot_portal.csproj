@@ -48,8 +48,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ClientApp\app\admin\" />
-    <Folder Include="ClientApp\app\live-queue\assisting\" />
-    <Folder Include="ClientApp\app\live-queue\pending\" />
     <Folder Include="ClientApp\app\model\activities\" />
     <Folder Include="ClientApp\app\model\cards\" />
     <Folder Include="ClientApp\app\notificationbar\assistingbar\" />

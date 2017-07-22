@@ -2,7 +2,7 @@
 import { Component} from '@angular/core';
 
 import { TestModal } from '../test-modal/test-modal';
-
+import { ChatWindowComponent } from '../../chatwindow/chat-window.component';
 
 //services
 import { ChatAuthenticationService } from '../../services/chat-authentication.service';
@@ -21,7 +21,7 @@ import { LiveRequestService } from '../../services/live-request.service';
     providers: [ChatService, ChatConnectionService, UserService, ChatAuthenticationService, LiveRequestService], 
 })
 export class HomeComponent {
-
+    public shownext: boolean = false;
     public showModal: boolean = false;
     //test
     public users: string[];
@@ -41,6 +41,7 @@ export class HomeComponent {
     //test
     clickMe() {
 
+        this.shownext = true;
         this.liveservice.sendLiveRequest$("122-ds-3-dds").subscribe(msg => { console.log(msg) });
 
         /*

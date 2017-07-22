@@ -9,6 +9,8 @@ import { ChatAuthenticationService } from './services/chat-authentication.servic
 import { StateStorageService } from './services/state-storage.service';
 import { UserService } from './services/user.service';
 import { WebsocketService } from './services/websocket.service';
+import { LiveRequestService } from './services/live-request.service';
+
 
 @NgModule({
     bootstrap: sharedConfig.bootstrap,
@@ -26,6 +28,7 @@ import { WebsocketService } from './services/websocket.service';
         StateStorageService,
         UserService,
         WebsocketService,
+        LiveRequestService,
         
     ]
 })

@@ -16,6 +16,8 @@ import { HomeComponent } from './components/home/home.component';
 import { ContactComponent } from './components/contact/contact.component';
 import { CommentsComponent } from './components/comments/comments.component';
 import { TestModal } from './components/test-modal/test-modal';
+import { ChatWindowComponent } from './chatwindow/chat-window.component';
+import { PendingRequestComponent } from './components/agent/pendrequest.component';
 
 export const sharedConfig: NgModule = {
 
@@ -29,7 +31,8 @@ export const sharedConfig: NgModule = {
         ContactComponent,
         CommentsComponent,
         TestModal,
-        
+        ChatWindowComponent,
+        PendingRequestComponent,
     ],
 
     imports: [
