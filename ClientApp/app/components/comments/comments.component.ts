@@ -10,7 +10,7 @@ import { LiveRequest } from '../../model/LiveRequest';
 })
 
 export class CommentsComponent {
-    public requestUrl: string = 'localhost:523131/api/AgentTransfer/PendingRequests';
+    public requestUrl: string = '/api/AgentTransfer/PendingRequests';
     public queueEmpty: boolean;
     public users: LiveRequest[];
     constructor(private http: Http) {

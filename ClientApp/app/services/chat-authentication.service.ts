@@ -18,19 +18,22 @@ export class ChatAuthenticationService {
 
 
     //returns an observable for a conversation object
-    public getConversationObject$() : Observable<Conversation> {
+    public getConversationObject$(): Observable<Conversation> {
+        
         let headers = new Headers({
             'Authorization': this.mySecret
         });
         let options = new RequestOptions({ headers: headers });
         return this.http.post(this.tokenUri, undefined, options).map(data => data.json());
+        
+        //return this.http.get('/api/ChatToken/GetConversationObject').map(data => data.json());
     }
 
     // returns an observable of a new security token
     public getSecurityToken$(): Observable<string> {
 
-        return this.getConversationObject$().map(json_data => json_data["token"]);
+        return this.getConversationObject$().map(obj => obj.token);
 
     }
-    
+
 }

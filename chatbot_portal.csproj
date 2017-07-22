@@ -4,6 +4,7 @@
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
     <IsPackable>false</IsPackable>
     <PackageTargetFallback>portable-net45+win8</PackageTargetFallback>
+    <UserSecretsId>6e069888-bedb-47f9-8e51-c63254bf8a71</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Autofac" Version="4.6.0" />
@@ -18,9 +19,15 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="1.1.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.Design" Version="1.1.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="1.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="1.1.2" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="1.1.1" />
     <PackageReference Include="Microsoft.VisualStudio.Web.BrowserLink" Version="1.1.0" />
+    <PackageReference Include="NewtonSoft.Json" Version="10.0.3" />
+    <PackageReference Include="WebSocketManager" Version="1.0.1" />
     <PackageReference Include="xunit" Version="2.2.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <DotNetCliToolReference Include="Microsoft.Extensions.SecretManager.Tools" Version="1.0.1" />
   </ItemGroup>
   <ItemGroup>
     <!-- Files not to show in IDE -->
@@ -37,16 +44,17 @@
     <None Remove="wwwroot\NewFolder\**" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="ClientApp\app\agent-home\" />
+    <Content Include="wwwroot\index.css" />
+  </ItemGroup>
+  <ItemGroup>
     <Folder Include="ClientApp\app\admin\" />
     <Folder Include="ClientApp\app\live-queue\assisting\" />
     <Folder Include="ClientApp\app\live-queue\pending\" />
     <Folder Include="ClientApp\app\model\activities\" />
     <Folder Include="ClientApp\app\model\cards\" />
+    <Folder Include="ClientApp\app\notificationbar\assistingbar\" />
     <Folder Include="ClientApp\app\shared\components\" />
     <Folder Include="ClientApp\app\shared\pipes\" />
-    <Folder Include="ViewModel\" />
-    <Folder Include="Services\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="wwwroot\dist\vendor.js" />

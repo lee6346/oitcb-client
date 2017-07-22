@@ -6,7 +6,7 @@ import { ChatBotConnectionService } from './chatbot-connection.service';
 import { ChatBotTokenService } from './chatbot-token.service';
 
 import { StateStorageService } from './state-storage.service';
-import { LiveRequestQueueService } from './live-request-queue.service';
+import { LiveRequestService } from './live-request.service';
 import { LoginAuthenticationService } from './login-authentication.service';
 
 
@@ -19,7 +19,7 @@ import { LoginAuthenticationService } from './login-authentication.service';
         ChatBotConnectionService,
         ChatBotTokenService,
         StateStorageService,
-        LiveRequestQueueService,
+        LiveRequestService,
         LoginAuthenticationService,
     ]
 })

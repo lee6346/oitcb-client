@@ -6,10 +6,12 @@
         <title>@ViewData["Title"] - chatbot_portal</title>
         <base href="/" />
         <link rel="stylesheet" href="~/dist/vendor.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/index.css" asp-append-version="true"/>
     </head>
     <body>
         @RenderBody()
 
         @RenderSection("scripts", required: false)
+        <div class="fixed-footer"></div>
     </body>
 </html>

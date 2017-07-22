@@ -12,14 +12,13 @@ import { Observable } from 'rxjs/Observable';
 
 //sevices
 import { ChatAuthenticationService } from './chat-authentication.service';
-import { StateStorageService } from './state-storage.service';
 
 
 
 @Injectable()
 export class ChatConnectionService {
 
-    constructor(private chatAuthenticationService: ChatAuthenticationService, private stateStorageService : StateStorageService) { }
+    constructor(private chatAuthenticationService: ChatAuthenticationService) { }
 
 
     //returns an observable for direct line object

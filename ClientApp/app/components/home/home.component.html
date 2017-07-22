@@ -5,7 +5,7 @@
         <button (click)="clickMe()">Click Me</button>
         <div *ngIf="users?.length > 0">
             <ul>
-                <li *ngFor="let user of users">{{user.conversationId}}</li>
+                <li *ngFor="let user of users">{{user}}</li>
             </ul>
         </div>
         <section>

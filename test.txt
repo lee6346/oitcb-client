@@ -1,3 +1,0 @@
-﻿typings.json
-bower.json
-systemjs.config.js

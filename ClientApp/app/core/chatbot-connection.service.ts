@@ -12,14 +12,14 @@ import { Observable } from 'rxjs/Observable';
 
 //sevices
 import { ChatBotTokenService } from './chatbot-token.service';
-import { StateStorageService } from './state-storage.service';
+
 
 
 
 @Injectable()
 export class ChatBotConnectionService {
 
-    constructor(private chatBotTokenService : ChatBotTokenService, private stateStorageService: StateStorageService) { }
+    constructor(private chatBotTokenService : ChatBotTokenService) { }
 
 
     //returns an observable for direct line object
@@ -31,9 +31,7 @@ export class ChatBotConnectionService {
                 watermark: null,
             })
         );
-
     }
-
 
     // restart new directLine connection
     public restartConnection(directLine: DirectLine): void {

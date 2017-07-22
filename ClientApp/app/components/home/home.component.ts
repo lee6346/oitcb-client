@@ -13,21 +13,22 @@ import { UserService } from '../../services/user.service';
 import { LiveRequest } from '../../model/LiveRequest';
 import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import { Observable } from 'rxjs';
-
+import { LiveRequestService } from '../../services/live-request.service';
 @Component({
     selector: 'home',
     templateUrl: './home.component.html',
     styleUrls: ['./home.component.css'],
-    providers: [ChatService, ChatConnectionService, UserService, ChatAuthenticationService], 
+    providers: [ChatService, ChatConnectionService, UserService, ChatAuthenticationService, LiveRequestService], 
 })
 export class HomeComponent {
 
     public showModal: boolean = false;
     //test
-    public users: LiveRequest[];
-    public requestUrl: string = 'localhost:523131/api/AgentTransfer/PendingRequests';
+    public users: string[];
 
-    constructor(private http: Http) {
+    public requestUrl: string = '/api/AgentTransfer/MakeRequest';
+
+    constructor(private liveservice: LiveRequestService) {
         
     }
     showConver() {
@@ -39,11 +40,19 @@ export class HomeComponent {
     }
     //test
     clickMe() {
+
+        this.liveservice.sendLiveRequest$("122-ds-3-dds").subscribe(msg => { console.log(msg) });
+
+        /*
         let headers = new Headers({
             'Content-Type': 'application/json'
         });
+        
+        let conv = { ID: "jdiw-39=d32" };
+        let conv2 = { action: 'remove', ID: "jdk-ssald" } ;
         let options = new RequestOptions({ headers: headers });
-        this.http.get(this.requestUrl, options).subscribe(res => { this.users = res.json(); }, error => console.log("Error: " + error));
+        this.http.post(this.requestUrl, conv2, options).map(res => res.json()).subscribe(res => console.log(res), error => console.log("Error: " + error));
+        */
     }
 
 

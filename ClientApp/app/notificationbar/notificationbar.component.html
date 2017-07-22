@@ -1,0 +1,18 @@
+﻿<div [style.display]="isDisplayed? 'inherit':'none'" id="mySidenav" class="sidenav column-font">
+    <!--<div *ngIf=""class="loader"></div> -->
+    <ul *ngIf="requests?.length > 0" []="">
+        <li *ngFor="let req of requests | async">
+            <a href="#" (click)="acceptRequest(req)">{{req['conv_Id']}}</a>
+        </li>
+    </ul>
+        <!-- <vertical-tab light-up-directive (click)="dosomething()"> </vertical-tab>
+        <pending-bar></pending-bar>
+
+        <assisting-bar></assisting-bar> -->
+
+    </div>
+
+<div id="main">
+    <span style="font-size:30px;cursor:pointer" (click)="openBar()">&#9776; open</span>
+</div>
+<!--<div class="vertical-tab">&#9776;</div>-->

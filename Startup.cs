@@ -10,10 +10,18 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using chatbot_portal.Data;
+using chatbot_portal.Services;
+using chatbot_portal.Interfaces;
+using WebSocketManager;
+using chatbot_portal.Models.ConfigModels;
+
+
+
 namespace chatbot_portal
 {
     public class Startup
     {
+       
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
@@ -21,31 +29,49 @@ namespace chatbot_portal
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
+            if (env.IsDevelopment())
+            {
+               // builder.AddUserSecrets<Startup>();
+            }
             Configuration = builder.Build();
         }
 
         public IConfigurationRoot Configuration { get; }
+        
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+
+
+            //EF dbset services
             services.AddDbContext<DatabaseContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-            // Add framework services.
-            // services.AddCors();
-            services.AddMvc();/*.AddJsonOptions(options =>
-            {
-                options.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver();
-            }); */
+
+            services.AddOptions();
+
+
+            //Config options services
+            //services.Configure<AppSecretConfig>(Configuration.GetSection("AppSecrets"));
+            //services.Configure<ConnectionStringConfig>(Configuration.GetSection("ConnectionStrings"));
+            services.Configure<ChatBotOptions>(Configuration);
+
+            //chatbot token services
+            services.AddScoped<ISecretTokenService, SecretTokenService>();
+
+            //Socket services
+            services.AddWebSocketManager();
+            //framework services.
+            services.AddMvc();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IServiceProvider serviceProvider, DatabaseContext context)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
-            //if we are in development stage, use the webpack dev middleware configration (webpack.config.js)
-            // and set HMR to true
+            
+            // HMR true for dev stage
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -57,25 +83,25 @@ namespace chatbot_portal
             {
                 app.UseExceptionHandler("/Home/Error");
             }
-            //app.UseDefaultFiles();
+
+            
+            
             app.UseStaticFiles();
-            /*
-            app.UseCors(builder =>
-                builder.AllowAnyOrigin()
-                .AllowAnyHeader()
-                .AllowAnyMethod());
-                */
+            app.UseWebSockets();
+            
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
-                //everything not defined in the MVC gets default routed back to the angular application
                 /*
                 routes.MapSpaFallbackRoute(
                     name: "spa-fallback",
-                    defaults: new { controller = "Home", action = "Index" });  */
+                    defaults: new { controller = "Home", action = "Index" });      */
             });
+            app.MapWebSocketManager("/socketconnection", serviceProvider.GetService<LiveRequestService>());
+
+            //DbInitializer.Initialize(context);
 
         }
     }

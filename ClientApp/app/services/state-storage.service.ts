@@ -39,6 +39,15 @@ export class StateStorageService {
         return localStorage.getItem("chatbotuserid");
     }
 
+    public storeSocketId(socketId: string) {
+        if (this.storageAvailable('localStorage')) {
+            localStorage.setItem("socketid", socketId);
+        }
+    }
+
+    public getSocketId(): string {
+        return localStorage.getItem("socketid");
+    }
 
     public removeConversationId() {
         localStorage.removeItem("chatbotconversationid");
@@ -50,6 +59,10 @@ export class StateStorageService {
 
     public removeUserId() {
         localStorage.removeItem("chatbotuserid")
+    }
+
+    public removeSocketId() {
+        localStorage.removeItem("socketid");
     }
 
 
