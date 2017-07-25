@@ -2,66 +2,101 @@
 import * as Rx from 'rxjs/Rx';
 import { Component , OnInit, OnDestroy, ElementRef} from '@angular/core';
 import { WebsocketService } from '../../services/websocket.service';
+import { LiveRequestService } from '../../services/live-request.service';
 import { LiveRequest } from '../../model/LiveRequest';
 import { ISubscription } from "rxjs/Subscription";
 import { PendingRequestComponent } from './pendrequest.component';
+import { DatePipe } from '@angular/common';
+import { ChatService } from '../../services/chat.service';
+import { ChatAuthenticationService } from '../../services/chat-authentication.service';
+import { ChatConnectionService } from '../../services/chat-connection.service';
+import { DraggableWindowDirective } from './draggable-window.directive';
+import { DragAndDropDirective } from './drag-and-drop.directive';
+
 
 @Component({
     selector: 'agent',
     templateUrl: './agent.component.html',
-    styleUrls: ['./agent.component.html'],
+    styleUrls: ['./agent.component.css'],
     //providers: [WebsocketService]
 })
 export class AgentComponent implements OnInit, OnDestroy {
 
-    public buttonclicked: boolean = false; 
-    constructor(private elref: ElementRef) { }
-    ngOnInit() { }
-    ngOnDestroy() { }
 
-    public openNav() {
-        this.buttonclicked = this.buttonclicked? false : true;
-    }
-
-    public pullOff(): void {
-        this.elref.nativeElement.getId("mySidenav").style.width = "250px";
-        this.elref.nativeElement.getId("main").style.width = "250px";
-
-    }
-
-
-
-    public pushOn(): void {
-        this.elref.nativeElement.getId("mySidenav").style.width = "0x";
-        this.elref.nativeElement.getId("main").style.width = "0px";
-    }
-
-    /*
     private liveQueue: LiveRequest[];
     private sock_id: string;
-    private request_obs: Rx.Observable<LiveRequest[]>;
     private mysubscription: ISubscription;
-    constructor(private ws: WebsocketService) {
+    
+    private ws_connection: Rx.Observable<any>;
+    private ws_remove: Rx.Observable<LiveRequest>;
+    private ws_add: Rx.Observable<LiveRequest>;
+
+    constructor(private ws: WebsocketService, private lr: LiveRequestService, private auth: ChatAuthenticationService,
+        private conn: ChatConnectionService, private chat: ChatService) {
     }
     //public url: string = "ws://localhost:5000/socketconnection";
 
     ngOnInit() {
-        this.request_obs = this.ws.connectWebSocket$();
-        
-        this.request_obs.first().subscribe(res => { this.sock_id = res["data"]});
-        this.mysubscription = this.request_obs.skip(1).subscribe(res => { console.log(res) });
-        
+        console.log("in");
+
+
+        //this.lr.getDbRequests$().mergeMap(ob => ob).toArray().subscribe(res => console.log(res.length));
+
+        //get pending requests in db
+        this.lr.getDbRequests$().distinct().subscribe(res => this.liveQueue = res);
+
+        //connect to ws
+        this.ws_connection = this.ws.connectWebSocket$();
+        this.ws_connection.take(1).subscribe(res => { this.sock_id = res['data'], console.log(this.sock_id) });
+
+
+   
+        //set of observers for adding/removing requests
+        this.getJsonObjects$(this.ws_connection).filter(x => x['action'] === 'request').subscribe(res => { this.addToQueue(res) });
+        this.getJsonObjects$(this.ws_connection).filter(x => x['action'] === 'remove').subscribe(res => { this.removefromQueue(res) });
+        //this.lr.getDbRequests$().mergeMap(ob => ob).concat(this.getJsonObjects$(this.ws_connection)).toArray().subscribe(res => console.log(res));
+
+
     }
 
     ngOnDestroy() {
-        this.mysubscription.unsubscribe();
-    }*/
-    /*
-    public getReq() {
-        console.log("it worked");
-        this.ws.
-        this.ws.connectWebSocket$(this.url).subscribe(res => { console.log(res) }, err => console.log(err), ()=> console.log("complete"));
-        console.log("it skipped");
+
     }
-    */
+
+    public removefromQueue(lr: LiveRequest): void {
+        let index = this.getQueueIndex(lr['conv_id']);
+        if (index !== -1) {
+            this.liveQueue.splice(index, 1);
+        }
+    }
+
+    public addToQueue(lr: LiveRequest): void {
+        if (this.getQueueIndex(lr['conv_id']) === -1)
+            this.liveQueue.push(lr);
+    }
+
+    public getQueueIndex(id: string): number {
+        return this.liveQueue.findIndex(x => x.conv_id === id);
+    }
+
+    public getJsonObjects$(ws: Rx.Observable<any>): Rx.Observable<LiveRequest> {
+        return ws.skip(1).map(this.parseResponse);
+    }
+
+    public parseResponse(res): LiveRequest {
+        return JSON.parse(res['data']) as LiveRequest;
+    }
+
+
+    public remove() {
+        this.liveQueue.splice(4,1);
+        
+    }
+
+    public acceptRequest(live: LiveRequest): void {
+        console.log(live['conv_id']);
+        this.lr.acceptRequest$(live['conv_id']).subscribe(res => { console.log(res) });
+    }
+
+    public get
 }

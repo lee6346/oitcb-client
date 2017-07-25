@@ -22,6 +22,8 @@ export class WebsocketService {
 
     }
 
+
+
     public connectWebSocketMerge$() {
         return this.mergeDeleter$(this.connectWebSocket$());
     }
@@ -38,6 +40,9 @@ export class WebsocketService {
                 }
             });
                
+    }
+    public extractData(obs) {
+
     }
 
     

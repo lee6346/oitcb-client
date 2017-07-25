@@ -1,0 +1,26 @@
+
+<div class="container-fluid">
+    <div>
+    <h1 class="home-title">OIT Chatbot Services</h1>
+        <button (click)="clickMe()">Click Me</button>
+        <chat-window *ngIf="shownext"></chat-window>
+        <div *ngIf="users?.length > 0">
+            <ul>
+                <li *ngFor="let user of users">{{user}}</li>
+            </ul>
+        </div>
+        <section>
+            
+            <a>
+                Start Chat
+                <img src="../../../../wwwroot/images/roadrunner.png" (click)="showConver()" style="position:relative; top:-20px;" />
+
+            </a>
+                
+        </section>
+    </div>
+    <div>
+        <test-modal *ngIf="showModal" (deleteModal)="removeConver($event)"></test-modal>
+    </div>
+</div>
+

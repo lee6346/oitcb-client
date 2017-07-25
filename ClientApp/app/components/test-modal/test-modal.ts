@@ -9,16 +9,18 @@ import { HomeComponent } from '../home/home.component';
 //services
 import { ChatService } from '../../services/chat.service';
 import { ChatConnectionService } from '../../services/chat-connection.service';
+import { ChatAuthenticationService } from '../../services/chat-authentication.service';
 import { UserService } from '../../services/user.service';
 import { StateStorageService } from '../../services/state-storage.service';
 import * as uuid from 'uuid/v1';
 import { DraggableElementDirective } from './test.directive';
 
+
 @Component({
     selector: 'test-modal',
     templateUrl: './test-modal.html',
     styleUrls: ['./test-modal.css'],
-    providers: [ChatService, ChatConnectionService], 
+    providers: [ChatService, ChatConnectionService, ChatAuthenticationService], 
 })
 export class TestModal implements OnInit, OnDestroy{
 
@@ -29,11 +31,11 @@ export class TestModal implements OnInit, OnDestroy{
 
     private myuid: string;
     private directLine;
-
+    private conv_id: string;
     connected: boolean = false;
     defaultVal: string = null;
 
-    constructor(private chatConnectionService: ChatConnectionService, private chatService: ChatService) {
+    constructor(private chatConnectionService: ChatConnectionService, private chatService: ChatService, private authService: ChatAuthenticationService) {
         this.deleteModal = new EventEmitter<boolean>();
         this.myuid = uuid();
     }
@@ -41,8 +43,12 @@ export class TestModal implements OnInit, OnDestroy{
     //  .mergeMap(res => this.chatService.receiveBotActivity$(this.directLine))
     ngOnInit() {
         let timer$ = Observable.timer(2000);
+        this.authService.getConversationObject$().subscribe(res => {this.conv_id = res['conversationId']});
         let connection$ = this.chatConnectionService.startConnection$();
+        connection$.subscribe(res => { console.log(res) });
 
+
+        /*
         timer$
             .switchMap(() => connection$)
             .subscribe(res => {
@@ -52,6 +58,7 @@ export class TestModal implements OnInit, OnDestroy{
                     .subscribe(res => { this.Messages.push(res) });
                 
             });
+        */
     }
 
     ngOnDestroy() {

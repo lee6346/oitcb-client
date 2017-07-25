@@ -1,19 +1,36 @@
 ﻿
-<div class="main-wrap">
-
-<pend-bar >
-
-</pend-bar>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <!--
-<div id="mySidenav" class="sidenav">
-    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-    <a href="#">About</a>
-    <a href="#">Services</a>
-    <a href="#">Clients</a>
-    <a href="#">Contact</a>
+<ul >
+
+    <li  class="pending-item test" draggable-window *ngFor="let pend of liveQueue" (click)="acceptRequest(pend)">{{pend['user']}}: {{pend['date'] }}</li> 
+</ul>
+
+    -->
+
+<!--
+<button draggable-window (click)="remove()">click</button>
+<div class="test" draggable-window>
+    Testing
 </div>
--->
-    <div id="main">
-        <span style="font-size:30px;cursor:pointer" class="testing" (click)="pullOff(); pend.openBar()">&#9776;</span>
+    -->
+<div class="main-content">
+    <div id="pend-list">
+        <div id="pend-title">
+            Pending Requests
+        </div>
+        <ul class="nav">
+            <li class="pending-item test" draggable-window *ngFor="let pend of liveQueue" (click)="acceptRequest(pend)">
+            <i class="fa fa-user-circle-o"></i>   {{pend['user']}}: {{pend['date'] }}
+            </li> 
+        </ul>
     </div>
+    <div class="main-stage">
+        <div class="main-display">
+        </div>
+        <div class="minimize-bar">
+            <div class="minimize-window">Placeholding for Minimized windows</div>
+        </div>
+    </div>
+
 </div>

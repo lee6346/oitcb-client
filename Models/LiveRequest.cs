@@ -8,13 +8,17 @@ namespace chatbot_portal.Models
 {
     public class LiveRequest
     {
-        [Key]
-        public int ConversationID { get; set; }
-        public DateTime RequestMade { get; set; }
-        public int AgentId { get; set; }
-        public DateTime RequestAccepted { get; set; }
-        [Timestamp]
-        public byte[] TIMESTAMP { get; set; }
+        
+        public string conv_id { get; set; }
+        public string action { get; set; }
+        public string date { get; set; }
+        public string user { get; set; }
 
+        /*
+        public override string ToString()
+        {
+            //return "{ conv_id: " + conv_id + ", "
+        }
+        */
     }
 }

@@ -9,6 +9,8 @@ using chatbot_portal.Models;
 using Microsoft.EntityFrameworkCore;
 using chatbot_portal.Services;
 using WebSocketManager.Common;
+using System.Reflection;
+using Newtonsoft.Json;
 
 namespace chatbot_portal.Controllers
 {
@@ -33,20 +35,24 @@ namespace chatbot_portal.Controllers
             var queue = await _dbcontext.ConversationQueue
                 .Select(x => new { conv_id = x.ID, action = "request", datetime = "none", user = "student" })
                 .ToListAsync();
-               
+
+            
+
             return Json(queue);
+            
         }
       
         [HttpPost("[action]")]
         //[ValidateAntiForgeryToken]
-        public async Task<IActionResult> MakeRequest(string conv_id, string action, string datetime, string user)
+        public async Task<IActionResult> MakeRequest([FromBody] Object obj/*string conv_id, string action, string datetime, string user*/)
         {
             
             if(_lrcontext.AgentsAvailable() == 0)
             {
                 return Json(new { available = false} );
-            } 
-            if(await _dbcontext.RequestPending(conv_id) == false)
+            }
+            /*
+            if (await _dbcontext.RequestPending(conv_id) == false)
             {
                 return Json(new { available = "error" });
             }
@@ -58,6 +64,8 @@ namespace chatbot_portal.Controllers
                 datetime = datetime,
                 user = user
             };
+            */
+
             //DateTime.ParseExact(datetime, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
             await _lrcontext.SendMessageToAllAsync(new Message { MessageType = MessageType.Text, Data = obj.ToString() });
 
@@ -65,24 +73,42 @@ namespace chatbot_portal.Controllers
         }
 
         [HttpPost("[action]")]
-        public async Task<IActionResult> AcceptRequest(string conv_id, string action, string datetime, string user)
+        public async Task<IActionResult> AcceptRequest([FromBody] Object obj)
         {
+            /*
             var obj = new
             {
                 conv_id = conv_id,
                 action = action,
                 datetime = datetime,
                 user = user
-            };
+            };*/
             // this broadcast message is of action type remove
+
+
             await _lrcontext.SendMessageToAllAsync(new Message { MessageType = MessageType.Text, Data = obj.ToString() });
-            var result = await _dbcontext.DeleteRequest(conv_id);
+            
+
+           // Type t = obj.GetType();
+            //string conv = (string)t.GetProperty("conv_id").GetValue(obj, null);
+            //PropertyInfo[] props = obj.GetType().GetProperties();
+            //string test = props[2].Name;
+            /*
+            foreach(PropertyInfo prop in props)
+            {
+                if (prop.Name.Equals("conv_id")){
+                    conv_id = prop.GetValue(obj, null);
+                }
+            }
+            */
+            //var result = await _dbcontext.DeleteRequest(x.ToString());
+            /*
             if (!result)
             {
-                return Json(BadRequest("Already Removed"));
+                return Json(BadRequest(x.ToString()));
             }
-            
-            return Json(Accepted("Successfully Removed"));
+            */
+            return Json(Accepted());
         }
 
         

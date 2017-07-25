@@ -13,15 +13,15 @@ namespace chatbot_portal.Data
         { }
         public DbSet<Agent> Agents { get; set; }
         public DbSet<Conversation> ConversationQueue { get; set; }
-        public DbSet<LiveRequest> LiveRequests { get; set; }
+       // public DbSet<LiveRequest> LiveRequests { get; set; }
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Agent>().ToTable("AGENT");
-            modelBuilder.Entity<Conversation>().ToTable("USERQUEUE");
-            modelBuilder.Entity<LiveRequest>().ToTable("LIVEREQUEST");
-            modelBuilder.Entity<LiveRequest>().Property(lr => lr.RequestMade).HasDefaultValueSql("getdate()");
-            modelBuilder.Entity<LiveRequest>().Property(lr => lr.RequestAccepted).HasDefaultValueSql("getdate()");
+            modelBuilder.Entity<Agent>().ToTable("_AGENT");
+            modelBuilder.Entity<Conversation>().ToTable("_USERQUEUE");
+           // modelBuilder.Entity<LiveRequest>().ToTable("LIVEREQUEST");
+           // modelBuilder.Entity<LiveRequest>().Property(lr => lr.RequestMade).HasDefaultValueSql("getdate()");
+           // modelBuilder.Entity<LiveRequest>().Property(lr => lr.RequestAccepted).HasDefaultValueSql("getdate()");
 
 
 

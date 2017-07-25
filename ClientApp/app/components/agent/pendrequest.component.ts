@@ -37,6 +37,7 @@ export class PendingRequestComponent implements OnInit, OnDestroy, OnChanges {
     ngOnInit() {
         this.isLoading = true;
         this.isDisplayed = true;
+        console.log("at agent");
         //this.request_obs = this.liveRequestService.getDbRequests$();
         
         this.dbsubscriber = this.liveRequestService.getDbRequests$().map(res => res['conv_id'])

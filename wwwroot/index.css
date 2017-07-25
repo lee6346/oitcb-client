@@ -1,8 +1,7 @@
 ﻿
 html, body{
-    background: transparent;
+
     margin: 0;
-    padding: 0px 6px 0px 6px;
     min-height: 100%;
 
 }
@@ -11,15 +10,4 @@ html{
     height: 100%;
 }
 
-.fixed-footer {
-    position: fixed;
-    min-height: 40px;
-    background-color: #0c2340;
-    bottom: 0px;
-    left: 0px;
-    right: 0px;
-    margin-bottom: 0px;
-    padding: 0px 10px 0px 10px;
-    margin-left: 10px;
-    margin-right: 10px;
-}
+

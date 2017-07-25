@@ -15,7 +15,7 @@ export class DraggableElementDirective implements OnInit{
         this.mouseup.emit(event);
     }
 
-    @HostListener('document:mousedown', ['$event']) onMouseDown(event: MouseEvent) {
+    @HostListener('mousedown', ['$event']) onMouseDown(event: MouseEvent) {
         this.mousedown.emit(event);
     }
 
