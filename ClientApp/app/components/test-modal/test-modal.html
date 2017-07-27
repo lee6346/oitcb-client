@@ -1,4 +1,41 @@
-﻿<div draggable-element class="body modal custom modal-dialog" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+﻿<div class="chat-window">
+    <div class="window-header">
+        <button type="button" class="close-button" (click)="closeModal()"><span aria-hidden="true">&times;</span></button>
+        <button type="button" class="minimize-button" (click)="minimizeWindow()"><span aria-hidden="true">&minus;</span></button>
+
+        <h4 class="window-title">OIT ChatBot</h4>
+    </div>
+    <div class="window-body">
+        <div class="message-display">
+            
+            <div *ngIf="notConnected" class="loader">
+
+            </div>
+                
+            <ul *ngIf="Messages">
+                <li *ngFor="let msg of Messages"
+                    class="msg-row" [ngClass]="msgAlignment(msg.from.id)" >
+                    <span class="bubble" [ngClass]="bubbleProperties(msg.from.id)">{{msg['text']}}</span>
+                </li>
+            </ul>
+
+        </div>
+        <div class="partition"></div>
+        <div class="input-area">
+            <input #msgref type="text" [(ngModel)]="defaultVal" class="text-input" (keyup.enter)="submitMessage(msgref.value)" />
+        </div>
+        <div class="button-container">
+            <button type="button" class="req-button" (click)="makeLiveRequest()">Live Request</button>
+        </div>
+    </div>
+
+</div>
+
+
+
+<!--
+
+<div draggable-element class="body modal custom modal-dialog" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header" >
@@ -8,7 +45,11 @@
             <div class="modal-body">
 
                 <div class="chat-display">
-                    <ul>
+                        <div *ngIf="notConnected" class="loader">
+                            
+                        </div>
+
+                    <ul *ngIf="Messages">
                         <li class="msg-bubble chatmessages" *ngFor="let msg of Messages">{{msg}}</li>
                     </ul>
 
@@ -27,3 +68,5 @@
         </div>
     </div>
 </div>
+
+    -->

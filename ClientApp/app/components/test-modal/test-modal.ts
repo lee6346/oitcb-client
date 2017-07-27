@@ -4,8 +4,9 @@ import { FormsModule } from '@angular/forms';
 //rxjs libs
 import { Observable } from 'rxjs/Observable';
 import 'rxjs';
+import { NgStyle, NgClass } from '@angular/common';
 import { Conversation } from 'botframework-directlinejs';
-import { DirectLine, ConnectionStatus, IActivity } from 'botframework-directlinejs';
+import { DirectLine, ConnectionStatus, IActivity, Activity } from 'botframework-directlinejs';
 import { HomeComponent } from '../home/home.component';
 //services
 import { ChatService } from '../../services/chat.service';
@@ -16,6 +17,7 @@ import { StateStorageService } from '../../services/state-storage.service';
 import * as uuid from 'uuid/v1';
 import { DraggableElementDirective } from './test.directive';
 import { LiveRequestService } from '../../services/live-request.service';
+import { ISubscription } from "rxjs/Subscription";
 
 @Component({
     selector: 'test-modal',
@@ -28,7 +30,7 @@ export class TestModal implements OnInit, OnDestroy{
     @Output() deleteModal: EventEmitter<boolean>;
 
     isshowing: boolean = false;
-    Messages: string[] = ["welcome"];
+    Messages: Activity[] = [];
 
     private myuid: string;
     private directLine: DirectLine;
@@ -36,6 +38,10 @@ export class TestModal implements OnInit, OnDestroy{
     connected: boolean = false;
     defaultVal: string = null;
     private conv: Conversation;
+    private botSubscription: ISubscription;
+    private agentSubscription: ISubscription;
+    private botHandle: string = 'AskRowdy';
+    private notConnected: boolean = true;
 
     constructor(private chatConnectionService: ChatConnectionService, private chatService: ChatService,
         private authService: ChatAuthenticationService, private liveService: LiveRequestService) {
@@ -45,16 +51,23 @@ export class TestModal implements OnInit, OnDestroy{
 
     //  .mergeMap(res => this.chatService.receiveBotActivity$(this.directLine))
     ngOnInit() {
-        //let timer$ = Observable.timer(2000);
-        this.authService.getConversationObject$().subscribe(res => {
+        let timer$ = Observable.timer(10000);
+        let timer2$ = Observable.timer(2000);
+        timer2$.switchMap(() =>
+        this.authService.getConversationObject$()).subscribe(res => {
             this.conv = res;
             this.conv_id = res['conversationId'];
             console.log(res);
             this.directLine = this.chatConnectionService.startConnection$(res);
-            this.directLine.activity$.filter(res => res.from.id !== this.myuid)
-                .map(act => act['text']).subscribe(res => { this.Messages.push(res) });
+            this.notConnected = false;
 
         });
+        this.botSubscription = timer$
+            .switchMap(() => this.directLine.activity$)
+            .filter(res => res.from.id !== this.myuid)
+            .subscribe(res => { this.Messages.push(res) });
+
+        
         /*
         this.authService.getConversationObject$().subscribe(res => {this.conv_id = res['conversationId']});
         let connection$ = this.chatConnectionService.startConnection$();
@@ -82,8 +95,12 @@ export class TestModal implements OnInit, OnDestroy{
     submitMessage(sendingMessage: string) {
         this.defaultVal = '';
         if (sendingMessage !== '') {
-            this.Messages.push(sendingMessage);
-            this.chatService.sendMessage(this.directLine, sendingMessage, this.myuid);
+            let act = { from: { id: this.myuid }, type: 'message', text: sendingMessage } as Activity;
+
+            this.directLine.postActivity(act).subscribe(
+                id => console.log("posted activity, assigned ID ", id),
+                error => console.log("Error posting activity", error));
+            this.Messages.push(act);
         }
     }
 
@@ -93,6 +110,35 @@ export class TestModal implements OnInit, OnDestroy{
     public makeLiveRequest() {
         console.log(this.conv_id);
         this.liveService.sendLiveRequest$(this.conv_id).subscribe(msg => { console.log(msg) });
+        this.botSubscription.unsubscribe();
+        this.directLine.activity$.filter(res => res.from.id !== this.myuid).filter(res => res.from.id !== this.botHandle)
+            .subscribe(res => { this.Messages.push(res) });
+
+    }
+    public msgAlignment(id: string) {
+        if (id === this.myuid) {
+            return {
+                'align-window-right': true,
+            };
+        }
+        else return {
+            'align-window-left': true,
+        };
+    }
+
+    public bubbleProperties(id: string) {
+        if (id === this.myuid) {
+            return {
+                'align-window-right': true,
+                'host-bubble': true,
+            };
+        }
+        else return {
+            'align-window-left': true,
+            'remote-bubble': true,
+        };
+    }
+    public minimizeWindow() {
 
     }
 

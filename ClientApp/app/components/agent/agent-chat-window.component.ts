@@ -59,7 +59,7 @@ export class AgentChatWindowComponent implements OnInit, OnDestroy {
 
             });
             
-            this.directLine.activity$.filter(res => res.from.id !== this.myuid)
+            this.directLine.activity$.filter(res => res.from.id !== this.myuid).filter(res => res.from.id !== this.botHandle)
                 .subscribe(res => this.messages.push(res));
         });
 

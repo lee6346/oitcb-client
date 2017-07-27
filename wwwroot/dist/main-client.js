@@ -59,7 +59,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "bbb2a34e8e208f3b11bf"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "d4772d2e4b2f7a282409"; // eslint-disable-line no-unused-vars
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
 /******/ 	var hotCurrentParents = []; // eslint-disable-line no-unused-vars
@@ -5546,7 +5546,6 @@ var app_component_1 = __webpack_require__(97);
 var navmenu_component_1 = __webpack_require__(101);
 var home_component_1 = __webpack_require__(100);
 var contact_component_1 = __webpack_require__(99);
-var comments_component_1 = __webpack_require__(98);
 var test_modal_1 = __webpack_require__(102);
 var chat_window_component_1 = __webpack_require__(94);
 var pendrequest_component_1 = __webpack_require__(96);
@@ -5560,7 +5559,6 @@ exports.sharedConfig = {
         navmenu_component_1.NavMenuComponent,
         home_component_1.HomeComponent,
         contact_component_1.ContactComponent,
-        comments_component_1.CommentsComponent,
         test_modal_1.TestModal,
         chat_window_component_1.ChatWindowComponent,
         pendrequest_component_1.PendingRequestComponent,
@@ -5575,7 +5573,6 @@ exports.sharedConfig = {
             { path: '', redirectTo: 'home', pathMatch: 'full' },
             { path: 'home', component: home_component_1.HomeComponent },
             { path: 'agent', component: agent_component_1.AgentComponent },
-            { path: 'comments', component: comments_component_1.CommentsComponent },
             { path: 'contact', component: contact_component_1.ContactComponent },
             { path: '**', redirectTo: 'home' }
         ])
@@ -5849,54 +5846,7 @@ exports.AppComponent = AppComponent;
 
 
 /***/ }),
-/* 98 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var core_1 = __webpack_require__(5);
-var http_1 = __webpack_require__(21);
-var CommentsComponent = (function () {
-    function CommentsComponent(http) {
-        this.http = http;
-        this.requestUrl = '/api/AgentTransfer/PendingRequests';
-        this.queueEmpty = true;
-    }
-    CommentsComponent.prototype.addtoList = function () {
-        var _this = this;
-        var headers = new http_1.Headers({
-            'Content-Type': 'application/json'
-        });
-        var options = new http_1.RequestOptions({ headers: headers });
-        this.http.get(this.requestUrl, options).subscribe(function (res) { _this.users = res.json(); }, function (error) { return console.log("Error: " + error); });
-        //this.getList().subscribe(x => { console.log(x) });
-    };
-    CommentsComponent.prototype.getList = function () {
-        return this.http.get(this.requestUrl); //.map(data => data.json());
-    };
-    return CommentsComponent;
-}());
-CommentsComponent = __decorate([
-    core_1.Component({
-        selector: 'comments',
-        template: __webpack_require__(119),
-    }),
-    __metadata("design:paramtypes", [http_1.Http])
-], CommentsComponent);
-exports.CommentsComponent = CommentsComponent;
-
-
-/***/ }),
+/* 98 */,
 /* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -6044,6 +5994,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 //ng libs
 var core_1 = __webpack_require__(5);
+//rxjs libs
+var Observable_1 = __webpack_require__(0);
 __webpack_require__(42);
 //services
 var chat_service_1 = __webpack_require__(30);
@@ -6058,24 +6010,32 @@ var TestModal = (function () {
         this.authService = authService;
         this.liveService = liveService;
         this.isshowing = false;
-        this.Messages = ["welcome"];
+        this.Messages = [];
         this.connected = false;
         this.defaultVal = null;
+        this.botHandle = 'AskRowdy';
+        this.notConnected = true;
         this.deleteModal = new core_1.EventEmitter();
         this.myuid = uuid();
     }
     //  .mergeMap(res => this.chatService.receiveBotActivity$(this.directLine))
     TestModal.prototype.ngOnInit = function () {
         var _this = this;
-        //let timer$ = Observable.timer(2000);
-        this.authService.getConversationObject$().subscribe(function (res) {
+        var timer$ = Observable_1.Observable.timer(10000);
+        var timer2$ = Observable_1.Observable.timer(2000);
+        timer2$.switchMap(function () {
+            return _this.authService.getConversationObject$();
+        }).subscribe(function (res) {
             _this.conv = res;
             _this.conv_id = res['conversationId'];
             console.log(res);
             _this.directLine = _this.chatConnectionService.startConnection$(res);
-            _this.directLine.activity$.filter(function (res) { return res.from.id !== _this.myuid; })
-                .map(function (act) { return act['text']; }).subscribe(function (res) { _this.Messages.push(res); });
+            _this.notConnected = false;
         });
+        this.botSubscription = timer$
+            .switchMap(function () { return _this.directLine.activity$; })
+            .filter(function (res) { return res.from.id !== _this.myuid; })
+            .subscribe(function (res) { _this.Messages.push(res); });
         /*
         this.authService.getConversationObject$().subscribe(res => {this.conv_id = res['conversationId']});
         let connection$ = this.chatConnectionService.startConnection$();
@@ -6099,16 +6059,47 @@ var TestModal = (function () {
     TestModal.prototype.submitMessage = function (sendingMessage) {
         this.defaultVal = '';
         if (sendingMessage !== '') {
-            this.Messages.push(sendingMessage);
-            this.chatService.sendMessage(this.directLine, sendingMessage, this.myuid);
+            var act = { from: { id: this.myuid }, type: 'message', text: sendingMessage };
+            this.directLine.postActivity(act).subscribe(function (id) { return console.log("posted activity, assigned ID ", id); }, function (error) { return console.log("Error posting activity", error); });
+            this.Messages.push(act);
         }
     };
     TestModal.prototype.closeModal = function () {
         this.deleteModal.emit(false);
     };
     TestModal.prototype.makeLiveRequest = function () {
+        var _this = this;
         console.log(this.conv_id);
         this.liveService.sendLiveRequest$(this.conv_id).subscribe(function (msg) { console.log(msg); });
+        this.botSubscription.unsubscribe();
+        this.directLine.activity$.filter(function (res) { return res.from.id !== _this.myuid; }).filter(function (res) { return res.from.id !== _this.botHandle; })
+            .subscribe(function (res) { _this.Messages.push(res); });
+    };
+    TestModal.prototype.msgAlignment = function (id) {
+        if (id === this.myuid) {
+            return {
+                'align-window-right': true,
+            };
+        }
+        else
+            return {
+                'align-window-left': true,
+            };
+    };
+    TestModal.prototype.bubbleProperties = function (id) {
+        if (id === this.myuid) {
+            return {
+                'align-window-right': true,
+                'host-bubble': true,
+            };
+        }
+        else
+            return {
+                'align-window-left': true,
+                'remote-bubble': true,
+            };
+    };
+    TestModal.prototype.minimizeWindow = function () {
     };
     return TestModal;
 }());
@@ -6638,7 +6629,7 @@ exports = module.exports = __webpack_require__(12)(undefined);
 
 
 // module
-exports.push([module.i, "\r\n* {\r\n    box-sizing: border-box;\r\n}\r\n\r\n.main-content {\r\n    width: 100%;\r\n    min-height: 120vh;\r\n    display: -ms-flexbox;\r\n    display: -webkit-box;\r\n    display: -moz-box;\r\n    display: flex;\r\n    -ms-flex-direction: row;\r\n    -webkit-box-orient: horizontal;\r\n    -moz-box-orient: horizontal;\r\n    flex-direction: row;\r\n}\r\n.main-stage {\r\n    display: -ms-flexbox;\r\n    display: -webkit-box;\r\n    display: -moz-box;\r\n    display: flex;\r\n    -ms-flex-direction: column;\r\n    -webkit-box-orient: vertical;\r\n    -moz-box-orient: vertical;\r\n    flex-direction: column;\r\n    -ms-flex: 1;\r\n    -webkit-box-flex: 1;\r\n    -moz-box-flex: 1;\r\n    flex: 1;\r\n    width: 1400px;\r\n    order: -1;\r\n    padding: 15px;\r\n}\r\n\r\n.info-panel {\r\n    display: -ms-flexbox;\r\n    display: -webkit-box;\r\n    display: -moz-box;\r\n    display: flex;\r\n    -ms-flex-direction: column;\r\n    -webkit-box-orient: vertical;\r\n    -moz-box-orient: vertical;\r\n    flex-direction: column;\r\n    -webkit-flex: 0;\r\n    -webkit-box-flex: 0;\r\n    -moz-box-flex: 0;\r\n    flex: 0;\r\n    background: #fff;\r\n    border-left: 4px solid #0c2340;\r\n    padding: .3em;\r\n    overflow-y: auto;\r\n}\r\n\r\n.home-title {\r\n    color: #0c2340;\r\n    font-weight: 900;\r\n    font-size: 9.00rem;\r\n    border-bottom: 10px solid #0c2340;\r\n    margin-right: 25px;\r\n\r\n\r\n}\r\n.title-header {\r\n    -ms-flex: 0;\r\n    -webkit-box-flex: 0;\r\n    -moz-box-flex: 0;\r\n    flex: 0 15vh;\r\n    border-bottom: 10px solid #f15a22;\r\n    margin-right: 150px;\r\n    order: -1;\r\n\r\n}\r\n.main-display {\r\n    display: -ms-flexbox;\r\n    display: -webkit-box;\r\n    display: -moz-box;\r\n    display: flex;\r\n    -ms-flex-direction: row;\r\n    -webkit-box-orient: horizontal;\r\n    -moz-box-orient: horizontal;\r\n    flex-direction: row;\r\n    -ms-flex: 1;\r\n    -webkit-box-flex: 1;\r\n    -moz-box-flex: 1;\r\n    flex: 1;\r\n    order: 0;\r\n    border: 1px solid black;\r\n}\r\n\r\n.chat-options {\r\n    -webkit-flex: 0;\r\n    -webkit-box-flex: 0;\r\n    -moz-box-flex: 0;\r\n    flex: 0 22vw;\r\n    order: -1;\r\n    border: 1px solid black;\r\n\r\n}\r\n.chat-window {\r\n    -webkit-flex: 0;\r\n    -webkit-box-flex: 0;\r\n    -moz-box-flex: 0;\r\n    flex: 1;\r\n    order: 0;\r\n    border: 1px solid black;\r\n}\r\n.feedback-center {\r\n    -webkit-flex: 0;\r\n    -webkit-box-flex: 0;\r\n    -moz-box-flex: 0;\r\n    flex: 0 24vw;\r\n    order: 1;\r\n    border: 1px solid black;\r\n}\r\n\r\n.chat-button {\r\n    border-radius: 10px;\r\n    border: 8px solid #0c2340;\r\n    background: #808080;\r\n    padding: 0px;\r\n    width: 250px;\r\n    height: 250px;\r\n    margin-top: 150px;\r\n    margin-left: 35px;\r\n    justify-content: center;\r\n    cursor:pointer;\r\n}\r\n.button-image{\r\n    width: 80%;\r\n    height: 100%;\r\n    margin: auto;\r\n    display:block;\r\n    \r\n\r\n}\r\n\r\n.unknown {\r\n    -ms-flex: 0;\r\n    -webkit-box-flex: 0;\r\n    -moz-box-flex: 0;\r\n    flex: 0 30vh;\r\n    border: 1px solid black;\r\n    order: 1;\r\n}\r\n.bot-info {\r\n    -ms-flex: 1;\r\n    -webkit-box-flex: 1;\r\n    -moz-box-flex: 1;\r\n    flex: 1;\r\n\r\n}\r\n\r\n.bot-menu {\r\n    -ms-flex: 0;\r\n    -webkit-box-flex: 0;\r\n    -moz-box-flex: 0;\r\n    flex: 0 20vh;\r\n}\r\n\r\n::-webkit-scrollbar-track {\r\n    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);\r\n    border-radius: 10px;\r\n    background-color: #F5F5F5;\r\n}\r\n\r\n::-webkit-scrollbar {\r\n    width: 12px;\r\n    background-color: #F5F5F5;\r\n}\r\n\r\n::-webkit-scrollbar-thumb {\r\n    border-radius: 10px;\r\n    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);\r\n    background-color: #0c2340;\r\n}\r\n/*\r\n.chat-button {\r\n    margin: auto;\r\n    width: 200px;\r\n    height: 150px;\r\n    display: flex;\r\n    justify-content: center;\r\n    border-color: #0c2340;\r\n    border: 2px, solid;\r\n    border-radius: 15px;\r\n    background-color: #f15a22;\r\n    color: #0c2340;\r\n    font-weight: 900;\r\n    font-size: 2.00rem;\r\n}\r\n\r\nsection {\r\n    margin: 150px auto 0;\r\n    width: 75px;\r\n    height: 95px;\r\n    position: relative;\r\n    text-align: center;\r\n}\r\n\r\n:active, :focus {\r\n    outline: 0;\r\n}\r\n\r\na {\r\n    color: #0c2340;\r\n    text-shadow: 0px 1px 1px #0c2340;\r\n    font-size: 4.50rem;\r\n    font-weight: 900;\r\n    display: block;\r\n    position: relative;\r\n    text-decoration: none;\r\n    background-color: #f15a22;\r\n    box-shadow: 0px 3px 0px 0px #0c2340, \r\n    0px 7px 10px 0px #0c2340, \r\n    inset 0px 1px 1px 0px #0c2340, \r\n    inset 0px -12px 35px 0px #0c2340; \r\n    width: 400px;\r\n    height: 300px;\r\n    border: 0;\r\n    border-radius: 20px;\r\n    text-align: center;\r\n    line-height: 79px;\r\n    transition: color 350ms, text-shadow 350ms;\r\n    -o-transition: color 350ms, text-shadow 350ms;\r\n    -moz-transition: color 350ms, text-shadow 350ms;\r\n    -webkit-transition: color 350ms, text-shadow 350ms;\r\n}\r\n\r\na + span {\r\n    display: block;\r\n    width: 8px;\r\n    height: 8px;\r\n    background-color: rgb(226,0,0);\r\n    box-shadow: inset 0px 1px 0px 0px rgba(250,250,250,0.5), 0px 0px 3px 2px rgba(226,0,0,0.5);\r\n    border-radius: 4px;\r\n    clear: both;\r\n    position: absolute;\r\n    bottom: 0;\r\n    left: 42%;\r\n}\r\n\r\na:active {\r\n    box-shadow: 0px 0px 0px 0px rgb(34,34,34),\r\n    0px 3px 7px 0px rgb(17,17,17), \r\n    inset 0px 1px 1px 0px rgba(250, 250, 250, .2),\r\n    inset 0px -10px 35px 5px rgba(0, 0, 0, .5);\r\n    background-color: rgb(83,87,93);\r\n    top: 3px;\r\n}\r\n\r\na:target {\r\n    box-shadow: 0px 0px 0px 0px rgb(34,34,34), 0px 3px 7px 0px rgb(17,17,17), inset 0px 1px 1px 0px rgba(250, 250, 250, .2), inset 0px -10px 35px 5px rgba(0, 0, 0, .5);\r\n    background-color: rgb(83,87,93);\r\n    top: 3px;\r\n    color: #fff;\r\n    text-shadow: 0px 0px 3px rgb(250,250,250);\r\n}\r\n\r\na:active:before, a:target:before {\r\n    top: -5px;\r\n    background-color: rgb(26,27,29);\r\n    box-shadow: 0px 1px 0px 0px rgba(250,250,250,0.1), inset 0px 1px 2px rgba(0, 0, 0, 0.5);\r\n}\r\n\r\n    a:target + span {\r\n        box-shadow: inset 0px 1px 0px 0px rgba(250,250,250,0.5), 0px 0px 3px 2px rgba(135,187,83,0.5);\r\n        background-color: rgb(135,187,83);\r\n        transition: background-color 350ms, box-shadow 700ms;\r\n        -o-transition: background-color 350ms, box-shadow 700ms;\r\n        -moz-transition: background-color 350ms, box-shadow 700ms;\r\n        -webkit-transition: background-color 350ms, box-shadow 700ms;\r\n    }\r\n\r\n*/\r\n\r\n\r\n", ""]);
+exports.push([module.i, "\r\n* {\r\n    box-sizing: border-box;\r\n}\r\n\r\n.main-content {\r\n    width: 100%;\r\n    min-height: 90vh;\r\n    display: -ms-flexbox;\r\n    display: -webkit-box;\r\n    display: -moz-box;\r\n    display: flex;\r\n    -ms-flex-direction: row;\r\n    -webkit-box-orient: horizontal;\r\n    -moz-box-orient: horizontal;\r\n    flex-direction: row;\r\n}\r\n.main-stage {\r\n    display: -ms-flexbox;\r\n    display: -webkit-box;\r\n    display: -moz-box;\r\n    display: flex;\r\n    -ms-flex-direction: column;\r\n    -webkit-box-orient: vertical;\r\n    -moz-box-orient: vertical;\r\n    flex-direction: column;\r\n    -ms-flex: 1;\r\n    -webkit-box-flex: 1;\r\n    -moz-box-flex: 1;\r\n    flex: 1;\r\n    width: 1400px;\r\n    order: -1;\r\n    padding: 15px;\r\n}\r\n\r\n.info-panel {\r\n    display: -ms-flexbox;\r\n    display: -webkit-box;\r\n    display: -moz-box;\r\n    display: flex;\r\n    -ms-flex-direction: column;\r\n    -webkit-box-orient: vertical;\r\n    -moz-box-orient: vertical;\r\n    flex-direction: column;\r\n    -webkit-flex: 0;\r\n    -webkit-box-flex: 0;\r\n    -moz-box-flex: 0;\r\n    flex: 0;\r\n    background: #fff;\r\n    border-left: 4px solid #0c2340;\r\n    padding: .3em;\r\n    overflow-y: auto;\r\n}\r\n\r\n.home-title {\r\n    color: #0c2340;\r\n    font-weight: 900;\r\n    font-size: 9.00rem;\r\n    border-bottom: 10px solid #0c2340;\r\n    margin-right: 25px;\r\n\r\n\r\n}\r\n.title-header {\r\n    -ms-flex: 0;\r\n    -webkit-box-flex: 0;\r\n    -moz-box-flex: 0;\r\n    flex: 0 15vh;\r\n    border-bottom: 10px solid #f15a22;\r\n    margin-right: 150px;\r\n    order: -1;\r\n\r\n}\r\n.main-display {\r\n    display: -ms-flexbox;\r\n    display: -webkit-box;\r\n    display: -moz-box;\r\n    display: flex;\r\n    -ms-flex-direction: row;\r\n    -webkit-box-orient: horizontal;\r\n    -moz-box-orient: horizontal;\r\n    flex-direction: row;\r\n    -ms-flex: 1;\r\n    -webkit-box-flex: 1;\r\n    -moz-box-flex: 1;\r\n    flex: 1;\r\n    order: 0;\r\n   /* border: 1px solid black;*/\r\n}\r\n\r\n.chat-options {\r\n    -webkit-flex: 0;\r\n    -webkit-box-flex: 0;\r\n    -moz-box-flex: 0;\r\n    flex: 0 22vw;\r\n    order: -1;\r\n    /*border: 1px solid black; */\r\n    align-items: center;\r\n\r\n}\r\n.chat-window {\r\n    -webkit-flex: 0;\r\n    -webkit-box-flex: 0;\r\n    -moz-box-flex: 0;\r\n    flex: 1;\r\n    order: 0;\r\n   /* border: 1px solid black; */\r\n    align-items: center;\r\n}\r\n.feedback-center {\r\n    -webkit-flex: 0;\r\n    -webkit-box-flex: 0;\r\n    -moz-box-flex: 0;\r\n    flex: 0 24vw;\r\n    order: 1;\r\n   /* border: 1px solid black; */\r\n}\r\n\r\n.chat-button {\r\n    border-radius: 10px;\r\n    border: 8px solid #0c2340;\r\n    background: #808080;\r\n    padding: 0px;\r\n    width: 250px;\r\n    height: 250px;\r\n    margin-top: 150px;\r\n    margin-left: 50px;\r\n    justify-content: center;\r\n    cursor:pointer;\r\n}\r\n.button-image{\r\n    width: 80%;\r\n    height: 100%;\r\n    margin: auto;\r\n    display:block;\r\n    \r\n\r\n}\r\n\r\n.unknown {\r\n    -ms-flex: 0;\r\n    -webkit-box-flex: 0;\r\n    -moz-box-flex: 0;\r\n    flex: 0 30vh;\r\n  /*  border: 1px solid black; */\r\n    order: 1;\r\n}\r\n.bot-info {\r\n    -ms-flex: 1;\r\n    -webkit-box-flex: 1;\r\n    -moz-box-flex: 1;\r\n    flex: 1;\r\n\r\n}\r\n\r\n.bot-menu {\r\n    -ms-flex: 0;\r\n    -webkit-box-flex: 0;\r\n    -moz-box-flex: 0;\r\n    flex: 0 20vh;\r\n}\r\n\r\n::-webkit-scrollbar-track {\r\n    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);\r\n    border-radius: 10px;\r\n    background-color: #F5F5F5;\r\n}\r\n\r\n::-webkit-scrollbar {\r\n    width: 12px;\r\n    background-color: #F5F5F5;\r\n}\r\n\r\n::-webkit-scrollbar-thumb {\r\n    border-radius: 10px;\r\n    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);\r\n    background-color: #0c2340;\r\n}\r\n/*\r\n.chat-button {\r\n    margin: auto;\r\n    width: 200px;\r\n    height: 150px;\r\n    display: flex;\r\n    justify-content: center;\r\n    border-color: #0c2340;\r\n    border: 2px, solid;\r\n    border-radius: 15px;\r\n    background-color: #f15a22;\r\n    color: #0c2340;\r\n    font-weight: 900;\r\n    font-size: 2.00rem;\r\n}\r\n\r\nsection {\r\n    margin: 150px auto 0;\r\n    width: 75px;\r\n    height: 95px;\r\n    position: relative;\r\n    text-align: center;\r\n}\r\n\r\n:active, :focus {\r\n    outline: 0;\r\n}\r\n\r\na {\r\n    color: #0c2340;\r\n    text-shadow: 0px 1px 1px #0c2340;\r\n    font-size: 4.50rem;\r\n    font-weight: 900;\r\n    display: block;\r\n    position: relative;\r\n    text-decoration: none;\r\n    background-color: #f15a22;\r\n    box-shadow: 0px 3px 0px 0px #0c2340, \r\n    0px 7px 10px 0px #0c2340, \r\n    inset 0px 1px 1px 0px #0c2340, \r\n    inset 0px -12px 35px 0px #0c2340; \r\n    width: 400px;\r\n    height: 300px;\r\n    border: 0;\r\n    border-radius: 20px;\r\n    text-align: center;\r\n    line-height: 79px;\r\n    transition: color 350ms, text-shadow 350ms;\r\n    -o-transition: color 350ms, text-shadow 350ms;\r\n    -moz-transition: color 350ms, text-shadow 350ms;\r\n    -webkit-transition: color 350ms, text-shadow 350ms;\r\n}\r\n\r\na + span {\r\n    display: block;\r\n    width: 8px;\r\n    height: 8px;\r\n    background-color: rgb(226,0,0);\r\n    box-shadow: inset 0px 1px 0px 0px rgba(250,250,250,0.5), 0px 0px 3px 2px rgba(226,0,0,0.5);\r\n    border-radius: 4px;\r\n    clear: both;\r\n    position: absolute;\r\n    bottom: 0;\r\n    left: 42%;\r\n}\r\n\r\na:active {\r\n    box-shadow: 0px 0px 0px 0px rgb(34,34,34),\r\n    0px 3px 7px 0px rgb(17,17,17), \r\n    inset 0px 1px 1px 0px rgba(250, 250, 250, .2),\r\n    inset 0px -10px 35px 5px rgba(0, 0, 0, .5);\r\n    background-color: rgb(83,87,93);\r\n    top: 3px;\r\n}\r\n\r\na:target {\r\n    box-shadow: 0px 0px 0px 0px rgb(34,34,34), 0px 3px 7px 0px rgb(17,17,17), inset 0px 1px 1px 0px rgba(250, 250, 250, .2), inset 0px -10px 35px 5px rgba(0, 0, 0, .5);\r\n    background-color: rgb(83,87,93);\r\n    top: 3px;\r\n    color: #fff;\r\n    text-shadow: 0px 0px 3px rgb(250,250,250);\r\n}\r\n\r\na:active:before, a:target:before {\r\n    top: -5px;\r\n    background-color: rgb(26,27,29);\r\n    box-shadow: 0px 1px 0px 0px rgba(250,250,250,0.1), inset 0px 1px 2px rgba(0, 0, 0, 0.5);\r\n}\r\n\r\n    a:target + span {\r\n        box-shadow: inset 0px 1px 0px 0px rgba(250,250,250,0.5), 0px 0px 3px 2px rgba(135,187,83,0.5);\r\n        background-color: rgb(135,187,83);\r\n        transition: background-color 350ms, box-shadow 700ms;\r\n        -o-transition: background-color 350ms, box-shadow 700ms;\r\n        -moz-transition: background-color 350ms, box-shadow 700ms;\r\n        -webkit-transition: background-color 350ms, box-shadow 700ms;\r\n    }\r\n\r\n*/\r\n\r\n\r\n", ""]);
 
 // exports
 
@@ -6652,7 +6643,7 @@ exports = module.exports = __webpack_require__(12)(undefined);
 
 
 // module
-exports.push([module.i, "\r\n\r\n\r\n\r\n.icon-bar {\r\n    width: 100%; \r\n    background-color: #0c2340;\r\n    overflow: auto; \r\n}\r\n\r\n    .icon-bar a {\r\n        float: left;\r\n        text-align: center;\r\n        width: 20%;\r\n        padding: 8px 0;\r\n        transition: all 0.3s ease; \r\n        color: #f15a22; \r\n        font-size: 20px;\r\n    }\r\n\r\n        .icon-bar a:hover {\r\n            background-color: rgb(40, 71, 119); \r\n        }\r\n\r\n.active {\r\n    background-color: rgb(40, 71, 119); \r\n}\r\n\r\n", ""]);
+exports.push([module.i, "\r\n\r\n\r\n\r\n.icon-bar {\r\n    width: 100%; \r\n    background-color: #0c2340;\r\n    overflow: auto; \r\n}\r\n\r\n    .icon-bar a {\r\n        float: left;\r\n        text-align: center;\r\n        width: 20%;\r\n        padding: 8px 0;\r\n        transition: all 0.3s ease;\r\n        color: #ffffff;\r\n        font-size: 20px;\r\n    }\r\n\r\n        .icon-bar a:hover {\r\n            background-color: rgb(40, 71, 119); \r\n        }\r\n\r\n.active {\r\n    background-color: rgb(40, 71, 119); \r\n}\r\n\r\n", ""]);
 
 // exports
 
@@ -6666,7 +6657,7 @@ exports = module.exports = __webpack_require__(12)(undefined);
 
 
 // module
-exports.push([module.i, ".modal {\r\n    outline: none;\r\n    width: 100%;\r\n    height:100%;\r\n    margin: 0 auto;\r\n\r\n\r\n}\r\n.custom {\r\n    outline: none;\r\n    width: 100%;\r\n    height: 100%;\r\n    margin: 0 auto;\r\n}\r\n\r\n.modal-dialog {\r\n    width: 100%;\r\n    height: 100%;\r\n    margin: 0 auto;\r\n}\r\n\r\n.loader {\r\n    border: 16px solid #f3f3f3;\r\n    border-radius: 50%;\r\n    border-top: 16px solid #3498db;\r\n    width: 120px;\r\n    height: 120px;\r\n    -webkit-animation: spin 2s linear infinite;\r\n    animation: spin 2s linear infinite;\r\n}\r\n\r\n@-webkit-keyframes spin {\r\n    0% {\r\n        -webkit-transform: rotate(0deg);\r\n    }\r\n\r\n    100% {\r\n        -webkit-transform: rotate(360deg);\r\n    }\r\n}\r\n\r\n@keyframes spin {\r\n    0% {\r\n        transform: rotate(0deg);\r\n    }\r\n\r\n    100% {\r\n        transform: rotate(360deg);\r\n    }\r\n}\r\n\r\n.body {\r\n    display: inline-block;\r\n\r\n}\r\n\r\n.modal-content {\r\n    border-color: #0c2340;\r\n    border: 2px, solid\r\n}\r\n\r\n.chat-display {\r\n    height: 300px;\r\n    border: 1px solid DimGray;\r\n    overflow-y: auto;\r\n    background-color: white;\r\n    \r\n}\r\n\r\n.modal-header {\r\n    background-color: #f15a22;\r\n}\r\n.modal-body {\r\n    background-color: #0c2340;\r\n}\r\n\r\n.modal-footer {\r\n    background-color: #f15a22;\r\n    \r\n}\r\n.input-display {\r\n    background-color: white;\r\n    overflow-y: auto;\r\n    \r\n    \r\n}\r\n.chatmessages {\r\n    overflow: auto;\r\n    position: absolute;\r\n    bottom: 0;\r\n    max-height: 400px;\r\n}\r\n.msg-bubble {\r\n    border: 1px solid;\r\n    border-color: #0c2340;\r\n    border-radius: 15px;\r\n    background-color: orange;\r\n    display: inline-block;\r\n    padding: 5px 11px 5px 11px;\r\n    text-align: justify;\r\n    position: relative;\r\n    margin: auto;\r\n    left: -25px;\r\n    width: 100%\r\n}\r\n\r\n\r\nul {\r\n    list-style-type: none;\r\n\r\n    flex-direction: column-reverse;\r\n}\r\n.text-frame {\r\n    border-top: 15px, solid, #0c2340;\r\n}\r\n.modal-title {\r\n    font-family: sans-serif;\r\n    font-weight: 900;\r\n    font-size: 2.00rem;\r\n    text-shadow: 1px 1px 1px #0c2340;\r\n    text-align: left;\r\n    color: #0c2340;\r\n}\r\n\r\n.btn-primary::before,\r\n.btn-primary:hover,\r\n.btn-primary:focus,\r\n.btn-primary:focus,\r\n.btn-primary:active,\r\n.btn-primary.active {\r\n    color: #ffffff;\r\n    background-color: #0c2340;\r\n    border-color: #0c2340;\r\n}\r\n\r\n.submit-button {\r\n    color: #ffffff;\r\n    background-color: #0c2340;\r\n    border-color: #0c2340;\r\n}\r\n\r\n.exit-button{\r\n\r\n}\r\n\r\n.close {\r\n    color: #0c2340;\r\n    opacity: 0.6;\r\n}", ""]);
+exports.push([module.i, "/*.modal {\r\n    outline: none;\r\n    width: 100%;\r\n    height:100%;\r\n    margin: 0 auto;\r\n\r\n\r\n}\r\n.custom {\r\n    outline: none;\r\n    width: 100%;\r\n    height: 100%;\r\n    margin: 0 auto;\r\n}\r\n\r\n.modal-dialog {\r\n    width: 100%;\r\n    height: 100%;\r\n    margin: 0 auto;\r\n}\r\n\r\n\r\n.body {\r\n    display: inline-block;\r\n\r\n}\r\n\r\n.modal-content {\r\n    border-color: #0c2340;\r\n    border: 2px, solid\r\n}\r\n\r\n.chat-display {\r\n    height: 300px;\r\n    border: 1px solid DimGray;\r\n    overflow-y: auto;\r\n    background-color: white;\r\n    \r\n}\r\n\r\n.modal-header {\r\n    background-color: #f15a22;\r\n}\r\n.modal-body {\r\n    background-color: #0c2340;\r\n}\r\n\r\n.modal-footer {\r\n    background-color: #f15a22;\r\n    \r\n}\r\n.input-display {\r\n    background-color: white;\r\n    overflow-y: auto;\r\n    \r\n    \r\n}\r\n.chatmessages {\r\n    overflow: auto;\r\n    position: absolute;\r\n    bottom: 0;\r\n    max-height: 400px;\r\n}\r\n.msg-bubble {\r\n    border: 1px solid;\r\n    border-color: #0c2340;\r\n    border-radius: 15px;\r\n    background-color: orange;\r\n    display: inline-block;\r\n    padding: 5px 11px 5px 11px;\r\n    text-align: justify;\r\n    position: relative;\r\n    margin: auto;\r\n    left: -25px;\r\n    width: 100%\r\n}\r\n\r\n\r\nul {\r\n    list-style-type: none;\r\n\r\n    flex-direction: column-reverse;\r\n}\r\n.text-frame {\r\n    border-top: 15px, solid, #0c2340;\r\n}\r\n.modal-title {\r\n    font-family: sans-serif;\r\n    font-weight: 900;\r\n    font-size: 2.00rem;\r\n    text-shadow: 1px 1px 1px #0c2340;\r\n    text-align: left;\r\n    color: #0c2340;\r\n}\r\n\r\n.btn-primary::before,\r\n.btn-primary:hover,\r\n.btn-primary:focus,\r\n.btn-primary:focus,\r\n.btn-primary:active,\r\n.btn-primary.active {\r\n    color: #ffffff;\r\n    background-color: #0c2340;\r\n    border-color: #0c2340;\r\n}\r\n\r\n.submit-button {\r\n    color: #ffffff;\r\n    background-color: #0c2340;\r\n    border-color: #0c2340;\r\n}\r\n\r\n.exit-button{\r\n\r\n}\r\n\r\n.close {\r\n    color: #0c2340;\r\n    opacity: 0.6;\r\n}\r\n*/\r\n\r\n\r\n\r\n\r\n\r\n.chat-window {\r\n    margin-top: 30px;\r\n    margin-left:20px;\r\n    position: relative;\r\n    width: 380px;\r\n    height: 550px;\r\n    border: 0.5px solid #141010;\r\n    border-radius: 1%;\r\n    -webkit-box-shadow: 2px 2px 4px #888;\r\n    -moz-box-shadow: 2px 2px 4px #888;\r\n    box-shadow: 2px 2px 4px #888;\r\n}\r\n\r\n.window-header {\r\n    display: block;\r\n    height: 10%;\r\n    background-color: #0c2340;\r\n}\r\n\r\n.close-button {\r\n    float: right;\r\n    color: white;\r\n    background: none;\r\n    margin-top: 2px;\r\n    margin-right: 2px;\r\n    border: none;\r\n    font-size: 30px;\r\n}\r\n\r\n.minimize-button {\r\n    float: right;\r\n    color: white;\r\n    background: none;\r\n    margin-top: 2px;\r\n    margin-right: 2px;\r\n    border: none;\r\n    font-size: 30px;\r\n}\r\n\r\n.window-title {\r\n    color: white;\r\n    font-size: 20px;\r\n    margin-top: 0;\r\n    padding-top: 10px;\r\n    padding-left: 10px;\r\n}\r\n\r\n.window-body {\r\n    display: block;\r\n    height: 90%;\r\n    background: #c7bebe;\r\n    padding: 10px 10px 10px 10px;\r\n}\r\n\r\n.message-display {\r\n    height: 80%;\r\n    background: white;\r\n    border-radius: 2%;\r\n    border: 0.7px solid #c7bebe;\r\n    display: -ms-flexbox;\r\n    display: -webkit-box;\r\n    display: -moz-box;\r\n    display: flex;\r\n    -ms-flex-direction: column-reverse;\r\n    -webkit-box-orient: vertical;\r\n    -moz-box-orient: vertical;\r\n    flex-direction: column-reverse;\r\n    overflow-y: auto;\r\n}\r\n\r\n\r\n\r\n.msg-row {\r\n    width: 60%;\r\n    /*float: right;*/\r\n}\r\n\r\n.align-window-right {\r\n    float: right;\r\n}\r\n\r\n.align-window-left {\r\n    float: left;\r\n}\r\n\r\n.remote-bubble {\r\n    background-color: #66cfac;\r\n}\r\n\r\n.host-bubble {\r\n    background-color: #cbc380;\r\n}\r\n\r\n.bubble {\r\n    border: 0.2px solid #808080;\r\n    border-radius: 30px;\r\n    /*background-color: #F2F2F2;*/\r\n    -webkit-box-shadow: 2px 2px 4px #888;\r\n    -moz-box-shadow: 2px 2px 4px #888;\r\n    box-shadow: 2px 2px 4px #888;\r\n    padding: 5px 11px 5px 11px;\r\n    text-align: left;\r\n    line-height: 1.5em;\r\n    display: inline-block;\r\n    vertical-align: top;\r\n    margin: 5px 15px 5px 15px;\r\n    overflow-wrap: break-word;\r\n    word-break: break-all;\r\n    /*float: right;*/\r\n    position: relative;\r\n}\r\n\r\n::-webkit-scrollbar-track {\r\n    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);\r\n    border-radius: 10px;\r\n    background-color: #F5F5F5;\r\n}\r\n\r\n::-webkit-scrollbar {\r\n    width: 12px;\r\n    background-color: #F5F5F5;\r\n}\r\n\r\n::-webkit-scrollbar-thumb {\r\n    border-radius: 10px;\r\n    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);\r\n    background-color: #555;\r\n}\r\n\r\n\r\n/*\r\n.bubble::before {\r\n    background-color: #F2F2F2;\r\n    content: \"\\00a0\";\r\n    display: block;\r\n    height: 16px;\r\n    position: absolute;\r\n    top: 11px;\r\n    transform: rotate( 29deg ) skew( -35deg );\r\n    -moz-transform: rotate( 29deg ) skew( -35deg );\r\n    -ms-transform: rotate( 29deg ) skew( -35deg );\r\n    -o-transform: rotate( 29deg ) skew( -35deg );\r\n    -webkit-transform: rotate( 29deg ) skew( -35deg );\r\n    width: 20px;\r\n}\r\n    */\r\n\r\n.host-messenger {\r\n    float: left;\r\n    margin: 5px 45px 5px 20px;\r\n}\r\n\r\n    .host-messenger::before {\r\n        box-shadow: -2px 2px 2px 0 rgba( 178, 178, 178, .4 );\r\n        left: -9px;\r\n    }\r\n\r\n.remote-messenger {\r\n    float: right;\r\n    margin: 5px 20px 5px 45px;\r\n}\r\n\r\n    .remote-messenger::before {\r\n        box-shadow: 2px -2px 2px 0 rgba( 178, 178, 178, .4 );\r\n        right: -9px;\r\n    }\r\n\r\n.partition {\r\n    display: block;\r\n    height: 2%;\r\n    margin-top: 2px;\r\n    margin-bottom: 2px;\r\n    background-color: #c7bebe;\r\n}\r\n\r\n.input-area {\r\n    display: block;\r\n    height: 7%;\r\n    background: none;\r\n    width: 100%;\r\n}\r\n\r\n.text-input {\r\n    display: inline;\r\n    resize: none;\r\n    overflow-y: auto;\r\n    height: 100%;\r\n    width: 100%;\r\n    margin: 0;\r\n    padding: 0;\r\n}\r\n\r\n.send-message {\r\n    color: white;\r\n    background-color: #0c2340;\r\n    border-radius: 10%;\r\n    border: none;\r\n    font-size: 30px;\r\n    height: 100%;\r\n}\r\n\r\n\r\n\r\n\r\nul {\r\n    margin: 0;\r\n    padding: 0;\r\n    list-style-type: none;\r\n    flex-direction: column-reverse;\r\n}\r\n.button-container {\r\n    height: 10%;\r\n    background: #c7bebe;\r\n    display: block;\r\n    width: 100%;\r\n    margin: 0;\r\n}\r\n.req-button{\r\n    width: 100%;\r\n    margin-top: 10px;\r\n    height: 40px;\r\n    background-color: #0c2340;\r\n    color: white;\r\n}\r\n\r\n\r\n.loader {\r\n    margin-bottom: 25%;\r\n    margin-left: 35%;\r\n    border: 10px solid #808080;\r\n    border-radius: 50%;\r\n    border-top: 16px solid #0c2340;\r\n    width: 120px;\r\n    height: 120px;\r\n    -webkit-animation: spin 2s linear infinite;\r\n    animation: spin 2s linear infinite;\r\n}\r\n\r\n@-webkit-keyframes spin {\r\n    0% {\r\n        -webkit-transform: rotate(0deg);\r\n    }\r\n\r\n    100% {\r\n        -webkit-transform: rotate(360deg);\r\n    }\r\n}\r\n\r\n@keyframes spin {\r\n    0% {\r\n        transform: rotate(0deg);\r\n    }\r\n\r\n    100% {\r\n        transform: rotate(360deg);\r\n    }\r\n}", ""]);
 
 // exports
 
@@ -7022,16 +7013,11 @@ module.exports = "<!--<div [style.display]=\"isDisplayed? 'inherit':'none'\" id=
 module.exports = "\r\n\r\n<div class=\"main-container\">\r\n\r\n\r\n\r\n        <nav-menu></nav-menu>\r\n\r\n\r\n        <div class=\"route-content\">\r\n\r\n        <router-outlet></router-outlet>\r\n        </div>\r\n\r\n        \r\n</div>\r\n<div class=\"my-footer\"></div>";
 
 /***/ }),
-/* 119 */
-/***/ (function(module, exports) {
-
-module.exports = "\r\n<div id=\"mySidenav\" class=\"sidenav\">\r\n    <a href=\"javascript:void(0)\" class=\"closebtn\" onclick=\"closeNav()\">&times;</a>\r\n    <a href=\"#\">About</a>\r\n    <a href=\"#\">Services</a>\r\n    <a href=\"#\">Clients</a>\r\n    <a href=\"#\">Contact</a>\r\n</div>\r\n\r\n<div id=\"main\">\r\n    <h2>Sidenav Push Example</h2>\r\n    <p>Click on the element below to open the side navigation menu, and push this content to the right.</p>\r\n    <span style=\"font-size:30px;cursor:pointer\" onclick=\"openNav()\">&#9776; open</span>\r\n</div>";
-
-/***/ }),
+/* 119 */,
 /* 120 */
 /***/ (function(module, exports) {
 
-module.exports = "<h1>OIT</h1>\r\n<p>Office of Information Technology Contact Info</p>\r\n<ul>\r\n    <li>Phone: {{contact_info.phone}} </li>\r\n    <li>Email: {{contact_info.email}}</li>\r\n    <li>Location: {{contact_info.location}}</li>\r\n    <li>Available Hours: {{contact_info.available_hours}}</li>\r\n</ul>";
+module.exports = "";
 
 /***/ }),
 /* 121 */
@@ -7043,13 +7029,13 @@ module.exports = "\r\n<div class=\"main-content\">\r\n    <div class=\"main-stag
 /* 122 */
 /***/ (function(module, exports) {
 
-module.exports = "\r\n\r\n\r\n<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css\">\r\n\r\n<div class=\"icon-bar\">\r\n    <a [routerLink]=\"['/home']\">Home<i class=\"fa fa-home\"></i></a>\r\n    <a [routerLink]=\"['/agent']\">Admin<i class=\"fa fa-user-circle-o\"></i></a>\r\n    <a [routerLink]=\"['/comments']\">Leave Comments<i class=\"fa fa-comments\"></i></a>\r\n    <a [routerLink]=\"['/contact']\">Contact Info<i class=\"fa fa-phone\"></i></a>\r\n</div>\r\n\r\n";
+module.exports = "\r\n\r\n\r\n<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css\">\r\n\r\n<div class=\"icon-bar\">\r\n    <a [routerLink]=\"['/home']\">Home<i class=\"fa fa-home\"></i></a>\r\n    <a [routerLink]=\"['/agent']\">Admin<i class=\"fa fa-user-circle-o\"></i></a>\r\n    <a [routerLink]=\"['/contact']\">Contact Info<i class=\"fa fa-phone\"></i></a>\r\n</div>\r\n\r\n";
 
 /***/ }),
 /* 123 */
 /***/ (function(module, exports) {
 
-module.exports = "<div draggable-element class=\"body modal custom modal-dialog\" id=\"exampleModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"exampleModalLabel\">\r\n    <div class=\"modal-dialog\" role=\"document\">\r\n        <div class=\"modal-content\">\r\n            <div class=\"modal-header\" >\r\n                <button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\" (click)=\"closeModal()\"><span aria-hidden=\"true\">&times;</span></button>\r\n                <h4 class=\"modal-title\" id=\"exampleModalLabel\">OIT CHAT BOT</h4>\r\n            </div>\r\n            <div class=\"modal-body\">\r\n\r\n                <div class=\"chat-display\">\r\n                    <ul>\r\n                        <li class=\"msg-bubble chatmessages\" *ngFor=\"let msg of Messages\">{{msg}}</li>\r\n                    </ul>\r\n\r\n                </div>\r\n\r\n                <div>\r\n                    <textarea #msgref [(ngModel)]=\"defaultVal\" class=\"form-control input-display\" rows=\"2\" id=\"message-text\" (keyup.enter)=\"submitMessage(msgref.value)\"></textarea>\r\n                </div>\r\n\r\n            </div>\r\n            <div class=\"modal-footer\">\r\n                <button type=\"button\" (click)=\"makeLiveRequest()\">Live Request</button>\r\n                <button type=\"button\" class=\"exit-button\" data-dismiss=\"modal\" (click)=\"closeModal()\">Close</button>\r\n                <button type=\"button\" class=\"submit-button\" (click)=\"submitMessage(msgref.value)\">Send</button>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</div>";
+module.exports = "<div class=\"chat-window\">\r\n    <div class=\"window-header\">\r\n        <button type=\"button\" class=\"close-button\" (click)=\"closeModal()\"><span aria-hidden=\"true\">&times;</span></button>\r\n        <button type=\"button\" class=\"minimize-button\" (click)=\"minimizeWindow()\"><span aria-hidden=\"true\">&minus;</span></button>\r\n\r\n        <h4 class=\"window-title\">OIT ChatBot</h4>\r\n    </div>\r\n    <div class=\"window-body\">\r\n        <div class=\"message-display\">\r\n            \r\n            <div *ngIf=\"notConnected\" class=\"loader\">\r\n\r\n            </div>\r\n                \r\n            <ul *ngIf=\"Messages\">\r\n                <li *ngFor=\"let msg of Messages\"\r\n                    class=\"msg-row\" [ngClass]=\"msgAlignment(msg.from.id)\" >\r\n                    <span class=\"bubble\" [ngClass]=\"bubbleProperties(msg.from.id)\">{{msg['text']}}</span>\r\n                </li>\r\n            </ul>\r\n\r\n        </div>\r\n        <div class=\"partition\"></div>\r\n        <div class=\"input-area\">\r\n            <input #msgref type=\"text\" [(ngModel)]=\"defaultVal\" class=\"text-input\" (keyup.enter)=\"submitMessage(msgref.value)\" />\r\n        </div>\r\n        <div class=\"button-container\">\r\n            <button type=\"button\" class=\"req-button\" (click)=\"makeLiveRequest()\">Live Request</button>\r\n        </div>\r\n    </div>\r\n\r\n</div>\r\n\r\n\r\n\r\n<!--\r\n\r\n<div draggable-element class=\"body modal custom modal-dialog\" id=\"exampleModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"exampleModalLabel\">\r\n    <div class=\"modal-dialog\" role=\"document\">\r\n        <div class=\"modal-content\">\r\n            <div class=\"modal-header\" >\r\n                <button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\" (click)=\"closeModal()\"><span aria-hidden=\"true\">&times;</span></button>\r\n                <h4 class=\"modal-title\" id=\"exampleModalLabel\">OIT CHAT BOT</h4>\r\n            </div>\r\n            <div class=\"modal-body\">\r\n\r\n                <div class=\"chat-display\">\r\n                        <div *ngIf=\"notConnected\" class=\"loader\">\r\n                            \r\n                        </div>\r\n\r\n                    <ul *ngIf=\"Messages\">\r\n                        <li class=\"msg-bubble chatmessages\" *ngFor=\"let msg of Messages\">{{msg}}</li>\r\n                    </ul>\r\n\r\n                </div>\r\n\r\n                <div>\r\n                    <textarea #msgref [(ngModel)]=\"defaultVal\" class=\"form-control input-display\" rows=\"2\" id=\"message-text\" (keyup.enter)=\"submitMessage(msgref.value)\"></textarea>\r\n                </div>\r\n\r\n            </div>\r\n            <div class=\"modal-footer\">\r\n                <button type=\"button\" (click)=\"makeLiveRequest()\">Live Request</button>\r\n                <button type=\"button\" class=\"exit-button\" data-dismiss=\"modal\" (click)=\"closeModal()\">Close</button>\r\n                <button type=\"button\" class=\"submit-button\" (click)=\"submitMessage(msgref.value)\">Send</button>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</div>\r\n\r\n    -->";
 
 /***/ }),
 /* 124 */
@@ -21504,7 +21490,7 @@ var AgentChatWindowComponent = (function () {
                 webSocket: true,
                 streamUrl: _this.conversation['streamUrl']
             });
-            _this.directLine.activity$.filter(function (res) { return res.from.id !== _this.myuid; })
+            _this.directLine.activity$.filter(function (res) { return res.from.id !== _this.myuid; }).filter(function (res) { return res.from.id !== _this.botHandle; })
                 .subscribe(function (res) { return _this.messages.push(res); });
         });
     };
