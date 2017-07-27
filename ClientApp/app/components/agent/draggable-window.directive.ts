@@ -28,7 +28,7 @@ export class DraggableWindowDirective implements OnInit {
         return false; 
     }
 
-    @HostListener('document:mousemove', ['$event'])
+    @HostListener('mousemove', ['$event'])
     onMousemove(event: MouseEvent) {
         this.mousemove.emit(event);
     }
@@ -36,13 +36,15 @@ export class DraggableWindowDirective implements OnInit {
 
 
     constructor(private elref: ElementRef) {
-        this.elref.nativeElement.style.position = 'relative';
+        this.elref.nativeElement.style.position = 'absolute';
+
         this.elref.nativeElement.style.cursor = 'pointer';
-        this.mousedrag = this.mousedown.flatMap(function (md) {
+        
+        this.mousedrag = this.mousedown.flatMap((md)=> {
             
             var startX = md.offsetX;
             var startY = md.offsetY;
-            return this.mousemove.map(function (mm) {
+            return this.mousemove.map((mm) => {
                 mm.preventDefault();
                 return {
                     left: mm.clientX - startX,

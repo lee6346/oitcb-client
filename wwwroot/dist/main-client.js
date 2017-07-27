@@ -59,7 +59,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "0708b27d7ccc2d57135f"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "bbb2a34e8e208f3b11bf"; // eslint-disable-line no-unused-vars
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
 /******/ 	var hotCurrentParents = []; // eslint-disable-line no-unused-vars
@@ -1207,6 +1207,8 @@ var ChatAuthenticationService = (function () {
         this.http = http;
         this.mySecret = 'Bearer gD8hMWEV0fM.cwA.x-U.EQEmjSeulWq60J-PHoJyD9sDeUIzOGNs5xIkKCxRxYs';
         this.tokenUri = 'https://directline.botframework.com/v3/directline/tokens/generate';
+        this.refreshUri = "https://directline.botframework.com/v3/directline/tokens/refresh";
+        this.joinUri = "https://directline.botframework.com/v3/directline/conversations/";
     }
     //returns an observable for a conversation object
     ChatAuthenticationService.prototype.getConversationObject$ = function () {
@@ -1220,6 +1222,21 @@ var ChatAuthenticationService = (function () {
     // returns an observable of a new security token
     ChatAuthenticationService.prototype.getSecurityToken$ = function () {
         return this.getConversationObject$().map(function (obj) { return obj.token; });
+    };
+    ChatAuthenticationService.prototype.refreshToken$ = function (oldToken) {
+        var headers = new http_1.Headers({
+            'Authorization': oldToken
+        });
+    };
+    ChatAuthenticationService.prototype.getSecret = function () {
+        return this.mySecret;
+    };
+    ChatAuthenticationService.prototype.getConvStreamUrl = function (convId) {
+        var headers = new http_1.Headers({
+            'Authorization': this.mySecret
+        });
+        var options = new http_1.RequestOptions({ headers: headers });
+        return this.http.get(this.joinUri + convId, options).map(function (res) { return res.json(); });
     };
     return ChatAuthenticationService;
 }());
@@ -1516,6 +1533,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 //ang libraries
 var core_1 = __webpack_require__(5);
+var http_1 = __webpack_require__(21);
 //Direct Line libraries
 var botframework_directlinejs_1 = __webpack_require__(104);
 //rxjs
@@ -1523,17 +1541,17 @@ var Observable_1 = __webpack_require__(0);
 //sevices
 var chat_authentication_service_1 = __webpack_require__(22);
 var ChatConnectionService = (function () {
-    function ChatConnectionService(chatAuthenticationService) {
+    function ChatConnectionService(chatAuthenticationService, http) {
         this.chatAuthenticationService = chatAuthenticationService;
+        this.http = http;
     }
     //returns an observable for direct line object
-    ChatConnectionService.prototype.startConnection$ = function (socket) {
-        if (socket === void 0) { socket = true; }
-        return this.chatAuthenticationService.getConversationObject$().map(function (data) { return new botframework_directlinejs_1.DirectLine({
-            token: data['token'],
-            webSocket: socket,
+    ChatConnectionService.prototype.startConnection$ = function (conv) {
+        return new botframework_directlinejs_1.DirectLine({
+            token: conv['token'],
+            webSocket: true,
             watermark: null,
-        }); });
+        });
     };
     // restart new directLine connection
     ChatConnectionService.prototype.restartConnection = function (directLine) {
@@ -1559,7 +1577,7 @@ var ChatConnectionService = (function () {
 }());
 ChatConnectionService = __decorate([
     core_1.Injectable(),
-    __metadata("design:paramtypes", [chat_authentication_service_1.ChatAuthenticationService])
+    __metadata("design:paramtypes", [chat_authentication_service_1.ChatAuthenticationService, http_1.Http])
 ], ChatConnectionService);
 exports.ChatConnectionService = ChatConnectionService;
 
@@ -5477,6 +5495,8 @@ var state_storage_service_1 = __webpack_require__(39);
 var user_service_1 = __webpack_require__(40);
 var websocket_service_1 = __webpack_require__(31);
 var live_request_service_1 = __webpack_require__(23);
+var agent_chat_window_component_1 = __webpack_require__(414);
+var draggable_window_directive_1 = __webpack_require__(420);
 var AppModule = (function () {
     function AppModule() {
     }
@@ -5485,7 +5505,10 @@ var AppModule = (function () {
 AppModule = __decorate([
     core_1.NgModule({
         bootstrap: app_module_shared_1.sharedConfig.bootstrap,
-        declarations: app_module_shared_1.sharedConfig.declarations,
+        declarations: [
+            app_module_shared_1.sharedConfig.declarations,
+            draggable_window_directive_1.DraggableWindowDirective,
+        ],
         imports: [
             platform_browser_1.BrowserModule,
             http_1.HttpModule
@@ -5499,7 +5522,8 @@ AppModule = __decorate([
             user_service_1.UserService,
             websocket_service_1.WebsocketService,
             live_request_service_1.LiveRequestService,
-        ]
+        ],
+        entryComponents: [agent_chat_window_component_1.AgentChatWindowComponent]
     })
 ], AppModule);
 exports.AppModule = AppModule;
@@ -5526,6 +5550,8 @@ var comments_component_1 = __webpack_require__(98);
 var test_modal_1 = __webpack_require__(102);
 var chat_window_component_1 = __webpack_require__(94);
 var pendrequest_component_1 = __webpack_require__(96);
+var agent_chat_window_component_1 = __webpack_require__(414);
+var insert_window_directive_1 = __webpack_require__(418);
 exports.sharedConfig = {
     bootstrap: [app_component_1.AppComponent],
     declarations: [
@@ -5538,6 +5564,8 @@ exports.sharedConfig = {
         test_modal_1.TestModal,
         chat_window_component_1.ChatWindowComponent,
         pendrequest_component_1.PendingRequestComponent,
+        agent_chat_window_component_1.AgentChatWindowComponent,
+        insert_window_directive_1.InsertWindowDirective,
     ],
     imports: [
         http_1.HttpModule,
@@ -5619,6 +5647,8 @@ var live_request_service_1 = __webpack_require__(23);
 var chat_service_1 = __webpack_require__(30);
 var chat_authentication_service_1 = __webpack_require__(22);
 var chat_connection_service_1 = __webpack_require__(29);
+var agent_chat_window_component_1 = __webpack_require__(414);
+var insert_window_directive_1 = __webpack_require__(418);
 var AgentComponent = (function () {
     function AgentComponent(ws, lr, auth, conn, chat) {
         this.ws = ws;
@@ -5627,14 +5657,12 @@ var AgentComponent = (function () {
         this.conn = conn;
         this.chat = chat;
     }
-    //public url: string = "ws://localhost:5000/socketconnection";
     AgentComponent.prototype.ngOnInit = function () {
         var _this = this;
         console.log("in");
-        //this.lr.getDbRequests$().mergeMap(ob => ob).toArray().subscribe(res => console.log(res.length));
         //get pending requests in db
         this.lr.getDbRequests$().distinct().subscribe(function (res) { return _this.liveQueue = res; });
-        //connect to ws
+        //connect to ws and get socket id
         this.ws_connection = this.ws.connectWebSocket$();
         this.ws_connection.take(1).subscribe(function (res) { _this.sock_id = res['data'], console.log(_this.sock_id); });
         //set of observers for adding/removing requests
@@ -5669,14 +5697,20 @@ var AgentComponent = (function () {
     AgentComponent.prototype.acceptRequest = function (live) {
         console.log(live['conv_id']);
         this.lr.acceptRequest$(live['conv_id']).subscribe(function (res) { console.log(res); });
+        this.windowAnchor.createChatWindow(live['conv_id'], this.auth.getSecret(), agent_chat_window_component_1.AgentChatWindowComponent);
     };
     return AgentComponent;
 }());
+__decorate([
+    core_1.ViewChild(insert_window_directive_1.InsertWindowDirective),
+    __metadata("design:type", insert_window_directive_1.InsertWindowDirective)
+], AgentComponent.prototype, "windowAnchor", void 0);
 AgentComponent = __decorate([
     core_1.Component({
         selector: 'agent',
         template: __webpack_require__(116),
         styles: [__webpack_require__(374)],
+        entryComponents: [agent_chat_window_component_1.AgentChatWindowComponent],
     }),
     __metadata("design:paramtypes", [websocket_service_1.WebsocketService, live_request_service_1.LiveRequestService, chat_authentication_service_1.ChatAuthenticationService,
         chat_connection_service_1.ChatConnectionService, chat_service_1.ChatService])
@@ -6010,21 +6044,21 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 //ng libs
 var core_1 = __webpack_require__(5);
-//rxjs libs
-var Observable_1 = __webpack_require__(0);
 __webpack_require__(42);
 //services
 var chat_service_1 = __webpack_require__(30);
 var chat_connection_service_1 = __webpack_require__(29);
 var chat_authentication_service_1 = __webpack_require__(22);
 var uuid = __webpack_require__(78);
+var live_request_service_1 = __webpack_require__(23);
 var TestModal = (function () {
-    function TestModal(chatConnectionService, chatService, authService) {
+    function TestModal(chatConnectionService, chatService, authService, liveService) {
         this.chatConnectionService = chatConnectionService;
         this.chatService = chatService;
         this.authService = authService;
+        this.liveService = liveService;
         this.isshowing = false;
-        this.Messages = ['Welcome'];
+        this.Messages = ["welcome"];
         this.connected = false;
         this.defaultVal = null;
         this.deleteModal = new core_1.EventEmitter();
@@ -6033,11 +6067,22 @@ var TestModal = (function () {
     //  .mergeMap(res => this.chatService.receiveBotActivity$(this.directLine))
     TestModal.prototype.ngOnInit = function () {
         var _this = this;
-        var timer$ = Observable_1.Observable.timer(2000);
-        this.authService.getConversationObject$().subscribe(function (res) { _this.conv_id = res['conversationId']; });
-        var connection$ = this.chatConnectionService.startConnection$();
-        connection$.subscribe(function (res) { console.log(res); });
+        //let timer$ = Observable.timer(2000);
+        this.authService.getConversationObject$().subscribe(function (res) {
+            _this.conv = res;
+            _this.conv_id = res['conversationId'];
+            console.log(res);
+            _this.directLine = _this.chatConnectionService.startConnection$(res);
+            _this.directLine.activity$.filter(function (res) { return res.from.id !== _this.myuid; })
+                .map(function (act) { return act['text']; }).subscribe(function (res) { _this.Messages.push(res); });
+        });
         /*
+        this.authService.getConversationObject$().subscribe(res => {this.conv_id = res['conversationId']});
+        let connection$ = this.chatConnectionService.startConnection$();
+        connection$.subscribe(res => { console.log(res) });
+
+
+        
         timer$
             .switchMap(() => connection$)
             .subscribe(res => {
@@ -6061,6 +6106,10 @@ var TestModal = (function () {
     TestModal.prototype.closeModal = function () {
         this.deleteModal.emit(false);
     };
+    TestModal.prototype.makeLiveRequest = function () {
+        console.log(this.conv_id);
+        this.liveService.sendLiveRequest$(this.conv_id).subscribe(function (msg) { console.log(msg); });
+    };
     return TestModal;
 }());
 __decorate([
@@ -6074,7 +6123,8 @@ TestModal = __decorate([
         styles: [__webpack_require__(379)],
         providers: [chat_service_1.ChatService, chat_connection_service_1.ChatConnectionService, chat_authentication_service_1.ChatAuthenticationService],
     }),
-    __metadata("design:paramtypes", [chat_connection_service_1.ChatConnectionService, chat_service_1.ChatService, chat_authentication_service_1.ChatAuthenticationService])
+    __metadata("design:paramtypes", [chat_connection_service_1.ChatConnectionService, chat_service_1.ChatService,
+        chat_authentication_service_1.ChatAuthenticationService, live_request_service_1.LiveRequestService])
 ], TestModal);
 exports.TestModal = TestModal;
 
@@ -6546,7 +6596,7 @@ exports = module.exports = __webpack_require__(12)(undefined);
 
 
 // module
-exports.push([module.i, "\r\n* {\r\n    box-sizing: border-box;\r\n}\r\n\r\n.main-content {\r\n    min-height: 100vh;\r\n    display: -ms-flexbox;\r\n    display: -webkit-box;\r\n    display: -moz-box;\r\n    display: flex;\r\n\r\n    -ms-flex-direction: row;\r\n    -webkit-box-orient: horizontal;\r\n    -moz-box-orient: horizontal;\r\n    flex-direction: row;\r\n}\r\n.main-stage {\r\n    display: -ms-flexbox;\r\n    display: -webkit-box;\r\n    display: -moz-box;\r\n    display: flex;\r\n    -ms-flex-direction: column;\r\n    -webkit-box-orient: vertical;\r\n    -moz-box-orient: vertical;\r\n    flex-direction: column;\r\n    -ms-flex: 1;\r\n    -webkit-box-flex: 1;\r\n    -moz-box-flex: 1;\r\n    flex: 1;\r\n    padding: 15px;\r\n    box-shadow: 0 0 5px rgba(0,0,0,1);\r\n\r\n\r\n}\r\n\r\n\r\n\r\n\r\n#pend-list {\r\n    display: -ms-flexbox;\r\n    display: -webkit-box;\r\n    display: -moz-box;\r\n    display: flex;\r\n    -ms-flex-direction: column;\r\n    -webkit-box-orient: vertical;\r\n    -moz-box-orient: vertical;\r\n    flex-direction: column;\r\n\r\n    -webkit-flex: 0;\r\n    -webkit-box-flex: 0;\r\n    -moz-box-flex: 0;\r\n    flex: 0 20vw;\r\n    width: 15vw;\r\n    background: #a9a9a9;\r\n    order: -1;\r\n    padding: .3em;\r\n    overflow-y: auto;\r\n}\r\n\r\n#pend-title {\r\n    font-size: 16px;\r\n    font\r\n    line-height: 30px;\r\n    text-align: center;\r\n    letter-spacing: 5px;\r\n    color: #0c2340;\r\n    border-bottom: 1px solid #222;\r\n    padding-top: 10px;\r\n    margin: 0;\r\n    background: #808080;\r\n    -webkit-flex: 0;\r\n    -webkit-box-flex: 0;\r\n    -moz-box-flex: 0;\r\n    flex: 0 7vh;\r\n}\r\n\r\n.nav > li {\r\n    position: relative;\r\n    display: block;\r\n    padding: 15px 15px 15px 15px;\r\n    font-size: 12px;\r\n    color: #eee;\r\n    border-bottom: 1px solid #222;\r\n    cursor: pointer;\r\n\r\n\r\n}\r\n.nav > li:hover{\r\n    background: #444;\r\n}\r\n\r\n\r\n.main-display {\r\n    display: -ms-flexbox;\r\n    display: -webkit-box;\r\n    display: -moz-box;\r\n    display: flex;\r\n    -ms-flex-direction: row;\r\n    -webkit-box-orient: horizontal;\r\n    -moz-box-orient: horizontal;\r\n    flex-direction: row;\r\n    -ms-flex: 1;\r\n    -webkit-box-flex: 1;\r\n    -moz-box-flex: 1;\r\n    flex: 1;\r\n    border: 2px solid #0c2340;\r\n}\r\n\r\n.minimize-bar {\r\n    min-width: 80vw;\r\n    display: -ms-flexbox;\r\n    display: -webkit-box;\r\n    display: -moz-box;\r\n    display: flex;\r\n    -ms-flex-direction: row;\r\n    -webkit-box-orient: horizontal;\r\n    -moz-box-orient: horizontal;\r\n    flex-direction: row;\r\n    -ms-flex: 0;\r\n    -webkit-box-flex: 0;\r\n    -moz-box-flex: 0;\r\n    flex: 0 8vh;\r\n\r\n}\r\n\r\n.minimize-window {\r\n    -ms-flex: 1;\r\n    -webkit-box-flex: 1;\r\n    -moz-box-flex: 1;\r\n    flex: 1;\r\n    border: 2px solid #0c2340;\r\n}\r\nul {\r\n    list-style-type: none;\r\n    height: 0vh;\r\n    padding: 0;\r\n    margin: 0;\r\n\r\n}\r\n\r\n\r\n::-webkit-scrollbar-track {\r\n    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);\r\n    border-radius: 10px;\r\n    background-color: #F5F5F5;\r\n}\r\n\r\n::-webkit-scrollbar {\r\n    width: 12px;\r\n    background-color: #F5F5F5;\r\n}\r\n\r\n::-webkit-scrollbar-thumb {\r\n    border-radius: 10px;\r\n    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);\r\n    background-color: #555;\r\n}", ""]);
+exports.push([module.i, "\r\n* {\r\n    box-sizing: border-box;\r\n}\r\n\r\n.main-content {\r\n    min-height: 100vh;\r\n    display: -ms-flexbox;\r\n    display: -webkit-box;\r\n    display: -moz-box;\r\n    display: flex;\r\n\r\n    -ms-flex-direction: row;\r\n    -webkit-box-orient: horizontal;\r\n    -moz-box-orient: horizontal;\r\n    flex-direction: row;\r\n}\r\n.main-stage {\r\n    display: -ms-flexbox;\r\n    display: -webkit-box;\r\n    display: -moz-box;\r\n    display: flex;\r\n    -ms-flex-direction: column;\r\n    -webkit-box-orient: vertical;\r\n    -moz-box-orient: vertical;\r\n    flex-direction: column;\r\n    -ms-flex: 1;\r\n    -webkit-box-flex: 1;\r\n    -moz-box-flex: 1;\r\n    flex: 1;\r\n    padding: 15px;\r\n    box-shadow: 0 0 5px rgba(0,0,0,1);\r\n\r\n\r\n}\r\n\r\n\r\n\r\n\r\n#pend-list {\r\n    display: -ms-flexbox;\r\n    display: -webkit-box;\r\n    display: -moz-box;\r\n    display: flex;\r\n    -ms-flex-direction: column;\r\n    -webkit-box-orient: vertical;\r\n    -moz-box-orient: vertical;\r\n    flex-direction: column;\r\n\r\n    -webkit-flex: 0;\r\n    -webkit-box-flex: 0;\r\n    -moz-box-flex: 0;\r\n    flex: 0 20vw;\r\n    width: 15vw;\r\n    background: #a9a9a9;\r\n    order: -1;\r\n    padding: .3em;\r\n    overflow-y: auto;\r\n}\r\n\r\n#pend-title {\r\n    font-size: 16px;\r\n    line-height: 30px;\r\n    text-align: center;\r\n    letter-spacing: 5px;\r\n    color: #0c2340;\r\n    border-bottom: 1px solid #222;\r\n    padding-top: 10px;\r\n    margin: 0;\r\n    background: #808080;\r\n    -webkit-flex: 0;\r\n    -webkit-box-flex: 0;\r\n    -moz-box-flex: 0;\r\n    flex: 0 7vh;\r\n}\r\n\r\n.nav > li {\r\n    position: relative;\r\n    display: block;\r\n    padding: 15px 15px 15px 15px;\r\n    font-size: 12px;\r\n    color: #eee;\r\n    border-bottom: 1px solid #222;\r\n    cursor: pointer;\r\n\r\n\r\n}\r\n.nav > li:hover{\r\n    background: #444;\r\n}\r\n\r\n\r\n.main-display {\r\n    display: -ms-flexbox;\r\n    display: -webkit-box;\r\n    display: -moz-box;\r\n    display: flex;\r\n    -ms-flex-direction: row;\r\n    -webkit-box-orient: horizontal;\r\n    -moz-box-orient: horizontal;\r\n    flex-direction: row;\r\n    flex-wrap:wrap;\r\n    -ms-flex: 1;\r\n    -webkit-box-flex: 1;\r\n    -moz-box-flex: 1;\r\n    flex: 1;\r\n    border: 2px solid #0c2340;\r\n   \r\n}\r\n\r\n.minimize-bar {\r\n    min-width: 80vw;\r\n    display: -ms-flexbox;\r\n    display: -webkit-box;\r\n    display: -moz-box;\r\n    display: flex;\r\n    -ms-flex-direction: row;\r\n    -webkit-box-orient: horizontal;\r\n    -moz-box-orient: horizontal;\r\n    flex-direction: row;\r\n    -ms-flex: 0;\r\n    -webkit-box-flex: 0;\r\n    -moz-box-flex: 0;\r\n    flex: 0 8vh;\r\n\r\n}\r\n\r\n.minimize-window {\r\n    -ms-flex: 1;\r\n    -webkit-box-flex: 1;\r\n    -moz-box-flex: 1;\r\n    flex: 1;\r\n    border: 2px solid #0c2340;\r\n}\r\nul {\r\n    list-style-type: none;\r\n    height: 0vh;\r\n    padding: 0;\r\n    margin: 0;\r\n\r\n}\r\n\r\n\r\n::-webkit-scrollbar-track {\r\n    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);\r\n    border-radius: 10px;\r\n    background-color: #F5F5F5;\r\n}\r\n\r\n::-webkit-scrollbar {\r\n    width: 12px;\r\n    background-color: #F5F5F5;\r\n}\r\n\r\n::-webkit-scrollbar-thumb {\r\n    border-radius: 10px;\r\n    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);\r\n    background-color: #555;\r\n}\r\n\r\n.move-chat {\r\n    position: relative;\r\n    width: 100%;\r\n    height: 100%;\r\n    background-color: none;\r\n\r\n}", ""]);
 
 // exports
 
@@ -6588,7 +6638,7 @@ exports = module.exports = __webpack_require__(12)(undefined);
 
 
 // module
-exports.push([module.i, ".body {\r\n    display: inline-block;\r\n    background-color:lightgray;\r\n}\r\n\r\n\r\n.home-title {\r\n    color: #0c2340;\r\n    font-weight: 900;\r\n    font-size: 9.00rem;\r\n}\r\n\r\n.chat-button {\r\n    margin: auto;\r\n    width: 200px;\r\n    height: 150px;\r\n    display: flex;\r\n    justify-content: center;\r\n    border-color: #0c2340;\r\n    border: 2px, solid;\r\n    border-radius: 15px;\r\n    background-color: #f15a22;\r\n    color: #0c2340;\r\n    font-weight: 900;\r\n    font-size: 2.00rem;\r\n}\r\n\r\nsection {\r\n    margin: 150px auto 0;\r\n    width: 75px;\r\n    height: 95px;\r\n    position: relative;\r\n    text-align: center;\r\n}\r\n\r\n:active, :focus {\r\n    outline: 0;\r\n}\r\n\r\na {\r\n    color: #0c2340;\r\n    text-shadow: 0px 1px 1px #0c2340;\r\n    font-size: 4.50rem;\r\n    font-weight: 900;\r\n    display: block;\r\n    position: relative;\r\n    text-decoration: none;\r\n    background-color: #f15a22;\r\n    box-shadow: 0px 3px 0px 0px #0c2340, /* 1st Shadow */\r\n    0px 7px 10px 0px #0c2340, /* 1nd Shadow */\r\n    inset 0px 1px 1px 0px #0c2340, /* 3rd Shadow */\r\n    inset 0px -12px 35px 0px #0c2340; /* 4th Shadow */\r\n    width: 400px;\r\n    height: 300px;\r\n    border: 0;\r\n    border-radius: 20px;\r\n    text-align: center;\r\n    line-height: 79px;\r\n    transition: color 350ms, text-shadow 350ms;\r\n    -o-transition: color 350ms, text-shadow 350ms;\r\n    -moz-transition: color 350ms, text-shadow 350ms;\r\n    -webkit-transition: color 350ms, text-shadow 350ms;\r\n}\r\n\r\na + span {\r\n    display: block;\r\n    width: 8px;\r\n    height: 8px;\r\n    background-color: rgb(226,0,0);\r\n    box-shadow: inset 0px 1px 0px 0px rgba(250,250,250,0.5), 0px 0px 3px 2px rgba(226,0,0,0.5);\r\n    border-radius: 4px;\r\n    clear: both;\r\n    position: absolute;\r\n    bottom: 0;\r\n    left: 42%;\r\n}\r\n\r\na:active {\r\n    box-shadow: 0px 0px 0px 0px rgb(34,34,34), /* 1st Shadow */\r\n    0px 3px 7px 0px rgb(17,17,17), /* 2nd Shadow */\r\n    inset 0px 1px 1px 0px rgba(250, 250, 250, .2), /* 3rd Shadow */\r\n    inset 0px -10px 35px 5px rgba(0, 0, 0, .5); /* 4th Shadow */\r\n    background-color: rgb(83,87,93);\r\n    top: 3px;\r\n}\r\n\r\na:target {\r\n    box-shadow: 0px 0px 0px 0px rgb(34,34,34), 0px 3px 7px 0px rgb(17,17,17), inset 0px 1px 1px 0px rgba(250, 250, 250, .2), inset 0px -10px 35px 5px rgba(0, 0, 0, .5);\r\n    background-color: rgb(83,87,93);\r\n    top: 3px;\r\n    color: #fff;\r\n    text-shadow: 0px 0px 3px rgb(250,250,250);\r\n}\r\n\r\na:active:before, a:target:before {\r\n    top: -5px;\r\n    background-color: rgb(26,27,29);\r\n    box-shadow: 0px 1px 0px 0px rgba(250,250,250,0.1), inset 0px 1px 2px rgba(0, 0, 0, 0.5);\r\n}\r\n\r\n    a:target + span {\r\n        box-shadow: inset 0px 1px 0px 0px rgba(250,250,250,0.5), 0px 0px 3px 2px rgba(135,187,83,0.5);\r\n        background-color: rgb(135,187,83);\r\n        transition: background-color 350ms, box-shadow 700ms;\r\n        -o-transition: background-color 350ms, box-shadow 700ms;\r\n        -moz-transition: background-color 350ms, box-shadow 700ms;\r\n        -webkit-transition: background-color 350ms, box-shadow 700ms;\r\n    }\r\n\r\n\r\n\r\n\r\n", ""]);
+exports.push([module.i, "\r\n* {\r\n    box-sizing: border-box;\r\n}\r\n\r\n.main-content {\r\n    width: 100%;\r\n    min-height: 120vh;\r\n    display: -ms-flexbox;\r\n    display: -webkit-box;\r\n    display: -moz-box;\r\n    display: flex;\r\n    -ms-flex-direction: row;\r\n    -webkit-box-orient: horizontal;\r\n    -moz-box-orient: horizontal;\r\n    flex-direction: row;\r\n}\r\n.main-stage {\r\n    display: -ms-flexbox;\r\n    display: -webkit-box;\r\n    display: -moz-box;\r\n    display: flex;\r\n    -ms-flex-direction: column;\r\n    -webkit-box-orient: vertical;\r\n    -moz-box-orient: vertical;\r\n    flex-direction: column;\r\n    -ms-flex: 1;\r\n    -webkit-box-flex: 1;\r\n    -moz-box-flex: 1;\r\n    flex: 1;\r\n    width: 1400px;\r\n    order: -1;\r\n    padding: 15px;\r\n}\r\n\r\n.info-panel {\r\n    display: -ms-flexbox;\r\n    display: -webkit-box;\r\n    display: -moz-box;\r\n    display: flex;\r\n    -ms-flex-direction: column;\r\n    -webkit-box-orient: vertical;\r\n    -moz-box-orient: vertical;\r\n    flex-direction: column;\r\n    -webkit-flex: 0;\r\n    -webkit-box-flex: 0;\r\n    -moz-box-flex: 0;\r\n    flex: 0;\r\n    background: #fff;\r\n    border-left: 4px solid #0c2340;\r\n    padding: .3em;\r\n    overflow-y: auto;\r\n}\r\n\r\n.home-title {\r\n    color: #0c2340;\r\n    font-weight: 900;\r\n    font-size: 9.00rem;\r\n    border-bottom: 10px solid #0c2340;\r\n    margin-right: 25px;\r\n\r\n\r\n}\r\n.title-header {\r\n    -ms-flex: 0;\r\n    -webkit-box-flex: 0;\r\n    -moz-box-flex: 0;\r\n    flex: 0 15vh;\r\n    border-bottom: 10px solid #f15a22;\r\n    margin-right: 150px;\r\n    order: -1;\r\n\r\n}\r\n.main-display {\r\n    display: -ms-flexbox;\r\n    display: -webkit-box;\r\n    display: -moz-box;\r\n    display: flex;\r\n    -ms-flex-direction: row;\r\n    -webkit-box-orient: horizontal;\r\n    -moz-box-orient: horizontal;\r\n    flex-direction: row;\r\n    -ms-flex: 1;\r\n    -webkit-box-flex: 1;\r\n    -moz-box-flex: 1;\r\n    flex: 1;\r\n    order: 0;\r\n    border: 1px solid black;\r\n}\r\n\r\n.chat-options {\r\n    -webkit-flex: 0;\r\n    -webkit-box-flex: 0;\r\n    -moz-box-flex: 0;\r\n    flex: 0 22vw;\r\n    order: -1;\r\n    border: 1px solid black;\r\n\r\n}\r\n.chat-window {\r\n    -webkit-flex: 0;\r\n    -webkit-box-flex: 0;\r\n    -moz-box-flex: 0;\r\n    flex: 1;\r\n    order: 0;\r\n    border: 1px solid black;\r\n}\r\n.feedback-center {\r\n    -webkit-flex: 0;\r\n    -webkit-box-flex: 0;\r\n    -moz-box-flex: 0;\r\n    flex: 0 24vw;\r\n    order: 1;\r\n    border: 1px solid black;\r\n}\r\n\r\n.chat-button {\r\n    border-radius: 10px;\r\n    border: 8px solid #0c2340;\r\n    background: #808080;\r\n    padding: 0px;\r\n    width: 250px;\r\n    height: 250px;\r\n    margin-top: 150px;\r\n    margin-left: 35px;\r\n    justify-content: center;\r\n    cursor:pointer;\r\n}\r\n.button-image{\r\n    width: 80%;\r\n    height: 100%;\r\n    margin: auto;\r\n    display:block;\r\n    \r\n\r\n}\r\n\r\n.unknown {\r\n    -ms-flex: 0;\r\n    -webkit-box-flex: 0;\r\n    -moz-box-flex: 0;\r\n    flex: 0 30vh;\r\n    border: 1px solid black;\r\n    order: 1;\r\n}\r\n.bot-info {\r\n    -ms-flex: 1;\r\n    -webkit-box-flex: 1;\r\n    -moz-box-flex: 1;\r\n    flex: 1;\r\n\r\n}\r\n\r\n.bot-menu {\r\n    -ms-flex: 0;\r\n    -webkit-box-flex: 0;\r\n    -moz-box-flex: 0;\r\n    flex: 0 20vh;\r\n}\r\n\r\n::-webkit-scrollbar-track {\r\n    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);\r\n    border-radius: 10px;\r\n    background-color: #F5F5F5;\r\n}\r\n\r\n::-webkit-scrollbar {\r\n    width: 12px;\r\n    background-color: #F5F5F5;\r\n}\r\n\r\n::-webkit-scrollbar-thumb {\r\n    border-radius: 10px;\r\n    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);\r\n    background-color: #0c2340;\r\n}\r\n/*\r\n.chat-button {\r\n    margin: auto;\r\n    width: 200px;\r\n    height: 150px;\r\n    display: flex;\r\n    justify-content: center;\r\n    border-color: #0c2340;\r\n    border: 2px, solid;\r\n    border-radius: 15px;\r\n    background-color: #f15a22;\r\n    color: #0c2340;\r\n    font-weight: 900;\r\n    font-size: 2.00rem;\r\n}\r\n\r\nsection {\r\n    margin: 150px auto 0;\r\n    width: 75px;\r\n    height: 95px;\r\n    position: relative;\r\n    text-align: center;\r\n}\r\n\r\n:active, :focus {\r\n    outline: 0;\r\n}\r\n\r\na {\r\n    color: #0c2340;\r\n    text-shadow: 0px 1px 1px #0c2340;\r\n    font-size: 4.50rem;\r\n    font-weight: 900;\r\n    display: block;\r\n    position: relative;\r\n    text-decoration: none;\r\n    background-color: #f15a22;\r\n    box-shadow: 0px 3px 0px 0px #0c2340, \r\n    0px 7px 10px 0px #0c2340, \r\n    inset 0px 1px 1px 0px #0c2340, \r\n    inset 0px -12px 35px 0px #0c2340; \r\n    width: 400px;\r\n    height: 300px;\r\n    border: 0;\r\n    border-radius: 20px;\r\n    text-align: center;\r\n    line-height: 79px;\r\n    transition: color 350ms, text-shadow 350ms;\r\n    -o-transition: color 350ms, text-shadow 350ms;\r\n    -moz-transition: color 350ms, text-shadow 350ms;\r\n    -webkit-transition: color 350ms, text-shadow 350ms;\r\n}\r\n\r\na + span {\r\n    display: block;\r\n    width: 8px;\r\n    height: 8px;\r\n    background-color: rgb(226,0,0);\r\n    box-shadow: inset 0px 1px 0px 0px rgba(250,250,250,0.5), 0px 0px 3px 2px rgba(226,0,0,0.5);\r\n    border-radius: 4px;\r\n    clear: both;\r\n    position: absolute;\r\n    bottom: 0;\r\n    left: 42%;\r\n}\r\n\r\na:active {\r\n    box-shadow: 0px 0px 0px 0px rgb(34,34,34),\r\n    0px 3px 7px 0px rgb(17,17,17), \r\n    inset 0px 1px 1px 0px rgba(250, 250, 250, .2),\r\n    inset 0px -10px 35px 5px rgba(0, 0, 0, .5);\r\n    background-color: rgb(83,87,93);\r\n    top: 3px;\r\n}\r\n\r\na:target {\r\n    box-shadow: 0px 0px 0px 0px rgb(34,34,34), 0px 3px 7px 0px rgb(17,17,17), inset 0px 1px 1px 0px rgba(250, 250, 250, .2), inset 0px -10px 35px 5px rgba(0, 0, 0, .5);\r\n    background-color: rgb(83,87,93);\r\n    top: 3px;\r\n    color: #fff;\r\n    text-shadow: 0px 0px 3px rgb(250,250,250);\r\n}\r\n\r\na:active:before, a:target:before {\r\n    top: -5px;\r\n    background-color: rgb(26,27,29);\r\n    box-shadow: 0px 1px 0px 0px rgba(250,250,250,0.1), inset 0px 1px 2px rgba(0, 0, 0, 0.5);\r\n}\r\n\r\n    a:target + span {\r\n        box-shadow: inset 0px 1px 0px 0px rgba(250,250,250,0.5), 0px 0px 3px 2px rgba(135,187,83,0.5);\r\n        background-color: rgb(135,187,83);\r\n        transition: background-color 350ms, box-shadow 700ms;\r\n        -o-transition: background-color 350ms, box-shadow 700ms;\r\n        -moz-transition: background-color 350ms, box-shadow 700ms;\r\n        -webkit-transition: background-color 350ms, box-shadow 700ms;\r\n    }\r\n\r\n*/\r\n\r\n\r\n", ""]);
 
 // exports
 
@@ -6616,7 +6666,7 @@ exports = module.exports = __webpack_require__(12)(undefined);
 
 
 // module
-exports.push([module.i, ".modal {\r\n    outline: none;\r\n    width: 45%;\r\n    margin: 0 auto;\r\n\r\n\r\n}\r\n.custom {\r\n    outline: none;\r\n    width: 45%;\r\n    margin: 0 auto;\r\n}\r\n\r\n.modal-dialog {\r\n    width: 45%;\r\n    margin: 0 auto;\r\n\r\n\r\n}\r\n\r\n.loader {\r\n    border: 16px solid #f3f3f3;\r\n    border-radius: 50%;\r\n    border-top: 16px solid #3498db;\r\n    width: 120px;\r\n    height: 120px;\r\n    -webkit-animation: spin 2s linear infinite;\r\n    animation: spin 2s linear infinite;\r\n}\r\n\r\n@-webkit-keyframes spin {\r\n    0% {\r\n        -webkit-transform: rotate(0deg);\r\n    }\r\n\r\n    100% {\r\n        -webkit-transform: rotate(360deg);\r\n    }\r\n}\r\n\r\n@keyframes spin {\r\n    0% {\r\n        transform: rotate(0deg);\r\n    }\r\n\r\n    100% {\r\n        transform: rotate(360deg);\r\n    }\r\n}\r\n\r\n.body {\r\n    display: inline-block;\r\n\r\n}\r\n\r\n.modal-content {\r\n    border-color: #0c2340;\r\n    border: 2px, solid\r\n}\r\n\r\n.chat-display {\r\n    height: 300px;\r\n    border: 1px solid DimGray;\r\n    overflow-y: auto;\r\n    background-color: white;\r\n    \r\n}\r\n\r\n.modal-header {\r\n    background-color: #f15a22;\r\n}\r\n.modal-body {\r\n    background-color: #0c2340;\r\n}\r\n\r\n.modal-footer {\r\n    background-color: #f15a22;\r\n    \r\n}\r\n.input-display {\r\n    background-color: white;\r\n    overflow-y: auto;\r\n    \r\n    \r\n}\r\n.chatmessages {\r\n    overflow: auto;\r\n    position: absolute;\r\n    bottom: 0;\r\n    max-height: 400px;\r\n}\r\n.msg-bubble {\r\n    border: 1px solid;\r\n    border-color: #0c2340;\r\n    border-radius: 15px;\r\n    background-color: orange;\r\n    display: inline-block;\r\n    padding: 5px 11px 5px 11px;\r\n    text-align: justify;\r\n    position: relative;\r\n    margin: auto;\r\n    left: -25px;\r\n    width: 100%\r\n}\r\n\r\n\r\nul {\r\n    list-style-type: none;\r\n\r\n    flex-direction: column-reverse;\r\n}\r\n.text-frame {\r\n    border-top: 15px, solid, #0c2340;\r\n}\r\n.modal-title {\r\n    font-family: sans-serif;\r\n    font-weight: 900;\r\n    font-size: 2.00rem;\r\n    text-shadow: 1px 1px 1px #0c2340;\r\n    text-align: left;\r\n    color: #0c2340;\r\n}\r\n\r\n.btn-primary::before,\r\n.btn-primary:hover,\r\n.btn-primary:focus,\r\n.btn-primary:focus,\r\n.btn-primary:active,\r\n.btn-primary.active {\r\n    color: #ffffff;\r\n    background-color: #0c2340;\r\n    border-color: #0c2340;\r\n}\r\n\r\n.submit-button {\r\n    color: #ffffff;\r\n    background-color: #0c2340;\r\n    border-color: #0c2340;\r\n}\r\n\r\n.exit-button{\r\n\r\n}\r\n\r\n.close {\r\n    color: #0c2340;\r\n    opacity: 0.6;\r\n}", ""]);
+exports.push([module.i, ".modal {\r\n    outline: none;\r\n    width: 100%;\r\n    height:100%;\r\n    margin: 0 auto;\r\n\r\n\r\n}\r\n.custom {\r\n    outline: none;\r\n    width: 100%;\r\n    height: 100%;\r\n    margin: 0 auto;\r\n}\r\n\r\n.modal-dialog {\r\n    width: 100%;\r\n    height: 100%;\r\n    margin: 0 auto;\r\n}\r\n\r\n.loader {\r\n    border: 16px solid #f3f3f3;\r\n    border-radius: 50%;\r\n    border-top: 16px solid #3498db;\r\n    width: 120px;\r\n    height: 120px;\r\n    -webkit-animation: spin 2s linear infinite;\r\n    animation: spin 2s linear infinite;\r\n}\r\n\r\n@-webkit-keyframes spin {\r\n    0% {\r\n        -webkit-transform: rotate(0deg);\r\n    }\r\n\r\n    100% {\r\n        -webkit-transform: rotate(360deg);\r\n    }\r\n}\r\n\r\n@keyframes spin {\r\n    0% {\r\n        transform: rotate(0deg);\r\n    }\r\n\r\n    100% {\r\n        transform: rotate(360deg);\r\n    }\r\n}\r\n\r\n.body {\r\n    display: inline-block;\r\n\r\n}\r\n\r\n.modal-content {\r\n    border-color: #0c2340;\r\n    border: 2px, solid\r\n}\r\n\r\n.chat-display {\r\n    height: 300px;\r\n    border: 1px solid DimGray;\r\n    overflow-y: auto;\r\n    background-color: white;\r\n    \r\n}\r\n\r\n.modal-header {\r\n    background-color: #f15a22;\r\n}\r\n.modal-body {\r\n    background-color: #0c2340;\r\n}\r\n\r\n.modal-footer {\r\n    background-color: #f15a22;\r\n    \r\n}\r\n.input-display {\r\n    background-color: white;\r\n    overflow-y: auto;\r\n    \r\n    \r\n}\r\n.chatmessages {\r\n    overflow: auto;\r\n    position: absolute;\r\n    bottom: 0;\r\n    max-height: 400px;\r\n}\r\n.msg-bubble {\r\n    border: 1px solid;\r\n    border-color: #0c2340;\r\n    border-radius: 15px;\r\n    background-color: orange;\r\n    display: inline-block;\r\n    padding: 5px 11px 5px 11px;\r\n    text-align: justify;\r\n    position: relative;\r\n    margin: auto;\r\n    left: -25px;\r\n    width: 100%\r\n}\r\n\r\n\r\nul {\r\n    list-style-type: none;\r\n\r\n    flex-direction: column-reverse;\r\n}\r\n.text-frame {\r\n    border-top: 15px, solid, #0c2340;\r\n}\r\n.modal-title {\r\n    font-family: sans-serif;\r\n    font-weight: 900;\r\n    font-size: 2.00rem;\r\n    text-shadow: 1px 1px 1px #0c2340;\r\n    text-align: left;\r\n    color: #0c2340;\r\n}\r\n\r\n.btn-primary::before,\r\n.btn-primary:hover,\r\n.btn-primary:focus,\r\n.btn-primary:focus,\r\n.btn-primary:active,\r\n.btn-primary.active {\r\n    color: #ffffff;\r\n    background-color: #0c2340;\r\n    border-color: #0c2340;\r\n}\r\n\r\n.submit-button {\r\n    color: #ffffff;\r\n    background-color: #0c2340;\r\n    border-color: #0c2340;\r\n}\r\n\r\n.exit-button{\r\n\r\n}\r\n\r\n.close {\r\n    color: #0c2340;\r\n    opacity: 0.6;\r\n}", ""]);
 
 // exports
 
@@ -6957,7 +7007,7 @@ module.exports = "<div id=\"popup1\" class=\"overlay main-body\">\r\n    <div cl
 /* 116 */
 /***/ (function(module, exports) {
 
-module.exports = "\r\n<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css\">\r\n<!--\r\n<ul >\r\n\r\n    <li  class=\"pending-item test\" draggable-window *ngFor=\"let pend of liveQueue\" (click)=\"acceptRequest(pend)\">{{pend['user']}}: {{pend['date'] }}</li> \r\n</ul>\r\n\r\n    -->\r\n\r\n<!--\r\n<button draggable-window (click)=\"remove()\">click</button>\r\n<div class=\"test\" draggable-window>\r\n    Testing\r\n</div>\r\n    -->\r\n<div class=\"main-content\">\r\n    <div id=\"pend-list\">\r\n        <div id=\"pend-title\">\r\n            Pending Requests\r\n        </div>\r\n        <ul class=\"nav\">\r\n            <li class=\"pending-item test\" draggable-window *ngFor=\"let pend of liveQueue\" (click)=\"acceptRequest(pend)\">\r\n            <i class=\"fa fa-user-circle-o\"></i>   {{pend['user']}}: {{pend['date'] }}\r\n            </li> \r\n        </ul>\r\n    </div>\r\n    <div class=\"main-stage\">\r\n        <div class=\"main-display\">\r\n        </div>\r\n        <div class=\"minimize-bar\">\r\n            <div class=\"minimize-window\">Placeholding for Minimized windows</div>\r\n        </div>\r\n    </div>\r\n\r\n</div>";
+module.exports = "\r\n<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css\">\r\n\r\n<div class=\"main-content\">\r\n    <div id=\"pend-list\">\r\n        <div id=\"pend-title\">\r\n            Pending Requests\r\n        </div>\r\n        <ul class=\"nav\">\r\n            <li class=\"pending-item test\" *ngFor=\"let pend of liveQueue\" (click)=\"acceptRequest(pend)\">\r\n            <i class=\"fa fa-user-circle-o\"></i>   \r\n                {{pend['user']}}: {{pend['date'] }} \r\n            \r\n            </li> \r\n        </ul>\r\n    </div>\r\n    <div class=\"main-stage\">\r\n\r\n        <div class=\"main-display\">\r\n            <div insertWindow></div>\r\n            <!--\r\n            <div class=\"move-chat\">\r\n                \r\n            </div> -->\r\n        </div>\r\n        <div class=\"minimize-bar\">\r\n            <div class=\"minimize-window\">Placeholding for Minimized windows</div>\r\n        </div>\r\n    </div>\r\n\r\n</div>";
 
 /***/ }),
 /* 117 */
@@ -6987,7 +7037,7 @@ module.exports = "<h1>OIT</h1>\r\n<p>Office of Information Technology Contact In
 /* 121 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = "\r\n<div class=\"container-fluid\">\r\n    <div>\r\n    <h1 class=\"home-title\">OIT Chatbot Services</h1>\r\n        <button (click)=\"clickMe()\">Click Me</button>\r\n        <chat-window *ngIf=\"shownext\"></chat-window>\r\n        <div *ngIf=\"users?.length > 0\">\r\n            <ul>\r\n                <li *ngFor=\"let user of users\">{{user}}</li>\r\n            </ul>\r\n        </div>\r\n        <section>\r\n            \r\n            <a>\r\n                Start Chat\r\n                <img src=\"" + __webpack_require__(380) + "\" (click)=\"showConver()\" style=\"position:relative; top:-20px;\" />\r\n\r\n            </a>\r\n                \r\n        </section>\r\n    </div>\r\n    <div>\r\n        <test-modal *ngIf=\"showModal\" (deleteModal)=\"removeConver($event)\"></test-modal>\r\n    </div>\r\n</div>\r\n\r\n";
+module.exports = "\r\n<div class=\"main-content\">\r\n    <div class=\"main-stage\">\r\n        <div class=\"title-header\">\r\n        <h1 class=\"home-title\">OIT Chatbot</h1>\r\n        </div>\r\n        <div class=\"main-display\">\r\n            <div class=\"chat-options\">\r\n                <div class=\"chat-button\">\r\n                    <img class=\"button-image\" src=\"" + __webpack_require__(413) + "\" (click)=\"showConver()\" /> \r\n                </div>\r\n            </div>\r\n            <div class=\"chat-window\">\r\n                <test-modal *ngIf=\"showModal\" (deleteModal)=\"removeConver($event)\"></test-modal>\r\n             </div>   \r\n            <div class=\"feedback-center\">\r\n\r\n            </div>\r\n      </div>\r\n      <div class=\"unknown\">\r\n\r\n      </div>  \r\n        \r\n    </div>\r\n    <div class=\"info-panel\">\r\n        <div class=\"bot-menu\"></div>\r\n        <div class=\"bot-info\"></div>\r\n\r\n    </div>\r\n</div>\r\n        <!--\r\n            <section>\r\n\r\n                <a>\r\n                    Start Chat\r\n                    <img src=\"" + __webpack_require__(380) + "\" (click)=\"showConver()\" style=\"position:relative; top:-20px;\" />\r\n\r\n                </a>\r\n\r\n            </section> -->\r\n            <!--\r\n            <div>\r\n                <button (click)=\"clickMe()\">Click Me</button>\r\n                <test-modal *ngIf=\"showModal\" (deleteModal)=\"removeConver($event)\"></test-modal>\r\n            </div>\r\n\r\n\r\n\r\n                <chat-window *ngIf=\"shownext\"></chat-window>\r\n                <div *ngIf=\"users?.length > 0\">\r\n                    <ul>\r\n                        <li *ngFor=\"let user of users\">{{user}}</li>\r\n                    </ul>\r\n                </div>\r\n            </div>\r\n                -->\r\n\r\n\r\n\r\n\r\n\r\n";
 
 /***/ }),
 /* 122 */
@@ -6999,7 +7049,7 @@ module.exports = "\r\n\r\n\r\n<link rel=\"stylesheet\" href=\"https://cdnjs.clou
 /* 123 */
 /***/ (function(module, exports) {
 
-module.exports = "<div draggable-element class=\"body modal custom modal-dialog\" id=\"exampleModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"exampleModalLabel\">\r\n    <div class=\"modal-dialog\" role=\"document\">\r\n        <div class=\"modal-content\">\r\n            <div class=\"modal-header\" >\r\n                <button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\" (click)=\"closeModal()\"><span aria-hidden=\"true\">&times;</span></button>\r\n                <h4 class=\"modal-title\" id=\"exampleModalLabel\">OIT CHAT BOT</h4>\r\n            </div>\r\n            <div class=\"modal-body\">\r\n\r\n                <div class=\"chat-display\">\r\n                    <ul>\r\n                        <li class=\"msg-bubble chatmessages\" *ngFor=\"let msg of Messages\">{{msg}}</li>\r\n                    </ul>\r\n\r\n                </div>\r\n\r\n                <div>\r\n                    <textarea #msgref [(ngModel)]=\"defaultVal\" class=\"form-control input-display\" rows=\"2\" id=\"message-text\" (keyup.enter)=\"submitMessage(msgref.value)\"></textarea>\r\n                </div>\r\n\r\n            </div>\r\n            <div class=\"modal-footer\">\r\n                <button type=\"button\" class=\"exit-button\" data-dismiss=\"modal\" (click)=\"closeModal()\">Close</button>\r\n                <button type=\"button\" class=\"submit-button\" (click)=\"submitMessage(msgref.value)\">Send</button>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</div>";
+module.exports = "<div draggable-element class=\"body modal custom modal-dialog\" id=\"exampleModal\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"exampleModalLabel\">\r\n    <div class=\"modal-dialog\" role=\"document\">\r\n        <div class=\"modal-content\">\r\n            <div class=\"modal-header\" >\r\n                <button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\" (click)=\"closeModal()\"><span aria-hidden=\"true\">&times;</span></button>\r\n                <h4 class=\"modal-title\" id=\"exampleModalLabel\">OIT CHAT BOT</h4>\r\n            </div>\r\n            <div class=\"modal-body\">\r\n\r\n                <div class=\"chat-display\">\r\n                    <ul>\r\n                        <li class=\"msg-bubble chatmessages\" *ngFor=\"let msg of Messages\">{{msg}}</li>\r\n                    </ul>\r\n\r\n                </div>\r\n\r\n                <div>\r\n                    <textarea #msgref [(ngModel)]=\"defaultVal\" class=\"form-control input-display\" rows=\"2\" id=\"message-text\" (keyup.enter)=\"submitMessage(msgref.value)\"></textarea>\r\n                </div>\r\n\r\n            </div>\r\n            <div class=\"modal-footer\">\r\n                <button type=\"button\" (click)=\"makeLiveRequest()\">Live Request</button>\r\n                <button type=\"button\" class=\"exit-button\" data-dismiss=\"modal\" (click)=\"closeModal()\">Close</button>\r\n                <button type=\"button\" class=\"submit-button\" (click)=\"submitMessage(msgref.value)\">Send</button>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</div>";
 
 /***/ }),
 /* 124 */
@@ -21388,6 +21438,309 @@ module.exports = (__webpack_require__(1))(84);
 __webpack_require__(89);
 __webpack_require__(88);
 module.exports = __webpack_require__(87);
+
+
+/***/ }),
+/* 413 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__.p + "756f1c731d625aa82dcc064fffc8d71f.png";
+
+/***/ }),
+/* 414 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var core_1 = __webpack_require__(5);
+var botframework_directlinejs_1 = __webpack_require__(104);
+var chat_service_1 = __webpack_require__(30);
+var chat_connection_service_1 = __webpack_require__(29);
+var chat_authentication_service_1 = __webpack_require__(22);
+var uuid = __webpack_require__(78);
+var AgentChatWindowComponent = (function () {
+    function AgentChatWindowComponent(injector, chatConnectionService, chatService, authService) {
+        this.injector = injector;
+        this.chatConnectionService = chatConnectionService;
+        this.chatService = chatService;
+        this.authService = authService;
+        /*
+        @Output() deleteModal: EventEmitter<boolean>;
+        @Input() conv_id: string;
+        isshowing: boolean = false;
+        Messages: string[] = [];
+    
+        private myuid: string;
+        private directLine;
+        connected: boolean = false;
+        defaultVal: string = null;
+        */
+        this.botHandle = 'AskRowdy';
+        this.close = new core_1.EventEmitter();
+        this.defaultVal = null;
+        this.messages = [];
+        //this.deleteModal = new EventEmitter<boolean>();
+        this.conv_id = this.injector.get('conv_id');
+        this.secret = this.injector.get('secret');
+        this.myuid = uuid();
+    }
+    AgentChatWindowComponent.prototype.ngOnInit = function () {
+        var _this = this;
+        this.authService.getConvStreamUrl(this.conv_id).subscribe(function (res) {
+            _this.conversation = res;
+            _this.directLine = new botframework_directlinejs_1.DirectLine({
+                token: _this.conversation['token'],
+                conversationId: _this.conv_id,
+                webSocket: true,
+                streamUrl: _this.conversation['streamUrl']
+            });
+            _this.directLine.activity$.filter(function (res) { return res.from.id !== _this.myuid; })
+                .subscribe(function (res) { return _this.messages.push(res); });
+        });
+    };
+    AgentChatWindowComponent.prototype.ngOnDestroy = function () {
+    };
+    AgentChatWindowComponent.prototype.submitMessage = function (sendingMessage) {
+        this.defaultVal = '';
+        if (sendingMessage !== '') {
+            var act = { from: { id: this.myuid }, type: 'message', text: sendingMessage };
+            this.directLine.postActivity(act).subscribe(function (id) { return console.log("posted activity, assigned ID ", id); }, function (error) { return console.log("Error posting activity", error); });
+            this.messages.push(act);
+        }
+    };
+    AgentChatWindowComponent.prototype.msgAlignment = function (id) {
+        if (id === this.myuid) {
+            return {
+                'align-window-right': true,
+            };
+        }
+        else
+            return {
+                'align-window-left': true,
+            };
+    };
+    AgentChatWindowComponent.prototype.bubbleProperties = function (id) {
+        if (id === this.myuid) {
+            return {
+                'align-window-right': true,
+                'host-bubble': true,
+            };
+        }
+        else
+            return {
+                'align-window-left': true,
+                'remote-bubble': true,
+            };
+    };
+    AgentChatWindowComponent.prototype.onClickedExit = function () {
+        this.close.emit('event');
+    };
+    return AgentChatWindowComponent;
+}());
+AgentChatWindowComponent = __decorate([
+    core_1.Component({
+        selector: 'agent-chat-window',
+        template: __webpack_require__(416),
+        styles: [__webpack_require__(417)],
+    }),
+    __metadata("design:paramtypes", [core_1.Injector, chat_connection_service_1.ChatConnectionService, chat_service_1.ChatService, chat_authentication_service_1.ChatAuthenticationService])
+], AgentChatWindowComponent);
+exports.AgentChatWindowComponent = AgentChatWindowComponent;
+
+
+/***/ }),
+/* 415 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(12)(undefined);
+// imports
+
+
+// module
+exports.push([module.i, "\r\n\r\n\r\n.chat-window {\r\n    position: relative;\r\n    width: 320px;\r\n    height: 420px;\r\n    border: 0.5px solid #141010;\r\n    border-radius: 1%;\r\n    -webkit-box-shadow: 2px 2px 4px #888;\r\n    -moz-box-shadow: 2px 2px 4px #888;\r\n    box-shadow: 2px 2px 4px #888;\r\n}\r\n.window-header {\r\n    display: block;\r\n    height: 10%;\r\n    background-color: #0c2340;\r\n\r\n}\r\n.close-button{\r\n    float:right;\r\n    color:white;\r\n    background:none;\r\n    margin-top: 2px;\r\n    margin-right: 2px;\r\n    border: none;\r\n    font-size: 30px;\r\n}\r\n\r\n.minimize-button {\r\n    float: right;\r\n    color: white;\r\n    background: none;\r\n    margin-top: 2px;\r\n    margin-right: 2px;\r\n    border: none;\r\n    font-size: 30px;\r\n}\r\n.window-title{\r\n    color: white;\r\n    font-size:20px;\r\n    margin-top:0;\r\n    padding-top:10px;\r\n    padding-left: 10px;\r\n}\r\n.window-body{\r\n    display:block;\r\n    height: 90%;\r\n    background:#c7bebe;\r\n    padding: 10px 10px 10px 10px;\r\n}\r\n.message-display {\r\n    height: 90%;\r\n    background: white;\r\n    border-radius: 2%;\r\n    border: 0.7px solid #c7bebe;\r\n    display: -ms-flexbox;\r\n    display: -webkit-box;\r\n    display: -moz-box;\r\n    display: flex;\r\n    -ms-flex-direction: column-reverse;\r\n    -webkit-box-orient: vertical;\r\n    -moz-box-orient: vertical;\r\n    flex-direction: column-reverse;\r\n    overflow-y:auto;\r\n\r\n}\r\n\r\n\r\n\r\n.msg-row{\r\n    width: 60%;\r\n    /*float: right;*/\r\n}\r\n.align-window-right{\r\n    float: right;\r\n\r\n}\r\n.align-window-left{\r\n    float: left;\r\n}\r\n\r\n.remote-bubble{\r\n    background-color:#66cfac;\r\n}\r\n.host-bubble{\r\n    background-color:#cbc380;\r\n}\r\n\r\n.bubble {\r\n    border: 0.2px solid #808080;\r\n    border-radius: 30px;\r\n    /*background-color: #F2F2F2;*/\r\n    -webkit-box-shadow: 2px 2px 4px #888;\r\n    -moz-box-shadow: 2px 2px 4px #888;\r\n    box-shadow: 2px 2px 4px #888;\r\n    padding: 5px 11px 5px 11px;\r\n    text-align: left;\r\n    line-height: 1.5em;\r\n    display: inline-block;\r\n    vertical-align: top;\r\n    margin: 5px 15px 5px 15px;\r\n    overflow-wrap: break-word;\r\n    word-break: break-all;\r\n    /*float: right;*/\r\n    position: relative;\r\n}\r\n\r\n::-webkit-scrollbar-track {\r\n    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);\r\n    border-radius: 10px;\r\n    background-color: #F5F5F5;\r\n}\r\n\r\n::-webkit-scrollbar {\r\n    width: 12px;\r\n    background-color: #F5F5F5;\r\n}\r\n\r\n::-webkit-scrollbar-thumb {\r\n    border-radius: 10px;\r\n    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);\r\n    background-color: #555;\r\n}\r\n\r\n\r\n/*\r\n.bubble::before {\r\n    background-color: #F2F2F2;\r\n    content: \"\\00a0\";\r\n    display: block;\r\n    height: 16px;\r\n    position: absolute;\r\n    top: 11px;\r\n    transform: rotate( 29deg ) skew( -35deg );\r\n    -moz-transform: rotate( 29deg ) skew( -35deg );\r\n    -ms-transform: rotate( 29deg ) skew( -35deg );\r\n    -o-transform: rotate( 29deg ) skew( -35deg );\r\n    -webkit-transform: rotate( 29deg ) skew( -35deg );\r\n    width: 20px;\r\n}\r\n    */\r\n\r\n.host-messenger {\r\n    float: left;\r\n    margin: 5px 45px 5px 20px;\r\n}\r\n.host-messenger::before {\r\n    box-shadow: -2px 2px 2px 0 rgba( 178, 178, 178, .4 );\r\n    left: -9px;\r\n}\r\n\r\n.remote-messenger {\r\n    float: right;\r\n    margin: 5px 20px 5px 45px;\r\n}\r\n.remote-messenger::before {\r\n    box-shadow: 2px -2px 2px 0 rgba( 178, 178, 178, .4 );\r\n    right: -9px;\r\n}\r\n.partition {\r\n    display: block;\r\n    height: 2%;\r\n    margin-top: 2px;\r\n    margin-bottom: 2px;\r\n    background-color: #c7bebe;\r\n}\r\n.input-area {\r\n    display: block;\r\n    height: 7%;\r\n    background: none;\r\n    width: 100%;\r\n}\r\n.text-input{\r\n    display:inline;\r\n    resize:none; \r\n    overflow-y:auto;\r\n    height: 100%;\r\n    width: 100%;\r\n    margin:0;\r\n    padding:0;\r\n}\r\n.send-message {\r\n\r\n    color: white;\r\n    background-color: #0c2340;\r\n    border-radius: 10%;\r\n    border: none;\r\n    font-size: 30px;\r\n    height: 100%;\r\n}\r\n\r\n\r\n\r\n\r\nul {\r\n    margin: 0;\r\n    padding: 0;\r\n    list-style-type: none;\r\n    flex-direction: column-reverse;\r\n\r\n}", ""]);
+
+// exports
+
+
+/***/ }),
+/* 416 */
+/***/ (function(module, exports) {
+
+module.exports = "\r\n<div class=\"chat-window\" >\r\n    <div class=\"window-header\">\r\n        <button type=\"button\" class=\"close-button\" (click)=\"onClickedExit()\"><span aria-hidden=\"true\">&times;</span></button>\r\n        <button type=\"button\" class=\"minimize-button\" (click)=\"minimizeWindow()\"><span aria-hidden=\"true\">&minus;</span></button>\r\n            \r\n        <h4 class=\"window-title\">OIT SUPPORT</h4>\r\n    </div>\r\n    <div class=\"window-body\">\r\n        <div class=\"message-display\">\r\n            <ul *ngIf=\"messages\">\r\n\r\n                <li *ngFor=\"let rmsg of messages\"\r\n                    class=\"msg-row\" [ngClass]=\"msgAlignment(rmsg.from.id)\" >\r\n                    <span class=\"bubble\" [ngClass]=\"bubbleProperties(rmsg.from.id)\">{{rmsg['text']}}</span>\r\n                </li>\r\n\r\n            </ul>\r\n        </div>\r\n        <div class=\"partition\"></div>\r\n        <div class=\"input-area\">\r\n            <input #msg type=\"text\" [(ngModel)]=\"defaultVal\" class=\"text-input\" (keyup.enter)=\"submitMessage(msg.value)\"/>\r\n        </div>\r\n    </div>\r\n</div>\r\n";
+
+/***/ }),
+/* 417 */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+        var result = __webpack_require__(415);
+
+        if (typeof result === "string") {
+            module.exports = result;
+        } else {
+            module.exports = result.toString();
+        }
+    
+
+/***/ }),
+/* 418 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var core_1 = __webpack_require__(5);
+var InsertWindowDirective = (function () {
+    function InsertWindowDirective(viewContainer, factoryResolver) {
+        this.viewContainer = viewContainer;
+        this.factoryResolver = factoryResolver;
+    }
+    //method passes in a new instance of the chat component and returns a reference to that component
+    InsertWindowDirective.prototype.createChatWindow = function (conv_id, secret, chatWindow) {
+        //removes already open chat windows (only use if we want one window open at time)
+        //this.viewContainer.clear(); 
+        var data = { inputs: 'test' };
+        //get service providers needed for the component
+        //let inputProviders = Object.keys(data.inputs).map((inputName) => { return { provide: inputName, useValue: data.inputs[inputName] }; });
+        //let resolvedInputs = ReflectiveInjector.resolve(inputProviders);
+        //create an injector for the 
+        var inputProviders = [{ provide: 'conv_id', useValue: conv_id }, { provide: 'secret', useValue: secret }];
+        var resolvedInputs = core_1.ReflectiveInjector.resolve(inputProviders);
+        var injector = core_1.ReflectiveInjector.fromResolvedProviders(resolvedInputs);
+        //the factory creates the component
+        var windowFactory = this.factoryResolver.resolveComponentFactory(chatWindow);
+        //converts the new made component into a reference component
+        var chatWindowComponentRef = this.viewContainer.createComponent(windowFactory, null, injector);
+        //set up a listener that will destroy the reference to the componet once ngOnDestroy? (prevent mem leaks)
+        chatWindowComponentRef.instance.close.subscribe(function () {
+            chatWindowComponentRef.destroy();
+        });
+        return chatWindowComponentRef;
+    };
+    return InsertWindowDirective;
+}());
+InsertWindowDirective = __decorate([
+    core_1.Directive({ selector: '[insertWindow]' }),
+    __metadata("design:paramtypes", [core_1.ViewContainerRef,
+        core_1.ComponentFactoryResolver])
+], InsertWindowDirective);
+exports.InsertWindowDirective = InsertWindowDirective;
+
+
+/***/ }),
+/* 419 */,
+/* 420 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var core_1 = __webpack_require__(5);
+var DraggableWindowDirective = (function () {
+    function DraggableWindowDirective(elref) {
+        var _this = this;
+        this.elref = elref;
+        this.mouseover = new core_1.EventEmitter();
+        this.mouseup = new core_1.EventEmitter();
+        this.mousedown = new core_1.EventEmitter();
+        this.mousemove = new core_1.EventEmitter();
+        this.elref.nativeElement.style.position = 'absolute';
+        this.elref.nativeElement.style.cursor = 'pointer';
+        this.mousedrag = this.mousedown.flatMap(function (md) {
+            var startX = md.offsetX;
+            var startY = md.offsetY;
+            return _this.mousemove.map(function (mm) {
+                mm.preventDefault();
+                return {
+                    left: mm.clientX - startX,
+                    top: mm.clientY - startY
+                };
+            }).takeUntil(_this.mouseup);
+        });
+    }
+    DraggableWindowDirective.prototype.onMouseover = function (event) {
+        this.mouseup.emit(event);
+    };
+    DraggableWindowDirective.prototype.onMouseup = function (event) {
+        this.mouseup.emit(event);
+    };
+    DraggableWindowDirective.prototype.onMousedown = function (event) {
+        this.mousedown.emit(event);
+        return false;
+    };
+    DraggableWindowDirective.prototype.onMousemove = function (event) {
+        this.mousemove.emit(event);
+    };
+    DraggableWindowDirective.prototype.ngOnInit = function () {
+        var _this = this;
+        this.mousedrag.subscribe({
+            next: function (pos) {
+                _this.elref.nativeElement.style.top = pos.top + 'px';
+                _this.elref.nativeElement.style.left = pos.left + 'px';
+            }
+        });
+    };
+    return DraggableWindowDirective;
+}());
+__decorate([
+    core_1.HostListener('mouseover', ['$event']),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [MouseEvent]),
+    __metadata("design:returntype", void 0)
+], DraggableWindowDirective.prototype, "onMouseover", null);
+__decorate([
+    core_1.HostListener('document:mouseup', ['$event']),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [MouseEvent]),
+    __metadata("design:returntype", void 0)
+], DraggableWindowDirective.prototype, "onMouseup", null);
+__decorate([
+    core_1.HostListener('mousedown', ['$event']),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [MouseEvent]),
+    __metadata("design:returntype", void 0)
+], DraggableWindowDirective.prototype, "onMousedown", null);
+__decorate([
+    core_1.HostListener('mousemove', ['$event']),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [MouseEvent]),
+    __metadata("design:returntype", void 0)
+], DraggableWindowDirective.prototype, "onMousemove", null);
+DraggableWindowDirective = __decorate([
+    core_1.Directive({
+        selector: '[draggable-window]'
+    }),
+    __metadata("design:paramtypes", [core_1.ElementRef])
+], DraggableWindowDirective);
+exports.DraggableWindowDirective = DraggableWindowDirective;
 
 
 /***/ })

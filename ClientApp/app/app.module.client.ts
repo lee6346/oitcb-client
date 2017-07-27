@@ -10,11 +10,16 @@ import { StateStorageService } from './services/state-storage.service';
 import { UserService } from './services/user.service';
 import { WebsocketService } from './services/websocket.service';
 import { LiveRequestService } from './services/live-request.service';
+import { AgentChatWindowComponent } from './components/agent/agent-chat-window.component';
+import { DraggableWindowDirective } from './components/agent/draggable-window.directive';
 
 
 @NgModule({
     bootstrap: sharedConfig.bootstrap,
-    declarations: sharedConfig.declarations,
+    declarations: [
+        sharedConfig.declarations,
+        DraggableWindowDirective,
+    ],
     imports: [
         BrowserModule,
         HttpModule,
@@ -30,7 +35,8 @@ import { LiveRequestService } from './services/live-request.service';
         WebsocketService,
         LiveRequestService,
         
-    ]
+    ],
+    entryComponents: [AgentChatWindowComponent]
 })
 export class AppModule {
 }

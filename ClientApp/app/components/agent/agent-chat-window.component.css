@@ -1,0 +1,202 @@
+﻿
+
+
+.chat-window {
+    position: relative;
+    width: 320px;
+    height: 420px;
+    border: 0.5px solid #141010;
+    border-radius: 1%;
+    -webkit-box-shadow: 2px 2px 4px #888;
+    -moz-box-shadow: 2px 2px 4px #888;
+    box-shadow: 2px 2px 4px #888;
+}
+.window-header {
+    display: block;
+    height: 10%;
+    background-color: #0c2340;
+
+}
+.close-button{
+    float:right;
+    color:white;
+    background:none;
+    margin-top: 2px;
+    margin-right: 2px;
+    border: none;
+    font-size: 30px;
+}
+
+.minimize-button {
+    float: right;
+    color: white;
+    background: none;
+    margin-top: 2px;
+    margin-right: 2px;
+    border: none;
+    font-size: 30px;
+}
+.window-title{
+    color: white;
+    font-size:20px;
+    margin-top:0;
+    padding-top:10px;
+    padding-left: 10px;
+}
+.window-body{
+    display:block;
+    height: 90%;
+    background:#c7bebe;
+    padding: 10px 10px 10px 10px;
+}
+.message-display {
+    height: 90%;
+    background: white;
+    border-radius: 2%;
+    border: 0.7px solid #c7bebe;
+    display: -ms-flexbox;
+    display: -webkit-box;
+    display: -moz-box;
+    display: flex;
+    -ms-flex-direction: column-reverse;
+    -webkit-box-orient: vertical;
+    -moz-box-orient: vertical;
+    flex-direction: column-reverse;
+    overflow-y:auto;
+
+}
+
+
+
+.msg-row{
+    width: 60%;
+    /*float: right;*/
+}
+.align-window-right{
+    float: right;
+
+}
+.align-window-left{
+    float: left;
+}
+
+.remote-bubble{
+    background-color:#66cfac;
+}
+.host-bubble{
+    background-color:#cbc380;
+}
+
+.bubble {
+    border: 0.2px solid #808080;
+    border-radius: 30px;
+    /*background-color: #F2F2F2;*/
+    -webkit-box-shadow: 2px 2px 4px #888;
+    -moz-box-shadow: 2px 2px 4px #888;
+    box-shadow: 2px 2px 4px #888;
+    padding: 5px 11px 5px 11px;
+    text-align: left;
+    line-height: 1.5em;
+    display: inline-block;
+    vertical-align: top;
+    margin: 5px 15px 5px 15px;
+    overflow-wrap: break-word;
+    word-break: break-all;
+    /*float: right;*/
+    position: relative;
+}
+
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    border-radius: 10px;
+    background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar {
+    width: 12px;
+    background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+    background-color: #555;
+}
+
+
+/*
+.bubble::before {
+    background-color: #F2F2F2;
+    content: "\00a0";
+    display: block;
+    height: 16px;
+    position: absolute;
+    top: 11px;
+    transform: rotate( 29deg ) skew( -35deg );
+    -moz-transform: rotate( 29deg ) skew( -35deg );
+    -ms-transform: rotate( 29deg ) skew( -35deg );
+    -o-transform: rotate( 29deg ) skew( -35deg );
+    -webkit-transform: rotate( 29deg ) skew( -35deg );
+    width: 20px;
+}
+    */
+
+.host-messenger {
+    float: left;
+    margin: 5px 45px 5px 20px;
+}
+.host-messenger::before {
+    box-shadow: -2px 2px 2px 0 rgba( 178, 178, 178, .4 );
+    left: -9px;
+}
+
+.remote-messenger {
+    float: right;
+    margin: 5px 20px 5px 45px;
+}
+.remote-messenger::before {
+    box-shadow: 2px -2px 2px 0 rgba( 178, 178, 178, .4 );
+    right: -9px;
+}
+.partition {
+    display: block;
+    height: 2%;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    background-color: #c7bebe;
+}
+.input-area {
+    display: block;
+    height: 7%;
+    background: none;
+    width: 100%;
+}
+.text-input{
+    display:inline;
+    resize:none; 
+    overflow-y:auto;
+    height: 100%;
+    width: 100%;
+    margin:0;
+    padding:0;
+}
+.send-message {
+
+    color: white;
+    background-color: #0c2340;
+    border-radius: 10%;
+    border: none;
+    font-size: 30px;
+    height: 100%;
+}
+
+
+
+
+ul {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    flex-direction: column-reverse;
+
+}

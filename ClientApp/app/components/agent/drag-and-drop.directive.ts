@@ -1,7 +1,7 @@
 ﻿import { Component, Directive, HostListener, HostBinding, ElementRef, EventEmitter, OnInit, AfterViewInit} from '@angular/core';
 
 import * as Rx from 'rxjs/Rx';
-import 'rxjs/add/operator/'
+
 
 @Directive({
     selector: '[drag-and-drop]'
@@ -34,22 +34,25 @@ export class DragAndDropDirective implements AfterViewInit, OnInit{
         this.elRef.nativeElement.style.position = 'relative';
         this.elRef.nativeElement.style.cursor = 'pointer';
 
-        this.mousedrag$ = this.mousedown$.flatMap(function (md) {
+        this.mousedrag$ = this.mousedown$.flatMap((md) => {
 
             var startX = md.offsetX;
             var startY = md.offsetY;
-            return this.mousemove.map(function (mm) {
+            return this.mousemove$.map((mm) => {
                 mm.preventDefault();
                 return {
                     left: mm.clientX - startX,
                     top: mm.clientY - startY
                 };
-            }).takeUntil(this.mouseup);
+            }).takeUntil(this.mouseup$);
         })
         
     }
+    
+    public mouseDrag$(loc: MouseEvent) {
+        let startX = loc.offsetX;
+        let startY = loc.offsetY;
 
-    public mouseDrag() {
         
     }
     ngAfterViewInit() {

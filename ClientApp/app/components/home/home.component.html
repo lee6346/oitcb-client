@@ -1,26 +1,61 @@
 
-<div class="container-fluid">
-    <div>
-    <h1 class="home-title">OIT Chatbot Services</h1>
-        <button (click)="clickMe()">Click Me</button>
-        <chat-window *ngIf="shownext"></chat-window>
-        <div *ngIf="users?.length > 0">
-            <ul>
-                <li *ngFor="let user of users">{{user}}</li>
-            </ul>
+<div class="main-content">
+    <div class="main-stage">
+        <div class="title-header">
+        <h1 class="home-title">OIT Chatbot</h1>
         </div>
-        <section>
-            
-            <a>
-                Start Chat
-                <img src="../../../../wwwroot/images/roadrunner.png" (click)="showConver()" style="position:relative; top:-20px;" />
+        <div class="main-display">
+            <div class="chat-options">
+                <div class="chat-button">
+                    <img class="button-image" src="../../../../wwwroot/images/chatbot_icon.png" (click)="showConver()" /> 
+                </div>
+            </div>
+            <div class="chat-window">
+                <test-modal *ngIf="showModal" (deleteModal)="removeConver($event)"></test-modal>
+             </div>   
+            <div class="feedback-center">
 
-            </a>
-                
-        </section>
+            </div>
+      </div>
+      <div class="unknown">
+
+      </div>  
+        
     </div>
-    <div>
-        <test-modal *ngIf="showModal" (deleteModal)="removeConver($event)"></test-modal>
+    <div class="info-panel">
+        <div class="bot-menu"></div>
+        <div class="bot-info"></div>
+
     </div>
 </div>
+        <!--
+            <section>
+
+                <a>
+                    Start Chat
+                    <img src="../../../../wwwroot/images/roadrunner.png" (click)="showConver()" style="position:relative; top:-20px;" />
+
+                </a>
+
+            </section> -->
+            <!--
+            <div>
+                <button (click)="clickMe()">Click Me</button>
+                <test-modal *ngIf="showModal" (deleteModal)="removeConver($event)"></test-modal>
+            </div>
+
+
+
+                <chat-window *ngIf="shownext"></chat-window>
+                <div *ngIf="users?.length > 0">
+                    <ul>
+                        <li *ngFor="let user of users">{{user}}</li>
+                    </ul>
+                </div>
+            </div>
+                -->
+
+
+
+
 

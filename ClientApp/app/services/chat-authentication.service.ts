@@ -13,7 +13,8 @@ export class ChatAuthenticationService {
 
     private mySecret: string = 'Bearer gD8hMWEV0fM.cwA.x-U.EQEmjSeulWq60J-PHoJyD9sDeUIzOGNs5xIkKCxRxYs';
     private tokenUri = 'https://directline.botframework.com/v3/directline/tokens/generate';
-
+    private refreshUri = "https://directline.botframework.com/v3/directline/tokens/refresh";
+    private joinUri = "https://directline.botframework.com/v3/directline/conversations/";
     constructor(private http: Http) { }
 
 
@@ -34,6 +35,24 @@ export class ChatAuthenticationService {
 
         return this.getConversationObject$().map(obj => obj.token);
 
+    }
+
+    public refreshToken$(oldToken: string) {
+        let headers = new Headers({
+            'Authorization': oldToken
+        })
+    }
+
+    public getSecret() {
+        return this.mySecret;
+    }
+
+    public getConvStreamUrl(convId: string) {
+        let headers = new Headers({
+            'Authorization': this.mySecret
+        });
+        let options = new RequestOptions({ headers: headers });
+        return this.http.get(this.joinUri + convId, options).map(res => res.json());
     }
 
 }

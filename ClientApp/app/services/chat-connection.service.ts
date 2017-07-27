@@ -1,7 +1,7 @@
 ﻿
 //ang libraries
 import { Injectable } from '@angular/core';
-
+import { Http, Response, Headers, RequestOptions } from '@angular/http';
 //Direct Line libraries
 import { DirectLine } from 'botframework-directlinejs';
 import { ConnectionStatus } from 'botframework-directlinejs';
@@ -18,18 +18,17 @@ import { ChatAuthenticationService } from './chat-authentication.service';
 @Injectable()
 export class ChatConnectionService {
 
-    constructor(private chatAuthenticationService: ChatAuthenticationService) { }
+    constructor(private chatAuthenticationService: ChatAuthenticationService, private http: Http) { }
 
 
     //returns an observable for direct line object
-    public startConnection$(socket: boolean = true): Observable<DirectLine> {
-        return this.chatAuthenticationService.getConversationObject$().map(
-            data => new DirectLine({
-                token: data['token'],
-                webSocket: socket,
-                watermark: null,
-            })
-        );
+    public startConnection$(conv: Conversation): DirectLine {
+        return new DirectLine({
+            token: conv['token'],
+            webSocket: true,
+            watermark: null,
+        });
+        
 
     }
 
@@ -41,6 +40,7 @@ export class ChatConnectionService {
     }
 
 
+
     // to resume an existing connection: must enable local cache services to store conversation Id
     public resumeConnection$(convId: string, tok: string): Observable<DirectLine> {
         return Observable.of(new DirectLine({
@@ -49,6 +49,8 @@ export class ChatConnectionService {
         }));
 
     }
+
+
 
 
     // get the connection status

@@ -18,6 +18,10 @@ import { CommentsComponent } from './components/comments/comments.component';
 import { TestModal } from './components/test-modal/test-modal';
 import { ChatWindowComponent } from './chatwindow/chat-window.component';
 import { PendingRequestComponent } from './components/agent/pendrequest.component';
+import { AgentChatWindowComponent } from './components/agent/agent-chat-window.component';
+import { InsertWindowDirective } from './components/agent/insert-window.directive';
+import { DragAndDropDirective } from './components/agent/drag-and-drop.directive';
+import { DraggableWindowDirective } from './components/agent/draggable-window.directive';
 
 export const sharedConfig: NgModule = {
 
@@ -33,6 +37,9 @@ export const sharedConfig: NgModule = {
         TestModal,
         ChatWindowComponent,
         PendingRequestComponent,
+        AgentChatWindowComponent,
+        InsertWindowDirective,
+
     ],
 
     imports: [

@@ -1,6 +1,6 @@
 ﻿
 import * as Rx from 'rxjs/Rx';
-import { Component , OnInit, OnDestroy, ElementRef} from '@angular/core';
+import { Component , Directive, OnInit, OnDestroy, ElementRef, ViewChildren, ViewChild} from '@angular/core';
 import { WebsocketService } from '../../services/websocket.service';
 import { LiveRequestService } from '../../services/live-request.service';
 import { LiveRequest } from '../../model/LiveRequest';
@@ -12,20 +12,25 @@ import { ChatAuthenticationService } from '../../services/chat-authentication.se
 import { ChatConnectionService } from '../../services/chat-connection.service';
 import { DraggableWindowDirective } from './draggable-window.directive';
 import { DragAndDropDirective } from './drag-and-drop.directive';
+import { AgentChatWindowComponent } from './agent-chat-window.component';
+import { InsertWindowDirective } from './insert-window.directive';
 
 
 @Component({
     selector: 'agent',
     templateUrl: './agent.component.html',
     styleUrls: ['./agent.component.css'],
-    //providers: [WebsocketService]
+    
+    entryComponents:[AgentChatWindowComponent],
 })
 export class AgentComponent implements OnInit, OnDestroy {
 
+    @ViewChild(InsertWindowDirective) windowAnchor: InsertWindowDirective;
 
     private liveQueue: LiveRequest[];
     private sock_id: string;
-    private mysubscription: ISubscription;
+    private wssubscription: ISubscription;
+    private dbsubscription: ISubscription;
     
     private ws_connection: Rx.Observable<any>;
     private ws_remove: Rx.Observable<LiveRequest>;
@@ -34,18 +39,16 @@ export class AgentComponent implements OnInit, OnDestroy {
     constructor(private ws: WebsocketService, private lr: LiveRequestService, private auth: ChatAuthenticationService,
         private conn: ChatConnectionService, private chat: ChatService) {
     }
-    //public url: string = "ws://localhost:5000/socketconnection";
-
+    
     ngOnInit() {
         console.log("in");
 
-
-        //this.lr.getDbRequests$().mergeMap(ob => ob).toArray().subscribe(res => console.log(res.length));
+        
 
         //get pending requests in db
         this.lr.getDbRequests$().distinct().subscribe(res => this.liveQueue = res);
 
-        //connect to ws
+        //connect to ws and get socket id
         this.ws_connection = this.ws.connectWebSocket$();
         this.ws_connection.take(1).subscribe(res => { this.sock_id = res['data'], console.log(this.sock_id) });
 
@@ -96,7 +99,7 @@ export class AgentComponent implements OnInit, OnDestroy {
     public acceptRequest(live: LiveRequest): void {
         console.log(live['conv_id']);
         this.lr.acceptRequest$(live['conv_id']).subscribe(res => { console.log(res) });
+        this.windowAnchor.createChatWindow(live['conv_id'], this.auth.getSecret(), AgentChatWindowComponent);
     }
 
-    public get
 }
