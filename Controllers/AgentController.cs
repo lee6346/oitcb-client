@@ -38,8 +38,8 @@ namespace chatbot_portal.Controllers
             }
 
             //retrieve a list all pending requets/return
-            var queue = await _dbcontext.ConversationQueue
-                .Select(x => new { conv_id = x.ID, action = "request", datetime = "none", user = "student" })
+            var queue = await _dbcontext.LiveRequests
+                .Select(x => new { conv_id = x.conv_id, action = "request", datetime = x.date, user = "student" })
                 .ToListAsync();
 
 

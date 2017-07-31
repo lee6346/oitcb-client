@@ -5,13 +5,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Net.Http;
 using System.Collections;
+using chatbot_portal.Models;
 
 namespace chatbot_portal.Interfaces
 {
     public interface ISecretTokenService
     {
-        Task<object> GetTokenAsync();
-        Task<IEnumerable> GetConversationAsync();
+        
+        Task<Conversation> GetConversationAsync();
+        Task<NewConnection> GetConnectionStreamAsync(string id);
         object GetSecret();
     }
     //create the interfaces for transient, scoped, and singltetons

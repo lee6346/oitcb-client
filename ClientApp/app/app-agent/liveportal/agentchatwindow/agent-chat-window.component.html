@@ -1,0 +1,25 @@
+﻿
+<div class="chat-window">
+    <div class="window-header">
+        <button type="button" class="close-button" (click)="onClickedExit()"><span aria-hidden="true">&times;</span></button>
+        <button type="button" class="minimize-button" (click)="minimizeWindow()"><span aria-hidden="true">&minus;</span></button>
+
+        <h4 class="window-title">OIT SUPPORT</h4>
+    </div>
+    <div class="window-body">
+        <div class="message-display">
+            <ul *ngIf="messages">
+
+                <li *ngFor="let rmsg of messages"
+                    class="msg-row" [ngClass]="msgAlignment(rmsg.from.id)">
+                    <span class="bubble" [ngClass]="bubbleProperties(rmsg.from.id)">{{rmsg['text']}}</span>
+                </li>
+
+            </ul>
+        </div>
+        <div class="partition"></div>
+        <div class="input-area">
+            <input #msg type="text" [(ngModel)]="defaultVal" class="text-input" (keyup.enter)="submitMessage(msg.value)" />
+        </div>
+    </div>
+</div>

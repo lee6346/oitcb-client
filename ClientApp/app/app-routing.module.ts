@@ -1,16 +1,19 @@
 ﻿import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import { HomeComponent } from './app-home/home.component';
+import { AgentComponent } from './app-agent/agent.component';
 
 export const routes: Routes = [
-    { path: '', redirectTo: 'contact', pathMatch: 'full' },
-    { path: 'home', loadChildren: 'app/home/home.module#HomeModule' },
-    { path: 'admin', loadChildren: 'app/admin/admin.module#AdminModule' },
-    { path: 'agent', loadChildren: 'app/agent/agent.module#AgentModule' },
-    { path: '**', redirectTo: 'home' }
+    //{ path: 'agent', component: AgentComponent }, 
+    { path: '', redirectTo: '/home', pathMatch: 'full' },
+
+    //{ path: '**', component: HomeComponent }
 ];
 
 @NgModule({
-    imports: [RouterModule.forRoot(routes)],
+    imports: [
+        RouterModule.forRoot(routes)
+    ],
     exports: [RouterModule]
 })
 export class AppRoutingModule { }

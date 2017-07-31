@@ -1,7 +1,7 @@
 ﻿import { Directive, ElementRef, Input, HostListener, Renderer } from '@angular/core';
 
 @Directive({ selector: '[blinking-directive]' })
-export class BlinkingDirective {
+export class BlinkingElementDirective {
 
 
     private startBlink: boolean = false;
@@ -10,11 +10,7 @@ export class BlinkingDirective {
         
     }
 
-    /** 1. blink when unavailabe
-        2. transition effect when agent clicks, or on exiting
-        3. transition effect to 
-     * /
-     */
+
     
     @HostListener('mouseenter') onMouseEnter() {
         

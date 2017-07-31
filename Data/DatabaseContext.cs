@@ -12,14 +12,28 @@ namespace chatbot_portal.Data
         public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
         { }
         public DbSet<Agent> Agents { get; set; }
-        public DbSet<Conversation> ConversationQueue { get; set; }
-       // public DbSet<LiveRequest> LiveRequests { get; set; }
+        public DbSet<LiveRequest> LiveRequests { get; set; }
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            //model to table name mappings
             modelBuilder.Entity<Agent>().ToTable("_AGENT");
-            modelBuilder.Entity<Conversation>().ToTable("_USERQUEUE");
-           // modelBuilder.Entity<LiveRequest>().ToTable("LIVEREQUEST");
+            modelBuilder.Entity<LiveRequest>().ToTable("LIVEREQUEST");
+
+            //property to column mappings
+            modelBuilder.Entity<LiveRequest>().Property(b => b.conv_id).HasColumnName("ConversationID");
+            modelBuilder.Entity<LiveRequest>().Property(b => b.action).HasColumnName("Action");
+            modelBuilder.Entity<LiveRequest>().Property(b => b.date).HasColumnName("Date");
+            modelBuilder.Entity<LiveRequest>().Property(b => b.user).HasColumnName("User");
+
+
+            //Concurrency Token
+            /*
+            modelBuilder.Entity<LiveRequest>()
+                .Property(lr => lr.last_modified)
+                .IsConcurrencyToken()
+                .ValueGeneratedOnAddOrUpdate();
+                */
            // modelBuilder.Entity<LiveRequest>().Property(lr => lr.RequestMade).HasDefaultValueSql("getdate()");
            // modelBuilder.Entity<LiveRequest>().Property(lr => lr.RequestAccepted).HasDefaultValueSql("getdate()");
 
@@ -33,15 +47,15 @@ namespace chatbot_portal.Data
             return agent;
         }
 
-        public async Task<bool> RequestPending(string conv_id)
+        public async Task<bool> RequestPending(LiveRequest req)
         {
-            var req = await this.ConversationQueue.FirstOrDefaultAsync(s => s.ID == conv_id);
-            if(req == null)
+            var pending_req = await this.LiveRequests.FirstOrDefaultAsync(s => s.conv_id == req.conv_id);
+            if(pending_req == null)
             {
                 
                 try
                 {
-                    this.Add(new Conversation { ID = conv_id });
+                    this.Add(req);
                     await this.SaveChangesAsync();
                     return true;
                 }
@@ -54,23 +68,23 @@ namespace chatbot_portal.Data
             return false;
         }
         // returns a matching conversation or null if non exists
-        public async Task<Conversation> GetRequest(string conv_id)
+        public async Task<LiveRequest> GetRequest(string conv_id)
         {
-            var req = await this.ConversationQueue.FirstOrDefaultAsync(s => s.ID == conv_id);
+            var req = await this.LiveRequests.FirstOrDefaultAsync(s => s.conv_id == conv_id);
             return req;
         }
 
         // removes a conversation from the pending queue 
         public async Task<bool> DeleteRequest(string conv_id)
         {
-            var liverequest = await this.ConversationQueue.SingleOrDefaultAsync(m => m.ID == conv_id);
+            var liverequest = await this.LiveRequests.SingleOrDefaultAsync(m => m.conv_id == conv_id);
             if(liverequest == null)
             {
                 return false;
             }
             try
             {
-                this.ConversationQueue.Remove(liverequest);
+                this.LiveRequests.Remove(liverequest);
                 await this.SaveChangesAsync();
                 return true;
             }

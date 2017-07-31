@@ -1,0 +1,53 @@
+﻿
+* {
+    box-sizing: border-box;
+}
+
+.main-container {
+    margin: 0;
+}
+
+.icon-bar {
+    width: 100%;
+    background-color: #0c2340;
+    overflow: auto;
+}
+
+.route-content {
+    display: flex;
+    min-height: 100vh;
+}
+
+.std-link {
+    float: left;
+    text-align: center;
+    width: 20%;
+    padding: 8px 0;
+    transition: all 0.3s ease;
+    color: #ffffff;
+    font-size: 20px;
+}
+
+.auth-link {
+    float: right;
+    text-align: center;
+    width: 20%;
+    padding: 8px 0;
+    transition: all 0.3s ease;
+    color: #ffffff;
+    font-size: 20px;
+}
+
+.icon-bar a:hover {
+    background-color: rgb(40, 71, 119);
+}
+
+.active {
+    background-color: rgb(40, 71, 119);
+}
+
+.my-footer {
+    padding: 1em;
+    background: #0c2340;
+    height: 8vh;
+}

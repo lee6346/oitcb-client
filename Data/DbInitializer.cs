@@ -30,25 +30,25 @@ namespace chatbot_portal.Data
             }
             context.SaveChanges();
 
-
-            if (context.ConversationQueue.Any())
+            
+            if (context.LiveRequests.Any())
             {
                 return;
             }
 
-            var userQueue = new Conversation[]
+            var _LiveRequests = new LiveRequest[]
             {
-                new Conversation{ID="1234-s3fg-32f4-23fs" },
-                new Conversation { ID = "asd4-s34f-aaf4-2sas" },
-                new Conversation{ID="12s34-s3sfg-32f4-2s3fs"},
-                new Conversation{ID="1as34-s3fg-32f4-23safs"},
+                new LiveRequest{conv_id="1234-s3fg-32f4-23fs",action="request",date="null",user="student"},
+                new LiveRequest {conv_id="asd4-s34f-aaf4-2sas",action="request",date="null",user="student" },
+                new LiveRequest{conv_id="12s34-s3sfg-32f4-2s3fs",action="request",date="null",user="student"},
+                new LiveRequest{conv_id="1as34-s3fg-32f4-23safs",action="request",date="null",user="student"}
             };
-            foreach (Conversation u in userQueue)
+            foreach (LiveRequest lr in _LiveRequests)
             {
-                context.ConversationQueue.Add(u);
+                context.LiveRequests.Add(lr);
             }
             context.SaveChanges();
-
+            
 
         }
         

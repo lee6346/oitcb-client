@@ -1,0 +1,12 @@
+﻿<div id="pend-list">
+    <div id="pend-title">
+        Pending Requests
+    </div>
+    <ul class="nav">
+        <li class="pending-item" *ngFor="let liveRequest of liveRequestQueue" (click)="selectPendingRequest(liveRequest)">
+            <i class="fa fa-user-circle-o"></i>
+            {{liveRequest['user']}}: {{liveRequest['date'] }}
+
+        </li>
+    </ul>
+</div>

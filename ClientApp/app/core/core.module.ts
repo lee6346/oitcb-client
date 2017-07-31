@@ -1,26 +1,25 @@
 ﻿import { NgModule } from '@angular/core';
-//import CommonModule and other Modules IF this module will also contain the root modules component
 
-import { ChatBotActivityService} from './chatbot-activity.service';
-import { ChatBotConnectionService } from './chatbot-connection.service';
-import { ChatBotTokenService } from './chatbot-token.service';
+//for one-time use components
+import { CommonModule } from '@angular/common';
 
-import { StateStorageService } from './state-storage.service';
-import { LiveRequestService } from './live-request.service';
-import { LoginAuthenticationService } from './login-authentication.service';
+import {
+    ChatBotActivityService, ChatBotConnectionService, LiveRequestService, AuthenticationService,
+    WebsocketService, StateStorageService
+} from './';
 
 
 @NgModule({
-    imports: [],
+    imports: [CommonModule],
     declarations: [],
     exports: [],
     providers: [
         ChatBotActivityService,
         ChatBotConnectionService,
-        ChatBotTokenService,
         StateStorageService,
         LiveRequestService,
-        LoginAuthenticationService,
+        AuthenticationService,
+        WebsocketService,
     ]
 })
 export class CoreModule { }

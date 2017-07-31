@@ -8,12 +8,10 @@ namespace chatbot_portal.Models
 {
     public class Conversation
     {
-        [Column("CONVERSATION_ID")]
-        public string ID { get; set; }
-        //[DataType(DataType.Date)]    => only takes the date, not time, from the DB timestamp
-        //[DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true}] => display format of the string, in edit mode = format applied
-        // in text boxes, etc
-        //[Column("TIMESTAMP")]
-        //public DateTime RequestTime { get; set; } 
+
+        public string conversationId { get; set; }
+        public int expires_in { get; set; }
+        public string streamUrl { get; set; }
+        public string token { get; set; }
     }
 }

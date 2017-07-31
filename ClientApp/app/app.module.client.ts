@@ -1,42 +1,33 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HttpModule} from '@angular/http';
 import { sharedConfig } from './app.module.shared';
 //register services
-import { ChatService } from './services/chat.service';
-import { ChatConnectionService } from './services/chat-connection.service';
-import { ChatAuthenticationService } from './services/chat-authentication.service';
-import { StateStorageService } from './services/state-storage.service';
-import { UserService } from './services/user.service';
-import { WebsocketService } from './services/websocket.service';
-import { LiveRequestService } from './services/live-request.service';
-import { AgentChatWindowComponent } from './components/agent/agent-chat-window.component';
-import { DraggableWindowDirective } from './components/agent/draggable-window.directive';
+import { CoreModule } from './core';
+
+//import { SharedModule } from './shared';
+
+
+
+//import { AgentChatWindowComponent } from './components/agent/agent-chat-window.component';
 
 
 @NgModule({
     bootstrap: sharedConfig.bootstrap,
     declarations: [
         sharedConfig.declarations,
-        DraggableWindowDirective,
+        //components that are part of feature modules are not declared here, but are declared inside the feature module itself
     ],
     imports: [
+        //module import order matters for routing... (ie: if you have two modules with /home components, the first module in the import will be selected)
         BrowserModule,
-        HttpModule,
+        CoreModule,
+        //SharedModule,
         ...sharedConfig.imports
     ],
     providers: [
         { provide: 'ORIGIN_URL', useValue: location.origin },
-        ChatService,
-        ChatConnectionService,
-        ChatAuthenticationService,
-        StateStorageService,
-        UserService,
-        WebsocketService,
-        LiveRequestService,
-        
     ],
-    entryComponents: [AgentChatWindowComponent]
+    //entryComponents: [AgentChatWindowComponent]
 })
 export class AppModule {
 }

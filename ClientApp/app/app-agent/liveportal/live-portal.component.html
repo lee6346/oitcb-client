@@ -1,0 +1,30 @@
+﻿<div class="main-content">
+    <!--<pending-list [liveRequestQueue]="lr_request | async" (liveRequestSelect)="acceptRequest($event)"></pending-list>-->
+    
+    <div id="pend-list">
+        <div id="pend-title">
+            Pending Requests
+        </div>
+
+        <ul class="nav">
+            <li class="pending-item test" *ngFor="let pend of liveQueue" (click)="acceptRequest(pend)">
+                <i class="fa fa-user-circle-o"></i>
+                {{pend['user']}}: {{pend['date'] }}
+
+            </li>
+        </ul>
+        
+    </div>
+    
+    <div class="main-stage">
+
+        <div class="main-display">
+            <div insertWindow></div>
+
+        </div>
+        <div class="minimize-bar">
+            <div class="minimize-window">Placeholding for Minimized windows</div>
+        </div>
+    </div>
+
+</div>

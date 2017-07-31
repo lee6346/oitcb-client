@@ -9,7 +9,7 @@ using System.Net.Http.Headers;
 using System.Net;
 using chatbot_portal.Services;
 using chatbot_portal.Interfaces;
-
+using chatbot_portal.Models;
 
 namespace chatbot_portal.Controllers
 {
@@ -29,7 +29,8 @@ namespace chatbot_portal.Controllers
         [HttpGet("[action]")]
         public async Task<IActionResult> GetConversationObject()
         {
-           var conv = await _service.GetConversationAsync();
+            
+           Conversation conv = await _service.GetConversationAsync();
             if(conv == null)
             {
                 return Json(BadRequest());
@@ -39,30 +40,28 @@ namespace chatbot_portal.Controllers
 
 
         
-        [HttpGet("[action]")]
-        public async Task<IActionResult> GetToken()
+        [HttpGet("[action]/{id}")]
+        public async Task<IActionResult> GetNewConnection(string id)
         {
-
-            var token = await _service.GetTokenAsync();
-            if(token == null)
+            if(id == null)
             {
                 return Json(BadRequest());
             }
 
-            return Json(token);
+            NewConnection nc = await _service.GetConnectionStreamAsync(id);
+            if(nc == null)
+            {
+                return Json(BadRequest());
+            }
+
+            return Json(nc);
         }
         
-
+        //need to include authentication to make such request
         [HttpGet("[action]")]
-        public IActionResult GetSecret(/*[FromBody] string credential*/)
+        public IActionResult GetSecret()
         {
 
-            /*check the string credential...
-            if(credential == null)
-            {
-                return Json(Unauthorized());
-            }
-            */
             object sec = _service.GetSecret();
 
             return Json(sec);

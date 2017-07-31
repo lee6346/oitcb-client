@@ -32,8 +32,8 @@ namespace chatbot_portal.Controllers
         [HttpGet("[action]")]
         public async Task<IActionResult> GetRequests()
         {
-            var queue = await _dbcontext.ConversationQueue
-                .Select(x => new { conv_id = x.ID, action = "request", datetime = "none", user = "student" })
+            var queue = await _dbcontext.LiveRequests
+                .Select(x => new { conv_id = x.conv_id, action = "request", datetime = x.date, user = "student" })
                 .ToListAsync();
 
             
@@ -44,70 +44,42 @@ namespace chatbot_portal.Controllers
       
         [HttpPost("[action]")]
         //[ValidateAntiForgeryToken]
-        public async Task<IActionResult> MakeRequest([FromBody] Object obj/*string conv_id, string action, string datetime, string user*/)
+        public async Task<IActionResult> MakeRequest([FromBody] LiveRequest request)
         {
             
             if(_lrcontext.AgentsAvailable() == 0)
             {
                 return Json(new { available = false} );
             }
-            /*
-            if (await _dbcontext.RequestPending(conv_id) == false)
+
+            if (await _dbcontext.RequestPending(request) == false)
             {
                 return Json(new { available = "error" });
             }
 
-            var obj = new
-            {
-                conv_id = conv_id,
-                action = action,
-                datetime = datetime,
-                user = user
-            };
-            */
-
             //DateTime.ParseExact(datetime, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
-            await _lrcontext.SendMessageToAllAsync(new Message { MessageType = MessageType.Text, Data = obj.ToString() });
 
+            
+            
+            await _lrcontext.SendMessageToAllAsync(new Message { MessageType = MessageType.Text, Data = JsonConvert.SerializeObject(request) });
             return Json(new { available = true });
+            
         }
 
         [HttpPost("[action]")]
-        public async Task<IActionResult> AcceptRequest([FromBody] Object obj)
+        public async Task<IActionResult> AcceptRequest([FromBody] LiveRequest request)
         {
-            /*
-            var obj = new
-            {
-                conv_id = conv_id,
-                action = action,
-                datetime = datetime,
-                user = user
-            };*/
-            // this broadcast message is of action type remove
 
 
-            await _lrcontext.SendMessageToAllAsync(new Message { MessageType = MessageType.Text, Data = obj.ToString() });
+            await _lrcontext.SendMessageToAllAsync(new Message { MessageType = MessageType.Text, Data = JsonConvert.SerializeObject(request) });
+
+            var result = await _dbcontext.DeleteRequest(request.conv_id);
             
-
-           // Type t = obj.GetType();
-            //string conv = (string)t.GetProperty("conv_id").GetValue(obj, null);
-            //PropertyInfo[] props = obj.GetType().GetProperties();
-            //string test = props[2].Name;
-            /*
-            foreach(PropertyInfo prop in props)
-            {
-                if (prop.Name.Equals("conv_id")){
-                    conv_id = prop.GetValue(obj, null);
-                }
-            }
-            */
-            //var result = await _dbcontext.DeleteRequest(x.ToString());
-            /*
             if (!result)
             {
-                return Json(BadRequest(x.ToString()));
+                return Json(BadRequest());
             }
-            */
+            
             return Json(Accepted());
         }
 

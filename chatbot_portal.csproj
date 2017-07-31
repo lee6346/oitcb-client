@@ -23,6 +23,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="1.1.1" />
     <PackageReference Include="Microsoft.VisualStudio.Web.BrowserLink" Version="1.1.0" />
     <PackageReference Include="NewtonSoft.Json" Version="10.0.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="1.0.0" />
     <PackageReference Include="WebSocketManager" Version="1.0.1" />
     <PackageReference Include="xunit" Version="2.2.0" />
   </ItemGroup>
@@ -33,25 +34,33 @@
     <!-- Files not to show in IDE -->
     <None Remove="yarn.lock" />
     <Compile Remove="ClientApp\app\components\chat-modal\**" />
+    <Compile Remove="ClientApp\app\notificationbar\**" />
     <Compile Remove="wwwroot\NewFolder\**" />
 
     <!-- Files not to publish (note that the 'dist' subfolders are re-added below) -->
     <Content Remove="ClientApp\**" />
     <Content Remove="wwwroot\NewFolder\**" />
     <EmbeddedResource Remove="ClientApp\app\components\chat-modal\**" />
+    <EmbeddedResource Remove="ClientApp\app\notificationbar\**" />
     <EmbeddedResource Remove="wwwroot\NewFolder\**" />
     <None Remove="ClientApp\app\components\chat-modal\**" />
+    <None Remove="ClientApp\app\notificationbar\**" />
     <None Remove="wwwroot\NewFolder\**" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="wwwroot\images\chatbot_icon.png" />
     <Content Include="wwwroot\index.css" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="ClientApp\app\admin\" />
-    <Folder Include="ClientApp\app\model\activities\" />
-    <Folder Include="ClientApp\app\model\cards\" />
-    <Folder Include="ClientApp\app\notificationbar\assistingbar\" />
-    <Folder Include="ClientApp\app\shared\components\" />
+    <Folder Include="ClientApp\app\app-admin\" />
+    <Folder Include="ClientApp\app\app-agent\liveportal\minimizewindow\" />
+    <Folder Include="ClientApp\app\app-agent\liveportal\summarychart\" />
+    <Folder Include="ClientApp\app\app-agent\liveportal\pendinglist\" />
+    <Folder Include="ClientApp\app\app-home\chatbot\chatfeedback\" />
+    <Folder Include="ClientApp\app\app-home\chatbot\generalinfo\" />
+    <Folder Include="ClientApp\app\app-home\contact\" />
+    <Folder Include="ClientApp\app\app-home\authform\" />
+    <Folder Include="ClientApp\app\core\data\" />
     <Folder Include="ClientApp\app\shared\pipes\" />
   </ItemGroup>
   <ItemGroup>

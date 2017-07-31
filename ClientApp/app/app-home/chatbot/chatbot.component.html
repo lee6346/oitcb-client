@@ -1,0 +1,29 @@
+﻿<div class="main-content">
+    <div class="main-stage">
+        <div class="title-header">
+            <h1 class="home-title">OIT Chatbot</h1>
+        </div>
+        <div class="main-display">
+            <div class="chat-options">
+                <div class="chat-button">
+                    <img class="button-image" src="../../../../wwwroot/images/chatbot_icon.png" (click)="showChatWindow()" />
+                </div>
+            </div>
+            <div class="chat-window">
+                <chat-window *ngIf="chatDisplayed" (removeWindow)="removeChatWindow($event)"></chat-window>
+            </div>
+            <div class="feedback-center">
+
+            </div>
+        </div>
+        <div class="unknown">
+
+        </div>
+
+    </div>
+    <div class="info-panel">
+        <div class="bot-menu"></div>
+        <div class="bot-info"></div>
+
+    </div>
+</div>

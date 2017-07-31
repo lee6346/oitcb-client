@@ -101,7 +101,7 @@ namespace chatbot_portal
             });
             app.MapWebSocketManager("/socketconnection", serviceProvider.GetService<LiveRequestService>());
 
-            //DbInitializer.Initialize(context);
+            DbInitializer.Initialize(context);
 
         }
     }

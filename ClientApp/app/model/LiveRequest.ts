@@ -14,7 +14,7 @@
 
     public getCurrentDateTime() : string {
         let today = new Date();
-        let date = today.getDate() + "/" + (today.getMonth() + 1) + "/"  + today.getFullYear();
+        let date = (today.getMonth() + 1) + "/" + today.getDate() + "/" + today.getFullYear();
         let time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
         //let ampm = today.getHours() > 12 ? "pm" : "am";
         //let hours = today.getHours() % 12;

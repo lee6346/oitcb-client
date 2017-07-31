@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System.Collections;
+using chatbot_portal.Models;
 
 namespace chatbot_portal.Services
 {
@@ -20,73 +21,47 @@ namespace chatbot_portal.Services
     public class SecretTokenService : ISecretTokenService
     {
         private readonly ChatBotOptions _options;
-        
+        //private static HttpClient client = new HttpClient();
         public SecretTokenService(IOptions<ChatBotOptions> optionsAccessor)
         {
             _options = optionsAccessor.Value;
  
            
         }
-        public async Task<IEnumerable> GetConversationAsync()
+        public async Task<Conversation> GetConversationAsync()
         {
-            using (var client = new HttpClient())
+            using (var client = new HttpClient() { BaseAddress = new Uri("https://directline.botframework.com") })
             {
                 client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _options.Secret);
-                var res = await client.PostAsync(_options.TokenUri, null);
-
-                var stringRes = await res.Content.ReadAsStringAsync();
-                var posts = JsonConvert.DeserializeObject<IEnumerable<ConversationObject>>(stringRes);
-                
-                if (res.StatusCode == HttpStatusCode.Forbidden)
-                {
-                    return null;
-                }
-                return posts;
-
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "gD8hMWEV0fM.cwA.x-U.EQEmjSeulWq60J-PHoJyD9sDeUIzOGNs5xIkKCxRxYs");
+                HttpResponseMessage res = client.PostAsync("v3/directline/tokens/generate", null).Result;
+                var msg = await res.Content.ReadAsStringAsync();
+                Conversation c = JsonConvert.DeserializeObject<Conversation>(msg);
+                return c;
             }
         }
 
-        public async Task<object> GetTokenAsync() {
-            var conv_string = await GetConversationAsync();
-
-            if (conv_string == null)
+        public async Task<NewConnection> GetConnectionStreamAsync(string id)
+        {
+            using(var client = new HttpClient() { BaseAddress = new Uri("https://directline.botframework.com") })
             {
-                return null;
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "gD8hMWEV0fM.cwA.x-U.EQEmjSeulWq60J-PHoJyD9sDeUIzOGNs5xIkKCxRxYs");
+                HttpResponseMessage res = await client.GetAsync("v3/directline/conversations/" + id);
+
+                var data = await res.Content.ReadAsStringAsync();
+
+                return JsonConvert.DeserializeObject<NewConnection>(data);
+                //return nc;
             }
+        } 
 
-            ConversationObject obj = JsonConvert.DeserializeObject<ConversationObject>("hello");
-            if(obj.token == null)
-            {
-                return null;
-            }
-
-            return new { token = obj.token };
-
-        }
         public object GetSecret()
         {
             return new { secret = _options.Secret };
         }
     }
-
-    public class ConversationObject
-    {
-        public string conversationId { get; set; }
-        public string token { get; set; }
-        public int expires_in { get; set; }
-
-    }
-
-    public class TokenObject
-    {
-        public string token { get; set; }  
-    }
-
-    public class SecretObject
-    {
-        public string secret { get; set; }
-    }
-
    
 }
