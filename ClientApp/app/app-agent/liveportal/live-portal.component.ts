@@ -17,6 +17,7 @@ import { LiveRequest } from '../../model';
 
 //directives/components
 import { AgentChatWindowComponent } from './agentchatwindow/agent-chat-window.component';
+import { MinimizeWindowContainerComponent } from './minimizewindow/minimized-window-container.component';
 import { InsertWindowDirective } from './directives/insert-window.directive';
 
 

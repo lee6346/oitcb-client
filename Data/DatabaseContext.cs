@@ -12,41 +12,168 @@ namespace chatbot_portal.Data
         public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
         { }
         public DbSet<Agent> Agents { get; set; }
-        public DbSet<LiveRequest> LiveRequests { get; set; }
+        //public DbSet<LiveRequest> LiveRequests { get; set; }
+        public DbSet<MessageActivity> MessageActivities { get; set; }
+        public DbSet<Channel> Channels { get; set; }
+        public DbSet<AgentRequest> AgentRequests { get; set; }
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //model to table name mappings
-            modelBuilder.Entity<Agent>().ToTable("_AGENT");
-            modelBuilder.Entity<LiveRequest>().ToTable("LIVEREQUEST");
 
-            //property to column mappings
+            OnChannelCreating(modelBuilder);
+            OnAgentCreating(modelBuilder);
+            OnAgentRequestCreating(modelBuilder);
+            OnMessageActivityCreating(modelBuilder);
+            //modelBuilder.Entity<LiveRequest>().ToTable("LIVEREQUEST");
+
+
+            /*
             modelBuilder.Entity<LiveRequest>().Property(b => b.conv_id).HasColumnName("ConversationID");
             modelBuilder.Entity<LiveRequest>().Property(b => b.action).HasColumnName("Action");
             modelBuilder.Entity<LiveRequest>().Property(b => b.date).HasColumnName("Date");
-            modelBuilder.Entity<LiveRequest>().Property(b => b.user).HasColumnName("User");
+            modelBuilder.Entity<LiveRequest>().Property(b => b.user).UseSqlServerIdentityColumn().HasColumnName("User");
+            
+            */
+            
 
 
-            //Concurrency Token
-            /*
-            modelBuilder.Entity<LiveRequest>()
-                .Property(lr => lr.last_modified)
-                .IsConcurrencyToken()
-                .ValueGeneratedOnAddOrUpdate();
-                */
-           // modelBuilder.Entity<LiveRequest>().Property(lr => lr.RequestMade).HasDefaultValueSql("getdate()");
-           // modelBuilder.Entity<LiveRequest>().Property(lr => lr.RequestAccepted).HasDefaultValueSql("getdate()");
-
-
-
-        } 
-
-        public async Task<Agent> GetAgent(string user, string pass)
+        }
+        
+        public void OnAgentCreating(ModelBuilder modelBuilder)
         {
-            var agent = await this.Agents.FirstOrDefaultAsync(s => s.UserName == user && s.Password == pass);
-            return agent;
+            modelBuilder.Entity<Agent>().ToTable("AGENT")
+                .Ignore(b => b.DateFormatter);
+
+            modelBuilder.Entity<Agent>().HasKey(b => b.Id)
+                .ForSqlServerHasName("AgentID")
+                .ForSqlServerIsClustered();
+
+            modelBuilder.Entity<Agent>().HasAlternateKey(b => b.UserName)
+                .ForSqlServerIsClustered(false);
+
+            modelBuilder.Entity<Agent>().Property(b => b.UserName)
+                .HasMaxLength(30);
+
+            modelBuilder.Entity<Agent>().Property(b => b.Password)
+                .HasMaxLength(30)
+                .IsRequired();
+
+            modelBuilder.Entity<Agent>().Property(b => b.FirstName)
+                .HasMaxLength(30)
+                .IsRequired();
+
+            modelBuilder.Entity<Agent>().Property(b => b.LastName)
+                .HasMaxLength(30)
+                .IsRequired();
+
+            modelBuilder.Entity<Agent>().Property(b => b.DateTimeCreated)
+                .ForSqlServerHasColumnType("datetime2")
+                .IsRequired();
+
+            modelBuilder.Entity<Agent>().Property(b => b.DateTimeUpdated)
+                .ForSqlServerHasColumnType("datetime2")
+                .IsConcurrencyToken();
+            
+
+        }
+        
+        
+        public void OnMessageActivityCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<MessageActivity>().ToTable("MESSAGE_ACTIVITY")
+                .Ignore(b => b.DateFormatter);
+
+            modelBuilder.Entity<MessageActivity>().HasKey(b => b.Id)
+                .ForSqlServerHasName("MessageActivityID")
+                .ForSqlServerIsClustered();
+
+            modelBuilder.Entity<MessageActivity>().Property(m => m.ConversationId)
+                .HasMaxLength(30)
+                .IsRequired();
+                
+            modelBuilder.Entity<MessageActivity>().Property(m => m.Text)
+                .HasMaxLength(200)
+                .IsRequired();
+
+            modelBuilder.Entity<MessageActivity>().Property(m => m.SenderId)
+                .IsRequired();
+
+            modelBuilder.Entity<MessageActivity>().Property(m => m.DateTimeSent).HasColumnType("datetime2")
+                .IsRequired();
+
+            modelBuilder.Entity<MessageActivity>().Property(m => m.RowVersion)
+                .ValueGeneratedOnAddOrUpdate()
+                .IsConcurrencyToken();
+
+
         }
 
+        public void OnChannelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Channel>().ToTable("CHANNEL")
+                .Ignore(b => b.DateFormatter);
+
+            modelBuilder.Entity<Channel>().HasKey(b => b.Id)
+                .ForSqlServerHasName("ChannelID")
+                .ForSqlServerIsClustered();
+
+            modelBuilder.Entity<Channel>().HasAlternateKey(b => b.ConversationId)
+                .ForSqlServerIsClustered(false);
+
+            modelBuilder.Entity<Channel>().Property(m => m.BotHandle)
+                .HasMaxLength(30)
+                .IsRequired();
+
+            modelBuilder.Entity<Channel>().Property(m => m.DateTimeCreated)
+                .HasColumnType("datetime2")
+                .IsRequired();
+
+            modelBuilder.Entity<Channel>().Property(m => m.DateTimeEnded)
+                .HasColumnType("datetime2")
+                .IsRequired();
+
+            modelBuilder.Entity<Channel>().Property(m => m.RowVersion)
+                .ValueGeneratedOnAddOrUpdate()
+                .IsConcurrencyToken();
+
+
+        }
+        
+        public void OnAgentRequestCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<AgentRequest>().ToTable("AGENT_REQUEST")
+                .Ignore(b => b.DateFormatter);
+
+            modelBuilder.Entity<AgentRequest>().HasKey(b => b.Id)
+                .ForSqlServerHasName("AgentRequestID")
+                .ForSqlServerIsClustered();
+
+            modelBuilder.Entity<AgentRequest>().Property(b => b.UserId)
+                .HasMaxLength(30)
+                .IsRequired();
+
+            modelBuilder.Entity<MessageActivity>().Property(m => m.ConversationId)
+                .HasMaxLength(30)
+                .IsRequired();
+
+            modelBuilder.Entity<AgentRequest>().Property(p => p.DateTimeRequested)
+                .ForSqlServerHasColumnType("datetime2")
+                .IsRequired();
+
+            modelBuilder.Entity<AgentRequest>().Property(p => p.DateTimeAccepted)
+                .ForSqlServerHasColumnType("datetime2");
+
+            modelBuilder.Entity<AgentRequest>().Property(m => m.AgentId)
+                .HasMaxLength(30);
+
+            modelBuilder.Entity<AgentRequest>().Property(p => p.RowVersion)
+                .ValueGeneratedOnAddOrUpdate()
+                .IsConcurrencyToken();
+
+        }
+        
+        /*
+       
         public async Task<bool> RequestPending(LiveRequest req)
         {
             var pending_req = await this.LiveRequests.FirstOrDefaultAsync(s => s.conv_id == req.conv_id);
@@ -67,6 +194,7 @@ namespace chatbot_portal.Data
             }
             return false;
         }
+        
         // returns a matching conversation or null if non exists
         public async Task<LiveRequest> GetRequest(string conv_id)
         {
@@ -95,7 +223,7 @@ namespace chatbot_portal.Data
             }
         }
         
-
+    */
     
        
     }

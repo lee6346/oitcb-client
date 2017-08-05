@@ -14,8 +14,8 @@ using chatbot_portal.Services;
 using chatbot_portal.Interfaces;
 using WebSocketManager;
 using chatbot_portal.Models.ConfigModels;
-
-
+using AutoMapper;
+using chatbot_portal.Repositories;
 
 namespace chatbot_portal
 {
@@ -59,10 +59,15 @@ namespace chatbot_portal
             //chatbot token services
             services.AddScoped<ISecretTokenService, SecretTokenService>();
 
+            //repository services
+            services.AddScoped<IActivityMessageRepository, ActivityMessageRepository>();
+            services.AddScoped<IAgentRequestRepository, AgentRequestRepository>();
+
             //Socket services
             services.AddWebSocketManager();
             //framework services.
             services.AddMvc();
+
         }
 
         

@@ -1,6 +1,6 @@
 ﻿//ng libs
 import { Component, OnInit, OnDestroy, EventEmitter, Injector } from '@angular/core';
-import { NgClass } from '@angular/common';
+import { NgClass, NgStyle } from '@angular/common';
 
 //rxjs libs
 import * as Rx from 'rxjs/Rx';
@@ -9,8 +9,14 @@ import * as Rx from 'rxjs/Rx';
 import { DirectLine, Conversation, Activity } from 'botframework-directlinejs';
 
 //services
-import { ChatBotActivityService, ChatBotConnectionService } from '../../../core';
+import { ChatBotActivityService, ChatBotConnectionService, IdleMessageService } from '../../../core';
+
+//models
 import * as uuid from 'uuid/v1';
+import { IdleStatus } from '../../../model';
+
+//child components
+import { ChatHistoryWindowComponent } from '../chathistorywindow/chat-history-window.component';
 
 @Component({
     selector: 'agent-chat-window',
@@ -28,7 +34,11 @@ export class AgentChatWindowComponent implements OnInit, OnDestroy {
     private defaultVal: string = null;
     private messages: Activity[] = [];
 
-    constructor(private injector: Injector, private chatConnectionService: ChatBotConnectionService, private chatService: ChatBotActivityService) {
+    private ngUnsubscribe: Rx.Subject<void> = new Rx.Subject<void>();
+    private isMinimized: boolean = false;
+
+    constructor(private injector: Injector, private chatConnectionService: ChatBotConnectionService,
+        private chatService: ChatBotActivityService, private idleMsgService: IdleMessageService) {
         this.conv_id = this.injector.get('conv_id');
         this.myuid = uuid();
     }
@@ -37,9 +47,8 @@ export class AgentChatWindowComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
 
-        this.chatConnectionService.getConvStreamUrl$(this.conv_id).subscribe(res => {
+        this.chatConnectionService.getConvStreamUrl$(this.conv_id).takeUntil(this.ngUnsubscribe).subscribe(res => {
             this.conversation = res as Conversation;
-            console.log(this.conversation);
             this.directLine = new DirectLine({
                 token: this.conversation['token'],
                 conversationId: this.conv_id,
@@ -48,12 +57,24 @@ export class AgentChatWindowComponent implements OnInit, OnDestroy {
 
             });
 
-            this.directLine.activity$.filter(res => res.from.id !== this.myuid).filter(res => res.from.id !== this.botHandle)
-                .subscribe(res => this.messages.push(res));
+            this.directLine.activity$.filter(res => res.from.id !== this.myuid)
+                .filter(res => res.from.id !== this.botHandle)
+                .takeUntil(this.ngUnsubscribe)
+                .subscribe(res => {
+                    this.messages.push(res);
+                    this.submitIdleMessage(this.conv_id);
+                });
         });
+        this.idleMsgService.getWindowRestore$().takeUntil(this.ngUnsubscribe)
+            .subscribe(res => {
+                this.restoreChatWindow(res);
+        });
+
     }
 
     ngOnDestroy() {
+        this.ngUnsubscribe.next();
+        this.ngUnsubscribe.complete();
     }
 
 
@@ -61,12 +82,36 @@ export class AgentChatWindowComponent implements OnInit, OnDestroy {
         this.defaultVal = '';
         if (sendingMessage !== '') {
             let act = { from: { id: this.myuid }, type: 'message', text: sendingMessage } as Activity;
-
-            this.directLine.postActivity(act).subscribe(
+            //where is where we shall make an httpcall to store my activity in db
+            this.directLine.postActivity(act).takeUntil(this.ngUnsubscribe).subscribe(
                 id => console.log("posted activity, assigned ID ", id),
                 error => console.log("Error posting activity", error));
             this.messages.push(act);
         }
+    }
+
+    public submitIdleMessage(id: string) {
+
+        if(this.isMinimized)
+            this.idleMsgService.sendIdleMessage({
+                conv_id: this.conv_id,
+                num_messages: 1,
+                connected: true
+            } as IdleStatus);
+    }
+
+    public restoreChatWindow(id: string) {
+        if (id === this.conv_id && this.isMinimized == true)
+            this.isMinimized = false;
+    }
+
+    public minimizeWindow() {
+        this.isMinimized = true;
+    }
+
+    //data emitted should be the conversation object emitted to the parent so they can make http call to db with it to modify connection table
+    public onClickedExit() {
+        this.close.emit('event');
     }
 
     public msgAlignment(id: string) {
@@ -93,8 +138,6 @@ export class AgentChatWindowComponent implements OnInit, OnDestroy {
         };
     }
 
-    onClickedExit() {
-        this.close.emit('event');
-    }
+
 
 }

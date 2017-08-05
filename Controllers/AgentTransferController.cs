@@ -8,9 +8,12 @@ using chatbot_portal.Data;
 using chatbot_portal.Models;
 using Microsoft.EntityFrameworkCore;
 using chatbot_portal.Services;
-using WebSocketManager.Common;
+using WebSocketManager;
 using System.Reflection;
 using Newtonsoft.Json;
+using WebSocketManager.Common;
+using chatbot_portal.Repositories;
+using chatbot_portal.Models.Dto;
 
 namespace chatbot_portal.Controllers
 {
@@ -19,61 +22,71 @@ namespace chatbot_portal.Controllers
     public class AgentTransferController : Controller 
     {
 
-        private readonly DatabaseContext _dbcontext;
+        //private readonly DatabaseContext _dbcontext;
         private readonly LiveRequestService _lrcontext;
+        private readonly IAgentRequestRepository _repo;
 
-        public AgentTransferController(DatabaseContext dbcontext, LiveRequestService lrcontext)
+        public AgentTransferController(/*DatabaseContext dbcontext, */LiveRequestService lrcontext, IAgentRequestRepository repo)
         {
-            this._dbcontext = dbcontext;
-            this._lrcontext = lrcontext;
+           // _dbcontext = dbcontext;
+            _lrcontext = lrcontext;
+            _repo = repo;
         }
-
+        
         
         [HttpGet("[action]")]
         public async Task<IActionResult> GetRequests()
         {
+            /*
             var queue = await _dbcontext.LiveRequests
                 .Select(x => new { conv_id = x.conv_id, action = "request", datetime = x.date, user = "student" })
                 .ToListAsync();
 
-            
+            */
+            var requests = await _repo.GetPendingRequests();
 
-            return Json(queue);
+            return Json(requests);
             
         }
       
         [HttpPost("[action]")]
         //[ValidateAntiForgeryToken]
-        public async Task<IActionResult> MakeRequest([FromBody] LiveRequest request)
+        public async Task<IActionResult> MakeRequest([FromBody] AgentRequestDTO request)//LiveRequest request)
         {
             
             if(_lrcontext.AgentsAvailable() == 0)
             {
                 return Json(new { available = false} );
             }
-
+            /*
             if (await _dbcontext.RequestPending(request) == false)
             {
                 return Json(new { available = "error" });
             }
-
+            */
+            /*
+            if((await _repo.CreateLiveRequest(request)) == false)
+            {
+                return Json(new { available = "error" });
+            }
+            */
             //DateTime.ParseExact(datetime, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
 
             
             
-            await _lrcontext.SendMessageToAllAsync(new Message { MessageType = MessageType.Text, Data = JsonConvert.SerializeObject(request) });
+            await _lrcontext.SendMessageToAllAsync(new WebSocketManager.Common.Message { MessageType = MessageType.Text, Data = JsonConvert.SerializeObject(request) });
             return Json(new { available = true });
             
         }
 
         [HttpPost("[action]")]
-        public async Task<IActionResult> AcceptRequest([FromBody] LiveRequest request)
+        public async Task<IActionResult> AcceptRequest([FromBody] AgentRequestDTO request)//LiveRequest request)
         {
 
 
-            await _lrcontext.SendMessageToAllAsync(new Message { MessageType = MessageType.Text, Data = JsonConvert.SerializeObject(request) });
+            await _lrcontext.SendMessageToAllAsync(new WebSocketManager.Common.Message { MessageType = MessageType.Text, Data = JsonConvert.SerializeObject(request) });
 
-            var result = await _dbcontext.DeleteRequest(request.conv_id);
+            var result = await _repo.UpdateLiveRequest(request);//_dbcontext.DeleteRequest(request.conv_id);
             
             if (!result)
             {
@@ -82,7 +95,7 @@ namespace chatbot_portal.Controllers
             
             return Json(Accepted());
         }
-
+        /*
         
         [HttpGet("[action]")]
         public async Task<IActionResult> RemoveRequest(string conv_id)
@@ -96,7 +109,7 @@ namespace chatbot_portal.Controllers
                 user = "",
             };
 
-            await _lrcontext.SendMessageToAllAsync(new Message { MessageType = MessageType.Text, Data = obj.ToString() });
+            await _lrcontext.SendMessageToAllAsync(new WebSocketManager.Common.Message { MessageType = MessageType.Text, Data = obj.ToString() });
             var result = await _dbcontext.DeleteRequest(conv_id);
             if (!result)
             {
@@ -106,6 +119,6 @@ namespace chatbot_portal.Controllers
             return Json(null);
         }
 
-
+    */
     }
 }

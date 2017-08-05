@@ -2,6 +2,7 @@
 import { Component, OnInit, OnDestroy, EventEmitter, Output } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Http, RequestOptions, Response, Headers } from '@angular/http';
 
 //rxjs lib
 import * as Rx from 'rxjs/Rx';
@@ -39,8 +40,11 @@ export class ChatWindowComponent implements OnInit, OnDestroy {
     private botHandle: string = 'AskRowdy';
     private notConnected: boolean = true;
 
+    private sendMessageUri: string = '/api/Message/SendMessage';
+
+
     constructor(private chatConnectionService: ChatBotConnectionService, private chatService: ChatBotActivityService,
-        private liveService: LiveRequestService) {
+        private liveService: LiveRequestService, private http: Http) {
         this.removeWindow = new EventEmitter<boolean>();
         this.myuid = uuid();
     }
@@ -59,9 +63,19 @@ export class ChatWindowComponent implements OnInit, OnDestroy {
             });
         this.botSubscription = timer$
             .switchMap(() => this.directLine.activity$)
-            .filter(res => res.from.id !== this.myuid)
-            .subscribe(res => { this.Messages.push(res) });
+            .filter(res => res.type === "message")//!== this.myuid)
+            .subscribe(res => {
+                this.Messages.push(res);
+                console.log(res);
+                this.http.post(this.sendMessageUri, res, this.getRequestOptions())
+                    .map(x => x.json())
+                    .subscribe(res => { console.log(res) });
+                
+            });
 
+    }
+    public getRequestOptions(authToken?: string): RequestOptions {
+        return new RequestOptions(new Headers({ 'Content-Type': 'application/json' }));
     }
 
     ngOnDestroy() {

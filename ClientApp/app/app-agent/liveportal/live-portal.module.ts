@@ -9,6 +9,8 @@ import { LivePortalComponent } from './live-portal.component';
 import { InsertWindowDirective } from './directives/insert-window.directive';
 import { AgentChatWindowComponent } from './agentchatwindow/agent-chat-window.component';
 import { PendingListComponent } from './pendinglist/pending-list.component';
+import { MinimizeWindowContainerComponent } from './minimizewindow/minimized-window-container.component';
+import { ChatHistoryWindowComponent } from './chathistorywindow/chat-history-window.component';
 
 @NgModule({
     imports: [
@@ -20,6 +22,8 @@ import { PendingListComponent } from './pendinglist/pending-list.component';
         PendingListComponent,
         AgentChatWindowComponent,
         InsertWindowDirective,
+        MinimizeWindowContainerComponent,
+        ChatHistoryWindowComponent,
     ],
     entryComponents: [
         AgentChatWindowComponent
@@ -29,6 +33,8 @@ import { PendingListComponent } from './pendinglist/pending-list.component';
         PendingListComponent,
         AgentChatWindowComponent,
         InsertWindowDirective,
+        MinimizeWindowContainerComponent,
+        ChatHistoryWindowComponent,
     ],
 
 })

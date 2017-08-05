@@ -1,0 +1,9 @@
+﻿<div class="minimize-container">
+    <ul *ngIf="idleMessageContainer">
+        <li *ngFor="let idleMessage of idleMessageContainer" (click)="removeIdleMessageWindow(idleMessage)">
+            {{idleMessage['conv_id']}}
+
+            {{idleMessage['num_messages']}}
+        </li>
+    </ul>
+</div>

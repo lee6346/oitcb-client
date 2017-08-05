@@ -9,13 +9,18 @@ namespace chatbot_portal.Models
 {
     public class Agent
     {
-        public int AgentID { get; set; }
-        [Required]
+        public Guid Id { get; set; }
+        public string UserName { get; set; }
         public string Password { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        [Required]
-        public string UserName { get; set; }
+        public string DateTimeCreated { get; set; }
+        public string DateTimeUpdated { get; set; }
+
+        public DateTime DateFormatter { get; set; }
+
+
+
 
     }
 }

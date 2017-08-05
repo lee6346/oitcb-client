@@ -1,15 +1,20 @@
 ﻿
 
-
+.chat-frame{
+    position: relative;
+    width: 360px;
+    height: 420px;
+}
 .chat-window {
     position: relative;
-    width: 320px;
-    height: 420px;
+    width: 90%;
+    height: 100%;
     border: 0.5px solid #141010;
     border-radius: 1%;
     -webkit-box-shadow: 2px 2px 4px #888;
     -moz-box-shadow: 2px 2px 4px #888;
     box-shadow: 2px 2px 4px #888;
+
 }
 
 .window-header {
@@ -189,4 +194,35 @@ ul {
     padding: 0;
     list-style-type: none;
     flex-direction: column-reverse;
+}
+
+
+.side-panel {
+    position: absolute;
+    left: 324px;
+    height: 50%;
+    width: 8%;
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: 0 15px 15px 0;
+    background-color: #ada0a0;
+}
+
+    .side-panel:hover {
+        background-color: #c7bebe;
+        left: 400px;
+    }
+
+
+.lines {
+    position: relative;
+    float: right;
+    width: 0;
+    height: 90%;
+    margin-right: 5.5px;
+    margin-left: 0;
+    border-right: 0.3px solid #141111;
+    /*box-shadow: 0 0 0.5px 0;*/
+    top: 50%;
+    transform: translateY(-50%);
 }

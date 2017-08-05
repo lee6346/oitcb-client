@@ -21,7 +21,6 @@ namespace chatbot_portal.Services
     public class SecretTokenService : ISecretTokenService
     {
         private readonly ChatBotOptions _options;
-        //private static HttpClient client = new HttpClient();
         public SecretTokenService(IOptions<ChatBotOptions> optionsAccessor)
         {
             _options = optionsAccessor.Value;

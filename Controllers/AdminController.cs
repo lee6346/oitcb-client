@@ -13,32 +13,6 @@ namespace chatbot_portal.Controllers
     public class AdminController : Controller
     {
 
-        private readonly DatabaseContext _context;
 
-        public AdminController(DatabaseContext context)
-        {
-            this._context = context;
-        }
-        /*
-        [HttpPost("[action]")]
-        public async Task<IActionResult> Login()
-        {
-
-        }
-
-
-        [HttpPost("[action]")]
-        public async Task<IActionResult> Edit()
-        {
-
-        }
-
-        [HttpDelete("[action]")]
-        public async Task<IActionResult> Remove()
-        {
-
-        }
-
-    */
     }
 }

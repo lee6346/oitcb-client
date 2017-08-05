@@ -24,7 +24,7 @@ namespace chatbot_portal.Controllers
             this._dbcontext = context;
             this._liveService = liveService;
         }
-
+        /*
        //need to set this to store the agent in the LiveConnection db
         [HttpPost("[action]")]
         //[ValidateAntiForgeryToken]
@@ -124,7 +124,7 @@ namespace chatbot_portal.Controllers
             }
 
         }
-
+        */
     
     }
 }

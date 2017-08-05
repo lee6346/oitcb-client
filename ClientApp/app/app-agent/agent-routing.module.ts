@@ -2,7 +2,7 @@
 import { RouterModule, Routes } from '@angular/router';
 import { AgentComponent } from './agent.component';
 import { LivePortalComponent } from './liveportal/live-portal.component';
-
+import { DataPortalComponent } from './dataportal/data-portal.component';
 const agentRoutes: Routes = [
     {
         path: 'agent',
@@ -11,6 +11,14 @@ const agentRoutes: Routes = [
             {
                 path: '',
                 component: LivePortalComponent
+            },
+            {
+                path: 'agent',
+                component: LivePortalComponent
+            },
+            {
+                path: 'data',
+                component: DataPortalComponent
             },
             {
                 path: '**',

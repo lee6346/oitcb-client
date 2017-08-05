@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 
 import {
     ChatBotActivityService, ChatBotConnectionService, LiveRequestService, AuthenticationService,
-    WebsocketService, StateStorageService
+    WebsocketService, StateStorageService, IdleMessageService,
 } from './';
 
 
@@ -20,6 +20,7 @@ import {
         LiveRequestService,
         AuthenticationService,
         WebsocketService,
+        IdleMessageService,
     ]
 })
 export class CoreModule { }

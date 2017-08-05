@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace chatbot_portal.Models.Core
+namespace chatbot_portal.Interfaces
 {
-    public class Class
+    interface IMessageLogService
     {
+
     }
 }

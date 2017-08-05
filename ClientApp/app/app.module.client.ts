@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { sharedConfig } from './app.module.shared';
 //register services
 import { CoreModule } from './core';
@@ -20,6 +21,7 @@ import { CoreModule } from './core';
     imports: [
         //module import order matters for routing... (ie: if you have two modules with /home components, the first module in the import will be selected)
         BrowserModule,
+        BrowserAnimationsModule,
         CoreModule,
         //SharedModule,
         ...sharedConfig.imports
