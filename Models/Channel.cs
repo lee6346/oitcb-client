@@ -10,15 +10,10 @@ namespace chatbot_portal.Models
         public int Id { get; set; }
         public string ConversationId { get; set; }
         public string BotHandle { get; set; }
-        public string DateTimeCreated { get; set; }
-        public string DateTimeEnded { get; set; }
+        public DateTime DateTimeCreated { get; set; }
+        public DateTime? DateTimeEnded { get; set; }
         public byte[] RowVersion { get; set; }
 
-        public DateTime DateFormatter { get; set; }
-
-
-
-        
 
     }
 

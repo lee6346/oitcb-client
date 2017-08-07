@@ -1,6 +1,11 @@
-﻿export { ChatBotActivityService, ChatBotConnectionService } from './chatbot';
-export { LiveRequestService, WebsocketService, IdleMessageService} from './liverequest';
-export { AuthenticationService } from './authentication';
-export { StateStorageService } from './storage';
+﻿export { ChatBotActivityService} from './chatbot-activity.service';
+export { ChatBotConnectionService } from './chatbot-connection.service'
+export { LiveRequestService } from './live-request.service';
+export { WebsocketService } from './websocket.service';
+export { IdleMessageService } from './idle-message.service';
+export { AuthenticationService } from './authentication.service';
+export { StateStorageService } from './state-storage.service';
+export { MessageService } from './message.service';
+export { ChannelConnectionService } from './channel-connection.service';
 export { CoreModule } from './core.module';
-// then import { pick, } from './core';
+

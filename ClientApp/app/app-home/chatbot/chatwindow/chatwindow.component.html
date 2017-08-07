@@ -22,7 +22,7 @@
         </div>
         <div class="partition"></div>
         <div class="input-area">
-            <input #msgref type="text" [(ngModel)]="defaultVal" class="text-input" (keyup.enter)="submitMessage(msgref.value)" />
+            <input #msgref type="text" [(ngModel)]="defaultVal" class="text-input" (keyup.enter)="submitMessage(msgref.value)" [disabled]="notConnected" />
         </div>
         <div class="button-container">
             <button type="button" class="req-button" (click)="makeLiveRequest()">Live Request</button>

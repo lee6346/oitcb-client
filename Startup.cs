@@ -58,10 +58,12 @@ namespace chatbot_portal
 
             //chatbot token services
             services.AddScoped<ISecretTokenService, SecretTokenService>();
+            services.AddScoped<IChannelConnectionService, ChannelConnectionService>();
 
             //repository services
             services.AddScoped<IActivityMessageRepository, ActivityMessageRepository>();
             services.AddScoped<IAgentRequestRepository, AgentRequestRepository>();
+            services.AddScoped<IChannelRepository, ChannelRepository>();
 
             //Socket services
             services.AddWebSocketManager();
@@ -106,7 +108,7 @@ namespace chatbot_portal
             });
             app.MapWebSocketManager("/socketconnection", serviceProvider.GetService<LiveRequestService>());
 
-            DbInitializer.Initialize(context);
+
 
         }
     }

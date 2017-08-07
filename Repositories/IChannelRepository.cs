@@ -1,14 +1,18 @@
-﻿using System;
+﻿using chatbot_portal.Models.Dto;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace chatbot_portal.Repositories
 {
-    interface IChannelRepository<Channel>
+    public interface IChannelRepository
     {
-        void CreateChannel(Channel ch);
-        void EndChannel();
-        Channel GetChannelByConversationID(string cid);
+        Task<ChannelStatusDTO> CreateChannel(ChannelDTO ch);
+        Task<ChannelStatusDTO> EndChannel(CloseChannelDTO cch);
+        Task<List<ChannelDataDTO>> GetChannels();
+        Task<List<OpenedChannelDTO>> GetOpenChannels();
+        int OpenChannelCount();
+
     }
 }

@@ -59,11 +59,8 @@
     <Folder Include="ClientApp\app\app-agent\liveportal\summarychart\" />
     <Folder Include="ClientApp\app\app-home\chatbot\chatfeedback\" />
     <Folder Include="ClientApp\app\app-home\chatbot\generalinfo\" />
-    <Folder Include="ClientApp\app\app-home\contact\" />
-    <Folder Include="ClientApp\app\app-home\authform\" />
-    <Folder Include="ClientApp\app\core\data\" />
     <Folder Include="ClientApp\app\shared\pipes\" />
-    <Folder Include="Models\NewFolder\" />
+    <Folder Include="Migrations\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="wwwroot\dist\vendor.js" />

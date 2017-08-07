@@ -39,5 +39,5 @@ namespace chatbot_portal.Controllers
             return Json(log);
         }
         
-        }
     }
+}

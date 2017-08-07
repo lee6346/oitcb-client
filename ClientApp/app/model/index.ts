@@ -1,3 +1,9 @@
 ﻿export { AuthUser } from './AuthUser';
 export { LiveRequest } from './LiveRequest';
 export { IdleStatus } from './IdleStatus';
+export { Message } from './Message';
+export { OpenChannel } from './OpenChannel';
+export { ChannelData } from './ChannelData';
+export { Connection } from './Connection';
+export { CloseChannel } from './CloseChannel';
+export { LiveStatus } from './LiveStatus';

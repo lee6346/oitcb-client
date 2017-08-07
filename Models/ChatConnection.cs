@@ -10,13 +10,10 @@ namespace chatbot_portal.Models
         public int Id { get; set; }
         public string ConversationId { get; set; }
         public Guid UserId { get; set; } 
-        public DateTime DateTimeConnected { get; set; }
-        public DateTime DateTimeDisconnected { get; set; }
+        public string DateTimeConnected { get; set; }
+        public string DateTimeDisconnected { get; set; }
         public byte[] RowVersion { get; set; }
 
-        public Channel Channel { get; set; }
-        
-        public Agent Agent { get; set; }
         
     }
 }

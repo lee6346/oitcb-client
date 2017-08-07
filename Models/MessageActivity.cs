@@ -11,10 +11,9 @@ namespace chatbot_portal.Models
         public string ConversationId { get; set; }
         public string SenderId { get; set; }
         public string Text { get; set; }
-        public string DateTimeSent { get; set; }
+        public DateTime DateTimeSent { get; set; }
         public byte[] RowVersion { get; set; }
 
-        public DateTime DateFormatter { get; set; }
 
 
     }

@@ -47,7 +47,9 @@ export class AgentChatWindowComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
 
+        console.log("ll");
         this.chatConnectionService.getConvStreamUrl$(this.conv_id).takeUntil(this.ngUnsubscribe).subscribe(res => {
+            console.log(res);
             this.conversation = res as Conversation;
             this.directLine = new DirectLine({
                 token: this.conversation['token'],
@@ -56,20 +58,21 @@ export class AgentChatWindowComponent implements OnInit, OnDestroy {
                 streamUrl: this.conversation['streamUrl']
 
             });
-
             this.directLine.activity$.filter(res => res.from.id !== this.myuid)
                 .filter(res => res.from.id !== this.botHandle)
                 .takeUntil(this.ngUnsubscribe)
                 .subscribe(res => {
+                    console.log("here it is" + res);
                     this.messages.push(res);
-                    this.submitIdleMessage(this.conv_id);
+                    //this.submitIdleMessage(this.conv_id);
                 });
         });
+        /*
         this.idleMsgService.getWindowRestore$().takeUntil(this.ngUnsubscribe)
             .subscribe(res => {
                 this.restoreChatWindow(res);
         });
-
+        */
     }
 
     ngOnDestroy() {

@@ -1,7 +1,7 @@
 ﻿import { Injectable } from '@angular/core';
 import * as Rx from 'rxjs/Rx';
 
-import { IdleStatus } from '../../model';
+import { IdleStatus } from '../model';
 
 @Injectable()
 export class IdleMessageService {

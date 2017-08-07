@@ -2,17 +2,20 @@
 import { Component, OnInit, OnDestroy, EventEmitter, Output } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Http, RequestOptions, Response, Headers } from '@angular/http';
 
 //rxjs lib
 import * as Rx from 'rxjs/Rx';
-import { ISubscription } from "rxjs/Subscription";
 
 //direct line lib
-import { DirectLine, Activity, Conversation } from 'botframework-directlinejs';
+import {DirectLine, Activity, Message, Conversation } from 'botframework-directlinejs';
 
 //services
-import { ChatBotActivityService, ChatBotConnectionService, LiveRequestService } from '../../../core';
+import { ChatBotActivityService, ChatBotConnectionService, LiveRequestService, ChannelConnectionService, MessageService } from '../../../core';
+
+//models
+import { LiveRequest, LiveStatus } from '../../../model';
+
+
 
 //uid lib
 import * as uuid from 'uuid/v1';
@@ -29,83 +32,108 @@ export class ChatWindowComponent implements OnInit, OnDestroy {
     @Output() removeWindow: EventEmitter<boolean>;
 
 
-    Messages: Activity[] = [];
+    private Messages: Activity[] = [];
 
     private myuid: string;
-    private directLine: DirectLine;
-    private conv_id: string;
     private defaultVal: string = null;
-    private conv: Conversation;
-    private botSubscription: ISubscription;
-    private botHandle: string = 'AskRowdy';
+
+    private directLine: DirectLine;
+    private conversationObject: Conversation;
     private notConnected: boolean = true;
+    private agentConnected: boolean = false;
 
-    private sendMessageUri: string = '/api/Message/SendMessage';
 
+    private ngUnsubscribe: Rx.Subject<void> = new Rx.Subject<void>();
+    private botUnsubscribe: Rx.Subject<void> = new Rx.Subject<void>();
 
-    constructor(private chatConnectionService: ChatBotConnectionService, private chatService: ChatBotActivityService,
-        private liveService: LiveRequestService, private http: Http) {
+    private messageObservableActivity$: Rx.Observable<Activity>;
+
+    
+    private waitingActivity: Activity = { from: { id: 'Default' }, type: 'message', text: 'Waiting For Agent, Please Hold' };
+    private unavailableActivity: Activity = { from: { id: 'Default' }, type: 'message', text: 'There are currently no agents available' };
+    private availableActivity: Activity = { from: { id: 'Default' }, type: 'message', text: 'You are now disconnecting with the bot. An agent will be with you shortly' };
+
+    constructor(private chatService: ChatBotActivityService, private liveService: LiveRequestService,
+        private channelConnectionService: ChannelConnectionService,
+        private messageService: MessageService
+    ) {
         this.removeWindow = new EventEmitter<boolean>();
         this.myuid = uuid();
     }
 
     ngOnInit() {
-        let timer$ = Rx.Observable.timer(6000);
-        let timer2$ = Rx.Observable.timer(2000);
-        timer2$.switchMap(() =>
-            this.chatConnectionService.getConversationObject$()).subscribe(res => {
-                this.conv = res;
-                this.conv_id = res['conversationId'];
-                console.log(res);
-                this.directLine = this.chatConnectionService.startConnection$(res);
-                this.notConnected = false;
 
-            });
-        this.botSubscription = timer$
-            .switchMap(() => this.directLine.activity$)
-            .filter(res => res.type === "message")//!== this.myuid)
-            .subscribe(res => {
-                this.Messages.push(res);
-                console.log(res);
-                this.http.post(this.sendMessageUri, res, this.getRequestOptions())
-                    .map(x => x.json())
-                    .subscribe(res => { console.log(res) });
-                
-            });
+        this.channelConnectionService.openChannel$().takeUntil(this.ngUnsubscribe).subscribe(res => {
+            this.conversationObject = res;
+            this.directLine = this.chatService.getDirectLine(this.conversationObject);
+            this.messageObservableActivity$ = this.directLine.activity$.share();
+            this.notConnected = false;
 
+            this.messageObservableActivity$.filter(x => x.type === "message")
+                .subscribe(res => this.storeMessages(res));
+            this.messageObservableActivity$.filter(x => x.from.id === "AskRowdy" && x.type==="message")
+                .takeUntil(this.botUnsubscribe).subscribe(res => this.Messages.push(res));
+        })
     }
-    public getRequestOptions(authToken?: string): RequestOptions {
-        return new RequestOptions(new Headers({ 'Content-Type': 'application/json' }));
-    }
-
+    
     ngOnDestroy() {
-
+        this.ngUnsubscribe.next();
+        this.ngUnsubscribe.complete();
+        this.botUnsubscribe.next();
+        this.botUnsubscribe.complete();
+    }
+    public storeMessages(act: Activity) {
+        this.messageService.submitMessage(act).subscribe();
     }
 
 
-    submitMessage(sendingMessage: string) {
+    public submitMessage(sendingMessage: string) {
         this.defaultVal = '';
         if (sendingMessage !== '') {
             let act = { from: { id: this.myuid }, type: 'message', text: sendingMessage } as Activity;
-
-            this.directLine.postActivity(act).subscribe(
-                id => console.log("posted activity, assigned ID ", id),
-                error => console.log("Error posting activity", error));
+            this.chatService.sendMessage(this.directLine, act);
             this.Messages.push(act);
         }
     }
 
-    closeWindow(): void {
-        this.removeWindow.emit(false);
-    }
-    public makeLiveRequest() {
-        console.log(this.conv_id);
-        this.liveService.sendLiveRequest$(this.conv_id).subscribe(msg => { console.log(msg) });
-        this.botSubscription.unsubscribe();
-        this.directLine.activity$.filter(res => res.from.id !== this.myuid).filter(res => res.from.id !== this.botHandle)
-            .subscribe(res => { this.Messages.push(res) });
 
+    public closeWindow(): void {
+        this.channelConnectionService.closeChannel$(this.conversationObject.conversationId)
+            .subscribe(res => this.removeWindow.emit(false));
+        
     }
+
+    public makeLiveRequest() {
+        if (!this.agentConnected) {
+            this.liveService.sendLiveRequest$(this.conversationObject.conversationId, this.myuid)
+                .subscribe(res => {
+                    this.agentStatusHandler(res)
+                });
+        }
+    }
+    
+    public agentStatusHandler(response: LiveStatus) {
+        if (response.liveStatus === 'waiting') {
+            this.Messages.push(this.waitingActivity);
+        }
+        else if (response.liveStatus === 'unavailable') {
+            this.Messages.push(this.unavailableActivity);
+        }
+        else if (response.liveStatus === 'available') {
+            this.agentConnected = true;
+            this.Messages.push(this.availableActivity);
+            this.messageObservableActivity$.filter(x => x.from.id !== this.myuid && x.from.id !== "AskRowdy" && x.type === "message")
+                .subscribe(res => this.Messages.push(res));
+            this.botUnsubscribe.next();
+            this.botUnsubscribe.complete();
+
+        }
+    }
+
+
+
+
+
     public msgAlignment(id: string) {
         if (id === this.myuid) {
             return {

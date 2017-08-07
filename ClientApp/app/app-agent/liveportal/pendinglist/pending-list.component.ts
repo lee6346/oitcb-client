@@ -7,7 +7,7 @@ import * as Rx from 'rxjs/Rx';
 
 //models
 import { LiveRequest } from '../../../model';
-
+import {LiveRequestService } from '../../../core';
 
 @Component({
     selector: 'pending-list',
@@ -16,27 +16,31 @@ import { LiveRequest } from '../../../model';
 })
 export class PendingListComponent implements OnInit, OnDestroy, OnChanges {
 
-    //use javascript Set() to get unique conv-ids
-   // private lr: Set
 
+    private displayList: boolean = true;
     private _liveRequestQueue: LiveRequest[] = [];
+    private wsPendingRequests$: Rx.Observable<LiveRequest>;
+
+    private ngUnsubscribe: Rx.Subject<void> = new Rx.Subject<void>();
+
 
     @Input()
     set liveRequestQueue(req: Rx.Observable<LiveRequest>) {
         req.subscribe(res => this.processQueue(res));
         //this.processQueue(req);
     }
-    /*
-    get liveRequestQueue(){
-        return this._liveRequestQueue.pop();
-    }
-    */
+
     @Output()
     private liveRequestSelect: EventEmitter<LiveRequest>;
 
-    constructor() { }
+    constructor(private liveRequestService: LiveRequestService ) { }
 
     ngOnInit() {
+        this.liveRequestService.getDbRequests$()
+            .flatMap(x => x).takeUntil(this.ngUnsubscribe)
+            .subscribe(
+                res => this._liveRequestQueue.push(res)
+            );
 
     }
 
@@ -44,8 +48,16 @@ export class PendingListComponent implements OnInit, OnDestroy, OnChanges {
 
 
     ngOnDestroy() {
-        //this.ngUnsubscribe.next();
-        //this.ngUnsubscribe.complete();
+        this.ngUnsubscribe.next();
+        this.ngUnsubscribe.complete();
+    }
+
+    public getDbPendingRequests(): void {
+        this.liveRequestService.getDbRequests$()
+            .takeUntil(this.ngUnsubscribe)
+            .subscribe(
+
+            );
     }
 
     public selectPendingRequest(req: LiveRequest) {

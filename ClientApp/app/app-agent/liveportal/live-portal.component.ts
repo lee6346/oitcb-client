@@ -4,6 +4,7 @@ import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 
 //rxjs lib
 import * as Rx from 'rxjs/Rx';
+import { WebSocketSubject } from 'rxjs/observable/dom/WebSocketSubject';
 import { ISubscription } from "rxjs/Subscription";
 
 //services
@@ -13,7 +14,7 @@ import { WebsocketService, LiveRequestService } from '../../core';
 import { LiveRequest } from '../../model';
 
 
-
+import * as uuid from 'uuid/v1';
 
 //directives/components
 import { AgentChatWindowComponent } from './agentchatwindow/agent-chat-window.component';
@@ -32,29 +33,31 @@ export class LivePortalComponent implements OnInit, OnDestroy {
 
     @ViewChild(InsertWindowDirective) windowAnchor: InsertWindowDirective;
 
-    private liveQueue: LiveRequest[];
+    private liveQueue: LiveRequest[] = [];
     private ngUnsubscribe: Rx.Subject<void> = new Rx.Subject<void>();
-
+    private myuid;
     private sock_id: string;
 
     private ws_connection: Rx.Observable<any>;
     private lr_request: Rx.Observable<LiveRequest>;
 
     constructor(private ws: WebsocketService, private lr: LiveRequestService) {
+        this.myuid = uuid();
     }
 
     ngOnInit() {
 
         //get pending requests in db
-        this.lr.getDbRequests$().distinct().subscribe(res => this.liveQueue = res);
+        this.lr.getDbRequests$().flatMap(x => x).subscribe(res => this.addToQueue(res));
 
         //connect to ws and get socket id
         this.ws_connection = this.ws.connectWebSocket$();
         this.ws_connection.take(1).subscribe(res => { this.sock_id = res['data'], console.log(this.sock_id) });
+        
 
-    
+        
         //set of observers for adding/removing requests
-        this.getJsonObjects$(this.ws_connection).takeUntil(this.ngUnsubscribe).filter(x => x['action'] === 'request').subscribe(res => { this.addToQueue(res) });
+        this.getJsonObjects$(this.ws_connection).filter(x => x['action'] === 'request').subscribe(res => { this.addToQueue(res) });
         this.getJsonObjects$(this.ws_connection).filter(x => x['action'] === 'remove').subscribe(res => { this.removefromQueue(res) });
 
     }
@@ -72,12 +75,14 @@ export class LivePortalComponent implements OnInit, OnDestroy {
     }
 
     public addToQueue(lr: LiveRequest): void {
-        if (this.getQueueIndex(lr['conv_id']) === -1)
+       
+        if (this.liveQueue || (this.getQueueIndex(lr['conv_id']) === -1))
             this.liveQueue.push(lr);
+        
     }
 
     public getQueueIndex(id: string): number {
-        return this.liveQueue.findIndex(x => x.conv_id === id);
+        return this.liveQueue.findIndex(x => x['conv_id'] === id);
     }
     
     public getJsonObjects$(ws: Rx.Observable<any>): Rx.Observable<LiveRequest> {
@@ -90,7 +95,8 @@ export class LivePortalComponent implements OnInit, OnDestroy {
     
     public acceptRequest(live: LiveRequest): void {
         console.log(live['conv_id']);
-        this.lr.acceptRequest$(live['conv_id']).subscribe(res => { console.log(res) });
+
+        this.lr.acceptRequest$(live['conv_id'], this.myuid).subscribe(res => { console.log(res) });
         this.windowAnchor.createChatWindow(live['conv_id'], AgentChatWindowComponent);
     }
     

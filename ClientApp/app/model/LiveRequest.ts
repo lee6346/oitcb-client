@@ -1,25 +1,12 @@
 ﻿export class LiveRequest {
     public conv_id: string;
-    public action: string;
-
-    public date: string;
     public user: string;
-    constructor(conv_id: string, action: string, user: string = "student") {
+    public action: string;
+    public date: string;
+    constructor(conv_id: string, user: string, action: string) {
         this.conv_id = conv_id;
-        this.action = action;
-        
-        this.date = this.getCurrentDateTime();
         this.user = user;
+        this.action = action;
+        this.date = new Date().toISOString();
     }
-
-    public getCurrentDateTime() : string {
-        let today = new Date();
-        let date = (today.getMonth() + 1) + "/" + today.getDate() + "/" + today.getFullYear();
-        let time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-        //let ampm = today.getHours() > 12 ? "pm" : "am";
-        //let hours = today.getHours() % 12;
-        return date + ' ' + time;
-    }
-
-
 }

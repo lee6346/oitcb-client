@@ -14,10 +14,9 @@ namespace chatbot_portal.Models
         public string Password { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string DateTimeCreated { get; set; }
-        public string DateTimeUpdated { get; set; }
-
-        public DateTime DateFormatter { get; set; }
+        public DateTime DateTimeCreated { get; set; }
+        public DateTime DateTimeUpdated { get; set; }
+        
 
 
 

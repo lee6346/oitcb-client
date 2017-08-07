@@ -17,60 +17,69 @@ namespace chatbot_portal.Repositories
             _context = context;
         }
 
-        public async Task<bool> CreateLiveRequest(AgentRequestDTO req) {
+        public async Task<RequestStatusDTO> CreateLiveRequest(AgentRequestDTO req) {
 
-            var request = _context.AgentRequests.FirstOrDefaultAsync(p => p.ConversationId == req.ConversationId);
-            if (request == null)
+            if (await _context.AgentRequests.AnyAsync(b => b.ConversationId == req.ConversationId))
             {
-                return false;
+                return new RequestStatusDTO { LiveStatus = "waiting"};
             }
 
             var ar = new AgentRequest
             {
                 UserId = req.UserId,
                 ConversationId = req.ConversationId,
-                DateTimeRequested = DateTime.Now.ToString()//req.SentTime,
+                DateTimeRequested = DateTime.Parse(req.SentTime)
             };
+
             try
             {
-                _context.Add(req);
+                _context.Add(ar);
                 await _context.SaveChangesAsync();
-                return true;
+                return new RequestStatusDTO { LiveStatus = "available" };
+            }
+
+            catch (DbUpdateException)
+            {
+                return new RequestStatusDTO { LiveStatus = "error" };
+            }
+        }
+        
+        public async Task<RemoveStatusDTO> RemoveLiveRequest(AgentRequestDTO req) {
+            var ar = await _context.AgentRequests
+                .SingleOrDefaultAsync(s => s.ConversationId == req.ConversationId);
+            if(ar == null)
+            {
+                return new RemoveStatusDTO { RemoveStatus = RemoveStatus.Empty };
+            }
+            try
+            {
+                _context.AgentRequests.Remove(ar);
+                await _context.SaveChangesAsync();
+                return new RemoveStatusDTO { RemoveStatus = RemoveStatus.Removed };
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return new RemoveStatusDTO {RemoveStatus = RemoveStatus.ConcurrencyError };
             }
             catch (DbUpdateException)
             {
-                return false;
+                return new RemoveStatusDTO { RemoveStatus = RemoveStatus.RemoveError };
             }
-        }
 
-        public async Task<bool> UpdateLiveRequest(AgentRequestDTO req) {
-            var ar = await _context.AgentRequests.FirstOrDefaultAsync(s => s.ConversationId == req.ConversationId);
-            ar.DateTimeAccepted = req.SentTime;
-            ar.AgentId = req.UserId;
-            try
-            {
-                _context.Update(ar);
-                await _context.SaveChangesAsync();
-                return true;
-            }
-            catch (DbUpdateException)
-            {
-                return false;
-            }
         }
-
+        
         public async Task<List<AgentRequestDTO>> GetPendingRequests()
         {
-            var pending = await _context.AgentRequests//.Where(p => p.AgentId == null)
+
+            var pending = await _context.AgentRequests
                 .Select(p => new AgentRequestDTO
                 {
                     ConversationId = p.ConversationId,
                     UserId = p.UserId,
                     Action = "request",
-                    SentTime = p.DateTimeRequested
-                })
-                
-                .ToListAsync();
+                    SentTime = p.DateTimeRequested.ToString()
+                }).ToListAsync();
+
             return pending;
         }
     }

@@ -13,8 +13,6 @@ namespace chatbot_portal.Repositories
 
         Task<List<MessageLogDTO>> GetMessageLogByConversation(string ConversationId);
 
-        Task<List<MessageLogDTO>> GetMessageLogByAgent(string AgentId);
-
     }
 
 

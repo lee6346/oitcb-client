@@ -26,7 +26,7 @@ namespace chatbot_portal.Repositories
                 ConversationId = msg.Conversation.ConversationID,
                 SenderId = msg.Sender.SenderID,
                 Text = msg.Message,
-                DateTimeSent = msg.TimeStamp
+                DateTimeSent = DateTime.Parse(msg.TimeStamp)
             };
             
             try
@@ -45,31 +45,17 @@ namespace chatbot_portal.Repositories
         public async Task<List<MessageLogDTO>> GetMessageLogByConversation(string ConversationId)
         {
             var messages = await _dbContext.MessageActivities.Where(b => b.ConversationId == ConversationId)
+                .OrderBy(x => x.DateTimeSent)
                 .Select(p => new MessageLogDTO
                 {
                     ConversationId = p.ConversationId,
                     SenderId = p.SenderId,
-                    Timestamp = p.DateTimeSent,
+                    Timestamp = p.DateTimeSent.ToString(),
                     Text = p.Text
                 })
-                .OrderBy(p => p.Timestamp)
                 .ToListAsync();
             return messages;
         }
 
-        public async Task<List<MessageLogDTO>> GetMessageLogByAgent(string AgentId)
-        {
-            var messages = await _dbContext.MessageActivities.Where(b => b.SenderId == AgentId)
-                .Select(p => new MessageLogDTO
-                {
-                    ConversationId = p.ConversationId,
-                    SenderId = p.SenderId,
-                    Timestamp = p.DateTimeSent,
-                    Text = p.Text
-                })
-                .OrderBy(p => p.Timestamp)
-                .ToListAsync();
-            return messages;
-        }
     }
 }

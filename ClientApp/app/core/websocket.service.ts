@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import * as Rx from 'rxjs/Rx';
 import { Http, Response, Headers, RequestOptions } from '@angular/http';
-import { LiveRequest } from '../../model';
+import { LiveRequest } from '../model';
 
 @Injectable()
 export class WebsocketService {
