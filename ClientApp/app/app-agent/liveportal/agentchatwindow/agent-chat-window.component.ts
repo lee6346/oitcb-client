@@ -9,11 +9,11 @@ import * as Rx from 'rxjs/Rx';
 import { DirectLine, Conversation, Activity } from 'botframework-directlinejs';
 
 //services
-import { ChatBotActivityService, ChatBotConnectionService, IdleMessageService } from '../../../core';
+import { ChatBotActivityService, ChatBotConnectionService, WindowMessageService} from '../../../core';
 
 //models
 import * as uuid from 'uuid/v1';
-import { IdleStatus } from '../../../model';
+
 
 //child components
 import { ChatHistoryWindowComponent } from '../chathistorywindow/chat-history-window.component';
@@ -38,7 +38,7 @@ export class AgentChatWindowComponent implements OnInit, OnDestroy {
     private isMinimized: boolean = false;
 
     constructor(private injector: Injector, private chatConnectionService: ChatBotConnectionService,
-        private chatService: ChatBotActivityService, private idleMsgService: IdleMessageService) {
+        private chatService: ChatBotActivityService, private windowMessageService: WindowMessageService) {
         this.conv_id = this.injector.get('conv_id');
         this.myuid = uuid();
     }
@@ -46,40 +46,28 @@ export class AgentChatWindowComponent implements OnInit, OnDestroy {
 
 
     ngOnInit() {
-
-        console.log("ll");
-        this.chatConnectionService.getConvStreamUrl$(this.conv_id).takeUntil(this.ngUnsubscribe).subscribe(res => {
-            console.log(res);
+        
+        this.chatConnectionService.getConvStreamUrl$(this.conv_id).subscribe(res => {
             this.conversation = res as Conversation;
-            this.directLine = new DirectLine({
-                token: this.conversation['token'],
-                conversationId: this.conv_id,
-                webSocket: true,
-                streamUrl: this.conversation['streamUrl']
-
-            });
+            this.directLine = this.chatService.getDirectLine(this.conversation);
             this.directLine.activity$.filter(res => res.from.id !== this.myuid)
                 .filter(res => res.from.id !== this.botHandle)
                 .takeUntil(this.ngUnsubscribe)
                 .subscribe(res => {
-                    console.log("here it is" + res);
                     this.messages.push(res);
-                    //this.submitIdleMessage(this.conv_id);
                 });
         });
-        /*
-        this.idleMsgService.getWindowRestore$().takeUntil(this.ngUnsubscribe)
-            .subscribe(res => {
-                this.restoreChatWindow(res);
-        });
-        */
+
     }
 
     ngOnDestroy() {
         this.ngUnsubscribe.next();
         this.ngUnsubscribe.complete();
     }
-
+    public subscribeToActivities(dl: DirectLine) {
+        dl.activity$.filter(res => res.from.id !== this.botHandle && res.from.id !== this.myuid)
+            .takeUntil(this.ngUnsubscribe)
+    }
 
     public submitMessage(sendingMessage: string) {
         this.defaultVal = '';
@@ -93,15 +81,6 @@ export class AgentChatWindowComponent implements OnInit, OnDestroy {
         }
     }
 
-    public submitIdleMessage(id: string) {
-
-        if(this.isMinimized)
-            this.idleMsgService.sendIdleMessage({
-                conv_id: this.conv_id,
-                num_messages: 1,
-                connected: true
-            } as IdleStatus);
-    }
 
     public restoreChatWindow(id: string) {
         if (id === this.conv_id && this.isMinimized == true)

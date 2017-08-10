@@ -59,6 +59,7 @@ namespace chatbot_portal.Data
 
             modelBuilder.Entity<Agent>().Property(b => b.DateTimeUpdated)
                 .ForSqlServerHasColumnType("datetime2")
+                .ValueGeneratedOnAddOrUpdate()
                 .IsConcurrencyToken();
             
 

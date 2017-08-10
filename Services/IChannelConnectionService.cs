@@ -8,8 +8,8 @@ namespace chatbot_portal.Services
 {
     public interface IChannelConnectionService
     {
-        Task<ChannelDTO> RequestNewChannelAsync();
-        Task<ChannelConnectionDTO> RequestNewConnectionAsync(string conv_id);
+        Task<ConversationDTO> RequestNewChannelAsync();
+        Task<ConnectionDTO> RequestNewConnectionAsync(string conv_id);
     }
 
 }

@@ -10,7 +10,6 @@ export class MessageService {
     private sendActivityUrl: string = '/api/Message/SendMessage';
 
 
-
     constructor(private http: Http) { }
 
     public getMessageLog(conv_id: string): Rx.Observable<Message[]> {
@@ -27,4 +26,6 @@ export class MessageService {
     public getRequestOptions(): RequestOptions {
         return new RequestOptions(new Headers({ 'Content-Type': 'application/json' }));
     }
+
+
 }

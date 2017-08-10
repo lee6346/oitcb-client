@@ -4,7 +4,9 @@
 }
 
 .main-content {
-    min-height: 100vh;
+   margin-top: 10px;
+    width: 100%;
+    min-height: 880px;
     display: -ms-flexbox;
     display: -webkit-box;
     display: -moz-box;
@@ -20,22 +22,18 @@
     display: -webkit-box;
     display: -moz-box;
     display: flex;
-    -ms-flex-direction: column;
-    -webkit-box-orient: vertical;
-    -moz-box-orient: vertical;
-    flex-direction: column;
-    -ms-flex: 1;
-    -webkit-box-flex: 1;
-    -moz-box-flex: 1;
-    flex: 1;
+    -ms-flex-direction: row;
+    -webkit-box-orient: horizontal;
+    -moz-box-orient: horizontal;
+    flex-direction: row;
+    -ms-flex: 4.5;
+    -webkit-box-flex: 4.5;
+    -moz-box-flex: 4.5;
+    flex: 4.5;
     padding: 15px;
-    box-shadow: 0 0 5px rgba(0,0,0,1);
 }
-
-
-
-
-#pend-list {
+.minimized-windows {
+    position: relative;
     display: -ms-flexbox;
     display: -webkit-box;
     display: -moz-box;
@@ -44,67 +42,141 @@
     -webkit-box-orient: vertical;
     -moz-box-orient: vertical;
     flex-direction: column;
-    -webkit-flex: 0;
-    -webkit-box-flex: 0;
-    -moz-box-flex: 0;
-    flex: 0 20vw;
-    width: 15vw;
-    background: #a9a9a9;
+    -ms-flex: 1;
+    -webkit-box-flex: 1;
+    -moz-box-flex: 1;
+    flex: 1;
+    margin-left: 4px;
+}
+
+.agent-chat {
+    position: relative;
+    display: -ms-flexbox;
+    display: -webkit-box;
+    display: -moz-box;
+    display: flex;
+    -ms-flex-direction: column;
+    -webkit-box-orient: vertical;
+    -moz-box-orient: vertical;
+    flex-direction: column;
+    -ms-flex: 1.5;
+    -webkit-box-flex: 1.5;
+    -moz-box-flex: 1.5;
+    flex: 1.5;
+}
+
+.student-chat-list {
+
+    display: -ms-flexbox;
+    display: -webkit-box;
+    display: -moz-box;
+    display: flex;
+    -ms-flex-direction: column;
+    -webkit-box-orient: vertical;
+    -moz-box-orient: vertical;
+    flex-direction: column;
+    -webkit-flex: 1;
+    -webkit-box-flex: 1;
+    -moz-box-flex: 1;
+    flex: 1;
+    background: white;
     order: -1;
     padding: .3em;
-    overflow-y: auto;
+
+    margin-top: 2px;
+    margin-bottom: 2px;
+    margin-left: 4px;
+
 }
 
-#pend-title {
+.chat-list-header {
+
+    display: -ms-flexbox;
+    display: -webkit-box;
+    display: -moz-box;
+    display: flex;
+    -ms-flex-direction: row;
+    -webkit-box-orient: horizontal;
+    -moz-box-orient: horizontal;
+    flex-direction: row;
+    justify-content: center;
+    -webkit-flex: 1;
+    -webkit-box-flex: 1;
+    -moz-box-flex: 1;
+    flex: 1;
+}
+    
+.list-container {
+    margin-top: 10px;
+    position:relative;
+    -webkit-flex: 16;
+    -webkit-box-flex: 16;
+    -moz-box-flex: 16;
+    flex: 16;
+
+}
+.pending-list {
+    margin: 0 5px 0 5px;
+    -ms-flex: 1;
+    -webkit-box-flex: 1;
+    -moz-box-flex: 1;
+    flex: 1;
     font-size: 16px;
-    line-height: 30px;
-    text-align: center;
-    letter-spacing: 5px;
-    color: #0c2340;
-    border-bottom: 1px solid #222;
-    padding-top: 10px;
-    margin: 0;
-    background: #808080;
-    -webkit-flex: 0;
-    -webkit-box-flex: 0;
-    -moz-box-flex: 0;
-    flex: 0 7vh;
-}
-
-.nav > li {
-    position: relative;
-    display: block;
-    padding: 15px 15px 15px 15px;
-    font-size: 12px;
-    color: #eee;
-    border-bottom: 1px solid #222;
+    font-family: sans-serif;
+    font-size-adjust: inherit;
+    color: #3b3a36;
+    background-color: white;
+    border-style: outset;
     cursor: pointer;
+    text-decoration: none;
+}
+    .pending-list:hover {
+        background: #dddfd4;
+    }
+.pending-list::after{
+    background-color: #dddfd4;
 }
 
-    .nav > li:hover {
-        background: #444;
-    }
 
+.channel-list {
+    margin: 0 5px 0 5px;
+    -ms-flex: 1;
+    -webkit-box-flex: 1;
+    -moz-box-flex: 1;
+    flex: 1;
+    font-size: 16px;
+    font-family: sans-serif;
+    font-size-adjust: inherit;
+    color: #3b3a36;
+    background-color: white;
+    border-style: outset;
+    cursor: pointer;
+    text-decoration: none;
+}
+    .channel-list:hover {
+        background: #dddfd4;
+    }
+    .channel-list:active {
+        background-color: #dddfd4;
+    }
 
 .main-display {
     display: -ms-flexbox;
     display: -webkit-box;
     display: -moz-box;
     display: flex;
-    -ms-flex-direction: row;
-    -webkit-box-orient: horizontal;
-    -moz-box-orient: horizontal;
-    flex-direction: row;
-    flex-wrap: wrap;
-    -ms-flex: 1;
-    -webkit-box-flex: 1;
-    -moz-box-flex: 1;
-    flex: 1;
-    border: 2px solid #0c2340;
+    -ms-flex-direction: column;
+    -webkit-box-orient: vertical;
+    -moz-box-orient: vertical;
+    flex-direction: column;
+    -ms-flex: 3.5;
+    -webkit-box-flex: 3.5;
+    -moz-box-flex: 3.5;
+    flex: 3.5;
+
 }
 
-.minimize-bar {
-    min-width: 80vw;
+.window-container {
     display: -ms-flexbox;
     display: -webkit-box;
     display: -moz-box;
@@ -113,48 +185,52 @@
     -webkit-box-orient: horizontal;
     -moz-box-orient: horizontal;
     flex-direction: row;
-    -ms-flex: 0;
-    -webkit-box-flex: 0;
-    -moz-box-flex: 0;
-    flex: 0 8vh;
+    -ms-flex: 5;
+    -webkit-box-flex: 5;
+    -moz-box-flex: 5;
+    flex: 5;
+    /*
+    border-left: 1px solid #3b3a36;
+    border-right: 1px solid #3b3a36;*/
+    border-style:outset;
+}
+.insert-window {
+    position: relative;
+    display: -ms-flexbox;
+    display: -webkit-box;
+    display: -moz-box;
+    display: flex;
+    -ms-flex-direction: row;
+    -webkit-box-orient: horizontal;
+    -moz-box-orient: horizontal;
+    flex-direction: row;
+    -ms-flex: 5;
+    -webkit-box-flex: 5;
+    -moz-box-flex: 5;
+    flex: 5;
 }
 
-.minimize-window {
+.input-bar {
+    display: -ms-flexbox;
+    display: -webkit-box;
+    display: -moz-box;
+    display: flex;
+    -ms-flex-direction: column;
+    -webkit-box-orient: vertical;
+    -moz-box-orient: vertical;
+    flex-direction: column;
+    justify-content: center;
     -ms-flex: 1;
     -webkit-box-flex: 1;
     -moz-box-flex: 1;
     flex: 1;
-    border: 2px solid #0c2340;
-}
-
-ul {
-    list-style-type: none;
-    height: 0vh;
-    padding: 0;
-    margin: 0;
+    border-radius: 2px;
+    padding-left: 10px;
+    padding-right: 10px;
+    background-color: #dddfd4;
 }
 
 
-::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-    border-radius: 10px;
-    background-color: #F5F5F5;
-}
 
-::-webkit-scrollbar {
-    width: 12px;
-    background-color: #F5F5F5;
-}
 
-::-webkit-scrollbar-thumb {
-    border-radius: 10px;
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
-    background-color: #555;
-}
 
-.move-chat {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    background-color: none;
-}

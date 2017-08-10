@@ -1,7 +1,6 @@
 ﻿<div class="chat-window">
     <div class="window-header">
         <button type="button" class="close-button" (click)="closeWindow()"><span aria-hidden="true">&times;</span></button>
-        <button type="button" class="minimize-button" (click)="minimizeWindow()"><span aria-hidden="true">&minus;</span></button>
 
         <h4 class="window-title">OIT ChatBot</h4>
     </div>
@@ -15,7 +14,10 @@
             <ul *ngIf="Messages">
                 <li *ngFor="let msg of Messages"
                     class="msg-row" [ngClass]="msgAlignment(msg.from.id)">
-                    <span class="bubble" [ngClass]="bubbleProperties(msg.from.id)">{{msg['text']}}</span>
+                    <span class="bubble" [ngClass]="bubbleProperties(msg.from.id)">
+                        <span class="message-sender">{{msg['from']['name']}}</span>
+                        {{msg['text']}}
+                    </span>
                 </li>
             </ul>
 

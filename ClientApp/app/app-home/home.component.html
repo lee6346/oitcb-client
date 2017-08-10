@@ -4,14 +4,13 @@
 <div class="main-container">
     <div class="icon-bar">
         
-        <a class="std-link" [routerLink]="['/home/chatbot']" routerLinkActive="active">Home  <i class="fa fa-home"></i></a>
-        <a class="std-link" [routerLink]="['/home/contact']" routerLinkActive="active">Contact Info  <i class="fa fa-phone"></i></a>
-        <a class="auth-link" [routerLink]="['/agent']">Login  <i class="fa fa-user-circle-o"></i></a>
-        <!--<a class="auth-link" (click)="authLogin()">Agent  <i class="fa fa-user-circle-o"></i></a> -->
+        <a class="std-link" [routerLink]="['/home/chatbot']" routerLinkActive="active">Home </a>
+        <a class="std-link" [routerLink]="['/home/contact']" routerLinkActive="active">Contact Info </a>
+        <a class="auth-link" [routerLink]="['/agent']">Login</a>
             
     </div>
     <div class="route-content">
         <router-outlet></router-outlet>
     </div>
 </div>
-<div class="my-footer"></div>
+

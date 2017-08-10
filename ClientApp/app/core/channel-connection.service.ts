@@ -6,7 +6,7 @@ import { Http, Response, Headers, RequestOptions } from '@angular/http';
 //Direct Line libraries
 import { DirectLine, Conversation } from 'botframework-directlinejs';
 
-import { OpenChannel, CloseChannel, ChannelData, Connection } from '../model';
+import { OpenChannel, Channel, CloseChannel, ChannelData, Connection } from '../model';
 
 //rxjs
 import * as Rx from 'rxjs/Rx';
@@ -40,7 +40,7 @@ export class ChannelConnectionService {
             .map(res => res.json());
     }
 
-    public getOpenChannels$(): Rx.Observable<OpenChannel[]> {
+    public getOpenChannels$(): Rx.Observable<Channel[]> {
         return this.http.get(this.getOpenChannelsUri, this.getRequestOptions())
             .map(res => res.json());
     }

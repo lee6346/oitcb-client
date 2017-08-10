@@ -48,7 +48,6 @@
     -moz-box-flex: 0;
     flex: 0;
     background: #fff;
-    border-left: 4px solid #0c2340;
     padding: .3em;
     overflow-y: auto;
 }

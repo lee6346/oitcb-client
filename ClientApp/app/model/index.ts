@@ -1,9 +1,13 @@
 ﻿export { AuthUser } from './AuthUser';
 export { LiveRequest } from './LiveRequest';
-export { IdleStatus } from './IdleStatus';
 export { Message } from './Message';
 export { OpenChannel } from './OpenChannel';
 export { ChannelData } from './ChannelData';
 export { Connection } from './Connection';
 export { CloseChannel } from './CloseChannel';
 export { LiveStatus } from './LiveStatus';
+export { AgentMessage } from './AgentMessage';
+export { Channel } from './Channel';
+export { MinimizedWindow } from './MinimizedWindow';
+export { HiddenMessage } from './HiddenMessage';
+export { MessageTransfer } from './MessageTransfer';

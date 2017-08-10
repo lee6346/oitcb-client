@@ -8,10 +8,10 @@ namespace chatbot_portal.Repositories
 {
     public interface IChannelRepository
     {
-        Task<ChannelStatusDTO> CreateChannel(ChannelDTO ch);
-        Task<ChannelStatusDTO> EndChannel(CloseChannelDTO cch);
+        Task<ChannelDTO> CreateChannel(ConversationDTO ch);
+        Task<ChannelDTO> EndChannel(CloseChannelDTO cch);
         Task<List<ChannelDataDTO>> GetChannels();
-        Task<List<OpenedChannelDTO>> GetOpenChannels();
+        Task<List<ChannelDTO>> GetOpenChannels();
         int OpenChannelCount();
 
     }

@@ -1,5 +1,5 @@
 ﻿export class Connection {
-    private conversationId: string;
-    private token: string;
-    private streamUrl: string;
+    public conversationId: string;
+    public token: string;
+    public streamUrl: string;
 }

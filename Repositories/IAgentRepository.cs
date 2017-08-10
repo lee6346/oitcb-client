@@ -1,20 +1,17 @@
-﻿using System;
+﻿using chatbot_portal.Models.Dto;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace chatbot_portal.Repositories
 {
-    public interface IAgentRepository<Agent>
+    public interface IAgentRepository
     {
-        void CreateAgent(Agent ag);
-        void UpdateAgent(Agent ag);
-        void RemoveAgent(Guid aid);
-
-        Agent GetAgentById(Guid id);
-        Agent GetAgentByUserName(string user);
-
-        List<Agent> GetAgents();
-
+        Task<AgentCreateStatusDTO> CreateAgent(AgentRegisterDTO ag);
+        Task<AgentUpdateStatusDTO> UpdateAgent(AgentUpdateDTO ag);
+        Task<AgentLoginStatusDTO> AgentLogin(AgentLoginDTO ag);
+        Task<AgentRemoveStatusDTO> RemoveAgent(AgentRemoveDTO ag);
+        Task<List<AgentDTO>> GetAgents();
     }
 }

@@ -1,16 +1,14 @@
-﻿<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+﻿
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
+<div class="main-component">
+       <div class="icon-bar">
 
-<div class="main-container">
-    <div class="icon-bar">
+            <a class="std-link" [routerLink]="['/agent/liveportal']" >Chat Portal</a>
+            <a class="auth-link" (click)="authLogout()">Logout </a>
 
-        <a class="std-link" [routerLink]="['/agent/liveportal']" routerLinkActive="active">Live Portal  <i class="fa fa-home"></i></a>
-        <a class="std-link" [routerLink]="['/agent/data']" routerLinkActive="active">Data  <i class="fa fa-phone"></i></a>
-        <a class="auth-link" (click)="authLogout()">Logout  <i class="fa fa-user-circle-o"></i></a>
-
-    </div>
-    <div class="route-content">
-        <router-outlet></router-outlet>
-    </div>
+       </div>
+        <div class="route-content">
+            <router-outlet></router-outlet>
+        </div>
 </div>
-<div class="my-footer"></div>

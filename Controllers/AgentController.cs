@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using chatbot_portal.Data;
-using chatbot_portal.Models;
 using chatbot_portal.Services;
-using Microsoft.AspNetCore.Http;
-using System.Net.WebSockets;
+using chatbot_portal.Repositories;
+using chatbot_portal.Models.Dto;
+using WebSocketManager.Common;
+using Newtonsoft.Json;
 
 namespace chatbot_portal.Controllers
 {
@@ -16,38 +15,54 @@ namespace chatbot_portal.Controllers
     public class AgentController : Controller
     {
 
-        private readonly DatabaseContext _dbcontext;
+        private readonly IAgentRepository _repository;
         private readonly LiveRequestService _liveService;
 
-        public AgentController(DatabaseContext context, LiveRequestService liveService)
+        public AgentController(IAgentRepository repository, LiveRequestService liveService)
         {
-            this._dbcontext = context;
-            this._liveService = liveService;
+            _repository = repository;
+            _liveService = liveService;
         }
-        /*
-       //need to set this to store the agent in the LiveConnection db
+        
+
         [HttpPost("[action]")]
-        //[ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(string username, string password)
+        public async Task<IActionResult> SendMessage(AgentMessageDTO msg)
         {
-            //authenticate user credentials
-            var user = await _dbcontext.GetAgent(username, password);
-            if (user == null)
+            await _liveService.SendMessageToAllAsync(new Message
             {
-                return Json(Unauthorized());
+                MessageType = MessageType.Text,
+                Data = JsonConvert.SerializeObject(msg)
+            });
+            return Json(Ok(msg));
+        }
+
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> Register(AgentRegisterDTO ag)
+        {
+            var status = await _repository.CreateAgent(ag);
+            if(status.RegisterStatus != "complete")
+            {
+                return Json(BadRequest(new { err = status.RegisterStatus }));
+            }
+            return Json(Ok());
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> Login(AgentLoginDTO ag)
+        {
+
+            var status = await _repository.AgentLogin(ag);
+            if (status.LoginStatus != "complete")
+            {
+                return Json(BadRequest(new {err = status.LoginStatus}));
             }
 
-            //retrieve a list all pending requets/return
-            var queue = await _dbcontext.LiveRequests
-                .Select(x => new { conv_id = x.conv_id, action = "request", datetime = x.date, user = "student" })
-                .ToListAsync();
-
-
-            return Json(queue);
+            return Json(Ok());
         }
 
 
-
+        //this logout method should remove session cookies, etc
         [HttpGet("[action]")]
         public async Task<IActionResult> Logout(string sock_id)
         {
@@ -59,13 +74,13 @@ namespace chatbot_portal.Controllers
         
 
         [HttpGet("[action]")]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAgents()
         {
             //return a list of all agents
-            var agents = await _dbcontext.Agents.ToListAsync();
+            var agents = await _repository.GetAgents();
             if(agents == null)
             {
-                return Json(NotFound());
+                return Json(NoContent());
             }
             return Json(agents);
 
@@ -73,58 +88,30 @@ namespace chatbot_portal.Controllers
 
      
         [HttpPost("[action]")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(Agent agent)
+        public async Task<IActionResult> Update(AgentUpdateDTO ag)
         {
-            if(agent == null)
-            {
-                return Json(NotFound());
-            }
 
-            if(await TryUpdateModelAsync<Agent>(
-                agent,
-                "", 
-                ag => ag.Password, ag => ag.FirstName, ag => ag.LastName, ag => ag.UserName))
+            var status = await _repository.UpdateAgent(ag);
+            if(status.UpdateStatus != "complete")
             {
-                try
-                {
-                    await _dbcontext.SaveChangesAsync();
-                    
-                }
-                catch(DbUpdateException)
-                {
-                    return Json(new {status = "dbfail" });
-                }
-
+                return Json(BadRequest(new { err = status.UpdateStatus }));
             }
-            return Json(new { status = "updated" });
+            return Json(Ok());
         }
 
         
-        [HttpDelete("[action]")]
-        //[ValidateAntiForgeryToken]
-        public async Task<IActionResult> Remove(string username)
+        [HttpPost("[action]")]
+        public async Task<IActionResult> Remove(AgentRemoveDTO agent)
         {
-
-            var ag = await _dbcontext.Agents
-                .FirstOrDefaultAsync(a => a.UserName == username);
-            if (ag == null)
+            var status = await _repository.RemoveAgent(agent);
+            if(status.RemoveStatus != "complete")
             {
-                return Json(NotFound());
+                return Json(BadRequest(new { err = status.RemoveStatus }));
             }
-             
-            try
-            {
-                _dbcontext.Agents.Remove(ag);
-                await _dbcontext.SaveChangesAsync();
-                return Json(new {status = "removed" });
-            } catch (DbUpdateException)
-            {
-                return Json(new { status = "dbfail" });
-            }
+            return Json(Ok());
 
         }
-        */
+        
     
     }
 }

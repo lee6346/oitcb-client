@@ -1,10 +1,8 @@
 ﻿import { Component, OnInit, OnDestroy} from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { IdleStatus } from '../../../model';
-import { IdleMessageService } from '../../../core';
-
-
+import { HiddenMessage, MinimizedWindow } from '../../../model';
+import { WindowMessageService } from '../../../core';
 
 import * as Rx from 'rxjs/Rx';
 
@@ -17,16 +15,16 @@ import * as Rx from 'rxjs/Rx';
 export class MinimizeWindowContainerComponent implements OnInit, OnDestroy {
 
 
-    private idleMessageContainer: IdleStatus[] = [];
+    private watchWindowContainer: MinimizedWindow[] = [];
+    private chatWindowContainer: MinimizedWindow[] = [];
+    private messageObservable: Rx.Observable<HiddenMessage>;
+
     private ngUnsubscribe: Rx.Subject<void> = new Rx.Subject<void>();
 
-    constructor(private idleMessageService: IdleMessageService) { }
+    constructor(private windowMessageService: WindowMessageService) { }
     
     ngOnInit() {
-        this.idleMessageService.getIdleMessage$().takeUntil(this.ngUnsubscribe).subscribe(res => {
-            this.processIdleMessages(res);
-        });
-
+        this.subscribeToHiddenMessages();
     }
 
     ngOnDestroy() {
@@ -34,31 +32,65 @@ export class MinimizeWindowContainerComponent implements OnInit, OnDestroy {
         this.ngUnsubscribe.complete();
     }
 
-    public processIdleMessages(res: IdleStatus) {
-        let index = this.messageContainerIndex(res['conv_id']);
-        if (index === -1) {
-            this.idleMessageContainer.push(res);
+    public subscribeToHiddenMessages() {
+        this.messageObservable = this.windowMessageService.hiddenMessageObservable$
+            .takeUntil(this.ngUnsubscribe);
+        this.messageObservable.subscribe(res => {
+            console.log('received new hidden: ' + res.conversationId);
+
+            this.processHiddenMessage(res);
+        });
+    }
+
+    public processHiddenMessage(msg: HiddenMessage) {
+        if (msg['channelType'] === 'chat') {
+            //console.log('new chat minimized: ' + msg.conversationId);
+            this.processChatWindowMessage(msg);
         }
-        else if (!res['connected']) {
-            this.idleMessageContainer[index]['connected'] = false;
+        else if (msg['channelType'] === 'watch'){
+            console.log('new watch minimized: ' + msg.conversationId);
+            this.processWatchWindowMessage(msg);
         }
-        else {
-            this.idleMessageContainer[index]['num_messages'] += 1;
-        }
+    }
+
+    public processChatWindowMessage(msg: HiddenMessage) {
+        let index = this.getQueueIndex(msg['conversationId'], this.chatWindowContainer);
+        if (index === -1)
+            this.chatWindowContainer.push({ conversationId: msg.conversationId, messages: 0} as MinimizedWindow);
+        else 
+            this.chatWindowContainer[index].messages += 1;
 
     }
 
-    public messageContainerIndex(id: string): number {
-        return this.idleMessageContainer.findIndex(x => x.conv_id === id);
+    public processWatchWindowMessage(msg: HiddenMessage) {
+        let index = this.getQueueIndex(msg['conversationId'], this.watchWindowContainer);
+
+        if (index === -1)
+            this.watchWindowContainer.push({ conversationId: msg.conversationId, messages: 0 } as MinimizedWindow);
+        else if(msg['liveRequest'] == true)
+            this.watchWindowContainer[index].messages += 1;
+        else
+            this.watchWindowContainer[index].messages += 1;
     }
 
-    public removeIdleMessageWindow(res: IdleStatus) {
-        let index = this.messageContainerIndex(res['conv_id']);
+    public getQueueIndex(id: string, arr: MinimizedWindow[]) {
+        return arr.findIndex(x => x['conversationId'] === id);
+    }
 
+    public selectMinimizedChatWindow(minWindow: MinimizedWindow) {
+        let index = this.getQueueIndex(minWindow['conversationId'], this.chatWindowContainer);
         if (index !== -1) {
-            this.idleMessageService.sendWindowRestore(res['conv_id']);
-            this.idleMessageContainer.splice(index, 1);
+            this.chatWindowContainer.splice(index, 1);
+            this.windowMessageService.sendWindowStatus(minWindow['conversationId']);
+        }
+        
+    }
+    public selectMinimizedWatchWindow(minWindow: MinimizedWindow) {
+        let index = this.getQueueIndex(minWindow['conversationId'], this.watchWindowContainer);
+        if (index !== -1) {
+            this.watchWindowContainer.splice(index, 1);
+            this.windowMessageService.sendWindowStatus(minWindow['conversationId']);
         }
     }
-    
+
 }

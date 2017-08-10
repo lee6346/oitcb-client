@@ -17,10 +17,6 @@ const agentRoutes: Routes = [
                 component: LivePortalComponent
             },
             {
-                path: 'data',
-                component: DataPortalComponent
-            },
-            {
                 path: '**',
                 component: LivePortalComponent
             }

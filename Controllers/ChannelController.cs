@@ -3,10 +3,12 @@ using chatbot_portal.Models.Dto;
 using chatbot_portal.Repositories;
 using chatbot_portal.Services;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WebSocketManager.Common;
 
 namespace chatbot_portal.Controllers
 {
@@ -15,11 +17,12 @@ namespace chatbot_portal.Controllers
     {
         private readonly IChannelRepository _repository;
         private readonly IChannelConnectionService _channelService;
-
-        public ChannelController(IChannelRepository repository, IChannelConnectionService connectionService)
+        private readonly LiveRequestService _lrService;
+        public ChannelController(IChannelRepository repository, IChannelConnectionService connectionService, LiveRequestService lrService)
         {
             _repository = repository;
             _channelService = connectionService;
+            _lrService = lrService;
         }
 
 
@@ -28,7 +31,7 @@ namespace chatbot_portal.Controllers
         [HttpGet("[action]")]
         public async Task<IActionResult> StartChannel()
         {
-            ChannelDTO channel = await _channelService.RequestNewChannelAsync();
+            ConversationDTO channel = await _channelService.RequestNewChannelAsync();
             if (channel == null)
             {
                 return Json(BadRequest());
@@ -36,8 +39,9 @@ namespace chatbot_portal.Controllers
             }
             
             var status = await _repository.CreateChannel(channel);
-            if((status.ChannelStatus.Equals(ChannelStatus.Created)))
+            if(status.ChannelStatus == "opened")
             {
+                await _lrService.SendMessageToAllAsync(new Message { MessageType = MessageType.Text, Data = JsonConvert.SerializeObject(status) });
                 return Json(channel);
             }
             
@@ -50,7 +54,16 @@ namespace chatbot_portal.Controllers
         {
 
             var result = await _repository.EndChannel(ch);
-            return Json(result);
+            if (result.ChannelStatus == "closed")
+            {
+                await _lrService.SendMessageToAllAsync(new Message
+                {
+                    MessageType = MessageType.Text,
+                    Data = JsonConvert.SerializeObject(result)
+                });
+                return Json(result);
+            }
+            return Json(BadRequest(result.ChannelStatus));
 
         }
 
@@ -73,17 +86,17 @@ namespace chatbot_portal.Controllers
         }
 
         [HttpGet("[action]/{id}")]
-        public async Task<IActionResult> GetConnection(string conv_id)
+        public async Task<IActionResult> GetConnection(string id)
         {
-            if(conv_id == null)
+            if(id == null)
             {
-                return Json(BadRequest());
+                return Json(BadRequest(new { err = "no conv id", conv = id }));
             }
 
-            var connection = await _channelService.RequestNewConnectionAsync(conv_id);
+            var connection = await _channelService.RequestNewConnectionAsync(id);
             if(connection == null)
             {
-                return Json(BadRequest());
+                return Json(BadRequest(new { err = "service bad", conn = connection }));
             }
             return Json(connection);
 

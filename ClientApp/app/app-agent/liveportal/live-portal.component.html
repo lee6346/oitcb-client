@@ -1,31 +1,37 @@
 ﻿<div class="main-content">
-    <!--<pending-list [liveRequestQueue]="lr_request | async" (liveRequestSelect)="acceptRequest($event)"></pending-list>-->
-    
-    <div id="pend-list">
-        <div id="pend-title">
-            Pending Requests
+
+    <div class="student-chat-list">
+        <div class="chat-list-header">
+            <a class="pending-list" (click)="changeToPending()" routerLinkActive="active">Pending</a>
+            <a class="channel-list" (click)="changeToChannels()" routerLinkActive="active">Channels</a>
         </div>
-
-        <ul class="nav">
-            <li class="pending-item test" *ngFor="let pend of liveQueue" (click)="acceptRequest(pend)">
-                <i class="fa fa-user-circle-o"></i>
-                {{pend['user']}}: {{pend['date'] }}
-
-            </li>
-        </ul>
-        
+        <div class="list-container">
+            <pending-list [displayList]="clickedPending" (liveRequestSelect)="createRequestDisplay($event)"></pending-list>
+            <watch-list [displayChannels]="!clickedPending" (openChannelSelect)="createChannelDisplay($event)"> </watch-list>
+        </div>
     </div>
-    
+
     <div class="main-stage">
 
         <div class="main-display">
-            <div insertWindow></div>
+            <div class="window-container">
+                <div class="insert-window">
+                    
+                   <div insertWindow></div> 
+                </div> 
+            </div>
+            <div class="input-bar">
+                <input-bar [agentId]="myuid" [agentName]="userName"></input-bar>
+            </div>
+        </div>
 
-        </div>
-        <div class="minimize-bar">
+        <div class="minimized-windows">
+
             <minimized-window-container></minimized-window-container>
-            <!--<div class="minimize-window">Placeholding for Minimized windows</div>-->
         </div>
+    </div>
+    <div class="agent-chat">
+        <agent-group-chat></agent-group-chat>
     </div>
 
 </div>

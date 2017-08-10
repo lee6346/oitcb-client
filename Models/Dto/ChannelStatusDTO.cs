@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,6 +19,13 @@ namespace chatbot_portal.Models.Dto
     }
     public class ChannelStatusDTO
     {
-        public ChannelStatus ChannelStatus { get; set; }
+        [JsonProperty("channelStatus")]
+        public string ChannelStatus { get; set; }
+        [JsonProperty("conversationId")]
+        public string ConversationId { get; set; }
+        [JsonProperty("timeStamp")]
+        public string TimeStamp { get; set; }
+
+
     }
 }

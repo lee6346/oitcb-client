@@ -1,53 +1,48 @@
 ﻿
-* {
-    box-sizing: border-box;
-}
-
-.main-container {
-    margin: 0;
-}
 
 .icon-bar {
     width: 100%;
-    background-color: #0c2340;
-    overflow: auto;
+    height: 45px;
+    background-color: black;
+    margin: 0 auto;
+}
+.main-component {
+    width: 100%;
+    min-height: 100%;
+    margin: 0 auto;
 }
 
 .route-content {
-    display: flex;
-    min-height: 100vh;
+    width: 100%;
+    min-height: 100%;
+    margin: 0 auto;
 }
 
 .std-link {
     float: left;
     text-align: center;
-    width: 20%;
+    width: 50%;
     padding: 8px 0;
     transition: all 0.3s ease;
-    color: #ffffff;
-    font-size: 20px;
+    color: #eaeaea;
+    font-size: 22px;
+    font-family: sans-serif;
+    font-size-adjust: inherit;
+
+    text-decoration: none;
 }
 
 .auth-link {
     float: right;
     text-align: center;
-    width: 20%;
+    width: 15%;
     padding: 8px 0;
     transition: all 0.3s ease;
-    color: #ffffff;
+    color: #eaeaea;
     font-size: 20px;
+    font-family: sans-serif;
+    text-decoration: none;
+    cursor: pointer;
 }
 
-.icon-bar a:hover {
-    background-color: rgb(40, 71, 119);
-}
 
-.active {
-    background-color: rgb(40, 71, 119);
-}
-
-.my-footer {
-    padding: 1em;
-    background: #0c2340;
-    height: 8vh;
-}

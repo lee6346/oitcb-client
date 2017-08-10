@@ -1,0 +1,38 @@
+﻿<div class="display-frame" [style.display]="displayWindow?'inherit':'none'">
+    <div class="display-content">
+        <div class="display-header">{{conversationId}} 
+            <span class="x-button">
+                <i class="fa fa-times" (click)="closeWindow()"></i>
+            </span>
+            <span class="min-button">
+                <i class="fa fa-window-minimize" (click)="hideWindow()"></i>
+            </span>
+
+        </div>
+        <div class="display-body">
+            <ul>
+
+                <li *ngFor="let rmsg of messages"
+                    class="msg-row" [ngClass]="msgAlignment(rmsg.from.id)">
+                    <span class="bubble" [ngClass]="bubbleProperties(rmsg.from.id)">
+                        <span class="username">{{rmsg['from']['name']}}:</span>
+                        {{rmsg['text']}}
+                    </span>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+    <div class="history-frame">
+        <div class="history-header">Log</div>
+        <ul>
+        <li *ngFor="let activity of activitySet"
+            class="msg-row" [ngClass]="chatbotMsgAlignment(activity.from.id)">
+            <span class="bubble" [ngClass]="chatbotBubbleProperties(activity.from.id)">
+                <span class="username">{{activity['from']['name']}}:</span> 
+                {{activity['text']}}
+            </span>
+        </li>
+        </ul>
+    </div>
+</div>

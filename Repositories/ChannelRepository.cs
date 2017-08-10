@@ -20,7 +20,7 @@ namespace chatbot_portal.Repositories
             _context = context;
         }
 
-        public async Task<ChannelStatusDTO> CreateChannel(ChannelDTO ch)
+        public async Task<ChannelDTO> CreateChannel(ConversationDTO ch)
         {
             var channel = new Channel
             {
@@ -32,40 +32,42 @@ namespace chatbot_portal.Repositories
             {
                 _context.Add(channel);
                 await _context.SaveChangesAsync();
-                return new ChannelStatusDTO { ChannelStatus = ChannelStatus.Created };
+                return new ChannelDTO { ChannelStatus = "opened", ConversationId = channel.ConversationId,
+                    TimeStamp = channel.DateTimeCreated.ToString() };
             }
             catch (DbUpdateException)
             {
-                return new ChannelStatusDTO { ChannelStatus = ChannelStatus.DbError };
+                return new ChannelDTO { ChannelStatus = "dbError" };
             }
         }
 
-        public async Task<ChannelStatusDTO> EndChannel(CloseChannelDTO ch)
+        public async Task<ChannelDTO> EndChannel(CloseChannelDTO ch)
         {
             var channel = await _context.Channels
                 .SingleOrDefaultAsync(s => s.ConversationId == ch.ConversationId);
             if(channel == null)
             {
-                return new ChannelStatusDTO { ChannelStatus = ChannelStatus.IdError };
+                return new ChannelDTO { ChannelStatus = "inputError" };
             }
             if(channel.DateTimeEnded != null)
             {
-                return new ChannelStatusDTO { ChannelStatus = ChannelStatus.Ended };
+                return new ChannelDTO { ChannelStatus = "inputError" };
             }
             try
             {
                 channel.DateTimeEnded = DateTime.Now;
                 _context.Channels.Update(channel);
                 await _context.SaveChangesAsync();
-                return new ChannelStatusDTO { ChannelStatus = ChannelStatus.Ended };
+                return new ChannelDTO { ChannelStatus = "closed", ConversationId = ch.ConversationId,
+                    TimeStamp = channel.DateTimeEnded.ToString() };
             }
             catch (DbUpdateConcurrencyException)
             {
-                return new ChannelStatusDTO { ChannelStatus = ChannelStatus.DbConcurrencyError };
+                return new ChannelDTO { ChannelStatus = "concurrencyError" };
             }
             catch (DbUpdateException)
             {
-                return new ChannelStatusDTO { ChannelStatus = ChannelStatus.DbError };
+                return new ChannelDTO { ChannelStatus = "dbError" };
             }
         }
 
@@ -84,14 +86,15 @@ namespace chatbot_portal.Repositories
             return channels;
         }
 
-        public async Task<List<OpenedChannelDTO>> GetOpenChannels()
+        public async Task<List<ChannelDTO>> GetOpenChannels()
         {
             var channels = await _context.Channels
                 .Where(p => p.DateTimeEnded == null)
-                .Select(p => new OpenedChannelDTO
+                .Select(p => new ChannelDTO
                 {
+                    ChannelStatus = "opened",
                     ConversationId = p.ConversationId,
-                    DateTimeCreated = p.DateTimeCreated.ToString()
+                    TimeStamp = p.DateTimeCreated.ToString()
                 }).ToListAsync();
 
             return channels;

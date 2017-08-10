@@ -1,12 +1,6 @@
-﻿using chatbot_portal.Data;
-using chatbot_portal.Models;
-using chatbot_portal.Models.Dto;
+﻿using chatbot_portal.Models.Dto;
 using chatbot_portal.Repositories;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace chatbot_portal.Controllers
@@ -19,6 +13,7 @@ namespace chatbot_portal.Controllers
         public MessageController(IActivityMessageRepository repo)
         {
             _msgrepo = repo;
+            
         }
 
         

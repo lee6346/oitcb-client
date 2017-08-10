@@ -1,0 +1,21 @@
+﻿<div class="group-chat-container">
+    <div class="group-chat-header">
+        <h4 class="group-chat-title">Agents</h4>
+    </div>
+    <div class="group-chat-body">
+        <div class="group-chat-display">
+            <ul>
+                <li *ngFor="let amsg of agentMessageQueue"
+                    class="msg-row">
+                    <span class="bubble">
+                        <span class="username">{{amsg['userName']}}:</span>
+                        {{amsg['text']}}
+                    </span>
+                </li>
+            </ul>
+        </div>
+        <div class="group-chat-input">
+            <textarea #msg [(ngModel)]="defaultVal" class="text-input" (keyup.enter)="sendMessage(msg.value)"></textarea>
+        </div>
+    </div>
+</div>

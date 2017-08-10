@@ -14,7 +14,6 @@ using chatbot_portal.Services;
 using chatbot_portal.Interfaces;
 using WebSocketManager;
 using chatbot_portal.Models.ConfigModels;
-using AutoMapper;
 using chatbot_portal.Repositories;
 
 namespace chatbot_portal
@@ -64,6 +63,7 @@ namespace chatbot_portal
             services.AddScoped<IActivityMessageRepository, ActivityMessageRepository>();
             services.AddScoped<IAgentRequestRepository, AgentRequestRepository>();
             services.AddScoped<IChannelRepository, ChannelRepository>();
+            services.AddScoped<IAgentRepository, AgentRepository>();
 
             //Socket services
             services.AddWebSocketManager();
@@ -77,7 +77,10 @@ namespace chatbot_portal
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
-            
+
+
+
+
             // HMR true for dev stage
             if (env.IsDevelopment())
             {

@@ -1,12 +1,14 @@
-﻿<div id="pend-list">
-    <div id="pend-title">
-        Pending Requests
-    </div>
-    <ul class="nav">
-        <li class="pending-item" *ngFor="let liveRequest of liveRequestQueue" (click)="selectPendingRequest(liveRequest)">
-            <i class="fa fa-user-circle-o"></i>
-            {{liveRequest['user']}}: {{liveRequest['date'] }}
+﻿
+    <div class="pending-container" [style.display]="displayList?'inherit':'none'">
 
-        </li>
-    </ul>
+        <div class="pending-requests">
+        <ul class="pending">
+            <li class="pending-item" *ngFor="let liveRequest of liveRequestQueue" (click)="selectPendingRequest(liveRequest)">
+                <span class="user">{{liveRequest['conv_id']}} </span>
+                <span class="date">{{liveRequest['date'] }}</span>
+                
+
+            </li>
+        </ul>
+        </div>
 </div>

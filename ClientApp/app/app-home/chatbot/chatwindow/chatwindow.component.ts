@@ -35,6 +35,7 @@ export class ChatWindowComponent implements OnInit, OnDestroy {
     private Messages: Activity[] = [];
 
     private myuid: string;
+    private userName: string = 'student';
     private defaultVal: string = null;
 
     private directLine: DirectLine;
@@ -85,22 +86,27 @@ export class ChatWindowComponent implements OnInit, OnDestroy {
     public storeMessages(act: Activity) {
         this.messageService.submitMessage(act).subscribe();
     }
-
-
+    
     public submitMessage(sendingMessage: string) {
         this.defaultVal = '';
         if (sendingMessage !== '') {
-            let act = { from: { id: this.myuid }, type: 'message', text: sendingMessage } as Activity;
+            let act = { from: { id: this.myuid, name: this.userName }, type: 'message', text: sendingMessage } as Activity;
             this.chatService.sendMessage(this.directLine, act);
             this.Messages.push(act);
         }
     }
 
+    public subScribeToCloseConnection() {
+        this.messageObservableActivity$.filter(x => x.type === 'event' && x.name === 'closeConnection')
+            .take(1).subscribe(res => {
+                console.log("Agent has closed connection");
+            });
+    }
 
     public closeWindow(): void {
+        this.liveService.acceptRequest$(this.conversationObject.conversationId, this.myuid).subscribe(res => console.log(res));
         this.channelConnectionService.closeChannel$(this.conversationObject.conversationId)
-            .subscribe(res => this.removeWindow.emit(false));
-        
+            .subscribe(res => { this.removeWindow.emit(false), console.log(res) });
     }
 
     public makeLiveRequest() {
@@ -123,17 +129,25 @@ export class ChatWindowComponent implements OnInit, OnDestroy {
             this.agentConnected = true;
             this.Messages.push(this.availableActivity);
             this.messageObservableActivity$.filter(x => x.from.id !== this.myuid && x.from.id !== "AskRowdy" && x.type === "message")
-                .subscribe(res => this.Messages.push(res));
+                .subscribe(res => this.procMessages(res));
+            console.log('here i am')
             this.botUnsubscribe.next();
             this.botUnsubscribe.complete();
 
         }
     }
 
-
-
-
-
+    public procMessages(act: Activity) {
+        console.log('here i am');
+        if (act['from']['id'] === 'closeConnection') {
+            act['text'] = 'Agent has closed the connection';
+            console.log(act.id);
+            this.Messages.push(act);
+        }
+        else {
+            this.Messages.push(act);
+        }
+    }
     public msgAlignment(id: string) {
         if (id === this.myuid) {
             return {
@@ -144,7 +158,6 @@ export class ChatWindowComponent implements OnInit, OnDestroy {
             'align-window-left': true,
         };
     }
-
     public bubbleProperties(id: string) {
         if (id === this.myuid) {
             return {

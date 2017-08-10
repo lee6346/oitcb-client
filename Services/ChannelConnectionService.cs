@@ -21,7 +21,7 @@ namespace chatbot_portal.Services
 
         }
 
-        public async Task<ChannelDTO> RequestNewChannelAsync()
+        public async Task<ConversationDTO> RequestNewChannelAsync()
         {
             using (var client = new HttpClient() { BaseAddress = new Uri("https://directline.botframework.com") })
             {
@@ -30,11 +30,11 @@ namespace chatbot_portal.Services
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "gD8hMWEV0fM.cwA.x-U.EQEmjSeulWq60J-PHoJyD9sDeUIzOGNs5xIkKCxRxYs");
                 HttpResponseMessage res = client.PostAsync("v3/directline/tokens/generate", null).Result;
                 var msg = await res.Content.ReadAsStringAsync();
-                ChannelDTO c = JsonConvert.DeserializeObject<ChannelDTO>(msg);
+                ConversationDTO c = JsonConvert.DeserializeObject<ConversationDTO>(msg);
                 return c;
             }
         }
-        public async Task<ChannelConnectionDTO> RequestNewConnectionAsync(string conv_id)
+        public async Task<ConnectionDTO> RequestNewConnectionAsync(string conv_id)
         {
             using (var client = new HttpClient() { BaseAddress = new Uri("https://directline.botframework.com") })
             {
@@ -45,7 +45,7 @@ namespace chatbot_portal.Services
 
                 var data = await res.Content.ReadAsStringAsync();
 
-                return JsonConvert.DeserializeObject<ChannelConnectionDTO>(data);
+                return JsonConvert.DeserializeObject<ConnectionDTO>(data);
             }
         }
     }

@@ -1,5 +1,5 @@
 ﻿import { DirectLine, Activity, Conversation, EventActivity} from 'botframework-directlinejs';
-
+import { Http, RequestOptions, Response, Headers } from '@angular/http';
 import * as Rx from 'rxjs/Rx';
 
 import { Injectable } from '@angular/core';
@@ -12,10 +12,10 @@ export class ChatBotActivityService {
 
 
     private botHandle: string = 'AskRowdy';
+    private activitySetUrl: string = 'https://directline.botframework.com/v3/directline/conversations/';
 
 
-
-    constructor() { }
+    constructor(private http: Http) { }
 
 
     public getDirectLine(conversation: Conversation): DirectLine {
@@ -45,13 +45,23 @@ export class ChatBotActivityService {
 
     //this event notifies the bot of switching to the agent and is sent prior to unsubscribing from bot to 
     //maintain a connection
-    public sendSwitchEvent(directLine: DirectLine, userid: string) {
-        let event = { from: { id: userid }, type: "event" } as EventActivity;
-        directLine.postActivity(event).subscribe(
+    public sendCloseEvent(directLine: DirectLine, userid: string) {
+        let closeActivity = { from: { id: userid }, type: "message", id: 'closeConnection' } as Activity;
+        directLine.postActivity(closeActivity).subscribe(
             res => console.log(res),
             err => console.log(err),
             () => console.log("done")
             );
+    }
+
+    public sendCloseConnectionEvent(directLine: DirectLine, conversationId: string, userName: string) {
+        let act = { type: 'message', from: { id: 'closeConnection', name: userName }} as Activity;
+        directLine.postActivity(act).subscribe(res => console.log(res));
+    }
+
+    public getChatHistory(id: string, token: string, watermark: string = ''): Rx.Observable<Activity[]> {
+        return this.http.get(this.activitySetUrl + id + '/activities', this.getActivityRequestOptions(token))
+            .map(res => res.json()['activities']);
     }
 
     public botMessageFilter(act: Activity) {
@@ -61,7 +71,11 @@ export class ChatBotActivityService {
     public agentMessageFilter(act: Activity, userid: string) {
         return act.type === 'message' && act.from.id !== this.botHandle && act.from.id !== userid;
     }
-
+    public getActivityRequestOptions(token: string): RequestOptions {
+        let headers = new Headers({ 'Content-Type': 'application/json' });
+        headers.append('Authorization', 'Bearer ' + token);
+        return new RequestOptions({headers: headers });
+    }
 
 
     

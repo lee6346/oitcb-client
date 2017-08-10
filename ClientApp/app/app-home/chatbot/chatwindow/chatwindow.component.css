@@ -146,12 +146,13 @@ ul {
     -moz-box-orient: vertical;
     flex-direction: column-reverse;
     overflow-y: auto;
+    overflow-x:hidden;
 }
 
 
 
 .msg-row {
-    width: 60%;
+    width: 80%;
     /*float: right;*/
 }
 
@@ -170,22 +171,31 @@ ul {
 .host-bubble {
     background-color: #cbc380;
 }
-
+.message-sender {
+    font-size: 16px;
+    font-weight: 500;
+    color: black;
+    text-transform: capitalize;
+}
 .bubble {
-    border: 0.2px solid #808080;
-    border-radius: 30px;
-    /*background-color: #F2F2F2;*/
+    /*border: 0.2px solid #808080; */
+    border-radius: 5px;
+    /*
     -webkit-box-shadow: 2px 2px 4px #888;
     -moz-box-shadow: 2px 2px 4px #888;
     box-shadow: 2px 2px 4px #888;
+    padding: 5px 11px 5px 11px;
+        */
     padding: 5px 11px 5px 11px;
     text-align: left;
     line-height: 1.5em;
     display: inline-block;
     vertical-align: top;
     margin: 5px 15px 5px 15px;
+    /*word-break: break-all;
+        */
+    word-wrap: break-word;
     overflow-wrap: break-word;
-    word-break: break-all;
     /*float: right;*/
     position: relative;
 }

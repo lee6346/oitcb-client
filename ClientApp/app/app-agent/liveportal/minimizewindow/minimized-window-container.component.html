@@ -1,9 +1,29 @@
 ﻿<div class="minimize-container">
-    <ul *ngIf="idleMessageContainer">
-        <li *ngFor="let idleMessage of idleMessageContainer" (click)="removeIdleMessageWindow(idleMessage)">
-            {{idleMessage['conv_id']}}
+    <div class="minimized-chat">
+        <div class="minimized-chat-header">
+            <h4 class="minimized-chat-title">Chat</h4>
+        </div>
+        <div class="minimized-chat-body">
+            <ul class="chat-items">
+                <li *ngFor="let chatWindow of chatWindowContainer" (click)="selectMinimizedChatWindow(chatWindow)">
+                    <span class="users">User: {{chatWindow['conversationId']}}</span>
+                    <span class="msg-count">{{chatWindow['messages']?chatWindow['messages']:'' }}</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="minimized-watch">
+        <div class="minimized-watch-header">
+            <h4 class="minimized-watch-title">Watch</h4>
+        </div>
+        <div class="minimized-watch-body">
+            <ul class="watch-items">
+                <li *ngFor="let watchWindow of watchWindowContainer" (click)="selectMinimizedWatchWindow(watchWindow)">
 
-            {{idleMessage['num_messages']}}
-        </li>
-    </ul>
+                    <span class="users">User: {{watchWindow['conversationId']}}</span>
+                    <span class="msg-count">{{watchWindow['messages']?watchWindow['messages']:'' }}</span>
+                </li>
+            </ul>
+        </div>
+    </div>
 </div>

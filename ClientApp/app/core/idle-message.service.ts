@@ -1,15 +1,15 @@
 ﻿import { Injectable } from '@angular/core';
 import * as Rx from 'rxjs/Rx';
 
-import { IdleStatus } from '../model';
+//import { IdleStatus } from '../model';
 
 @Injectable()
 export class IdleMessageService {
 
 
-    private idleMessage: Rx.Subject<IdleStatus> = new Rx.Subject<IdleStatus>();
+   // private idleMessage: Rx.Subject<IdleStatus> = new Rx.Subject<IdleStatus>();
     private windowRestore: Rx.Subject<string> = new Rx.Subject<string>();
-
+    /*
     public getIdleMessage$(): Rx.Observable<IdleStatus> {
         return this.idleMessage.asObservable();
     }
@@ -27,5 +27,5 @@ export class IdleMessageService {
     public sendWindowRestore(id: string) {
         this.windowRestore.next(id);
     }
-
+    */
 }

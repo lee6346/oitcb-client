@@ -11,6 +11,11 @@ import { AgentChatWindowComponent } from './agentchatwindow/agent-chat-window.co
 import { PendingListComponent } from './pendinglist/pending-list.component';
 import { MinimizeWindowContainerComponent } from './minimizewindow/minimized-window-container.component';
 import { ChatHistoryWindowComponent } from './chathistorywindow/chat-history-window.component';
+import { AgentGroupChatComponent } from './agentgroupchat/agent-group-chat.component';
+import { WatchListComponent } from './watchlist/watch-list.component';
+import { InputBarComponent } from './inputbar/input-bar.component';
+import { ChatDisplayWindowComponent } from './chatdisplaywindow/chat-display-window.component';
+
 
 @NgModule({
     imports: [
@@ -24,9 +29,14 @@ import { ChatHistoryWindowComponent } from './chathistorywindow/chat-history-win
         InsertWindowDirective,
         MinimizeWindowContainerComponent,
         ChatHistoryWindowComponent,
+        AgentGroupChatComponent,
+        WatchListComponent,
+        InputBarComponent,
+        ChatDisplayWindowComponent,
     ],
     entryComponents: [
-        AgentChatWindowComponent
+        /*AgentChatWindowComponent*/
+        ChatDisplayWindowComponent
     ],
     exports: [
         LivePortalComponent,
@@ -35,6 +45,10 @@ import { ChatHistoryWindowComponent } from './chathistorywindow/chat-history-win
         InsertWindowDirective,
         MinimizeWindowContainerComponent,
         ChatHistoryWindowComponent,
+        AgentGroupChatComponent,
+        WatchListComponent,
+        InputBarComponent,
+        ChatDisplayWindowComponent,
     ],
 
 })

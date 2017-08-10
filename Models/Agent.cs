@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace chatbot_portal.Models
 {
@@ -15,11 +10,7 @@ namespace chatbot_portal.Models
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public DateTime DateTimeCreated { get; set; }
-        public DateTime DateTimeUpdated { get; set; }
-        
-
-
-
+        public DateTime? DateTimeUpdated { get; set; }
 
     }
 }

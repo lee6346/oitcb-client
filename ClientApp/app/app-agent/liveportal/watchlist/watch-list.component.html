@@ -1,0 +1,14 @@
+﻿<div class="channel-container" [style.display]="displayChannels?'inherit':'none'">
+    <div class="channels">
+        <ul class="watchlist">
+            <li class="open-channel" *ngFor="let channel of openChannelQueue" (click)="watchChannel(channel)">
+                <span class="user">{{channel['conversationId']}}</span>
+                
+                <span class="datetime">{{channel['timeStamp'] }}</span>
+
+            </li>
+        </ul>
+
+    </div>
+
+</div>
