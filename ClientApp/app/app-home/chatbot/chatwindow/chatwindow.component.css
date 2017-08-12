@@ -168,6 +168,10 @@ ul {
     background-color: #66cfac;
 }
 
+.default-bubble{
+    background-color: #dddfd4;
+}
+
 .host-bubble {
     background-color: #cbc380;
 }

@@ -15,7 +15,7 @@
                 <li *ngFor="let rmsg of messages"
                     class="msg-row" [ngClass]="msgAlignment(rmsg.from.id)">
                     <span class="bubble" [ngClass]="bubbleProperties(rmsg.from.id)">
-                        <span class="username">{{rmsg['from']['name']}}:</span>
+                        <span class="username">{{rmsg['from']['name']}} </span>
                         {{rmsg['text']}}
                     </span>
                 </li>
@@ -29,7 +29,7 @@
         <li *ngFor="let activity of activitySet"
             class="msg-row" [ngClass]="chatbotMsgAlignment(activity.from.id)">
             <span class="bubble" [ngClass]="chatbotBubbleProperties(activity.from.id)">
-                <span class="username">{{activity['from']['name']}}:</span> 
+                <span class="username">{{activity['from']['name']}} </span> 
                 {{activity['text']}}
             </span>
         </li>

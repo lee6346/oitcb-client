@@ -55,7 +55,7 @@ export class ChatBotActivityService {
     }
 
     public sendCloseConnectionEvent(directLine: DirectLine, conversationId: string, userName: string) {
-        let act = { type: 'message', from: { id: 'closeConnection', name: userName }} as Activity;
+        let act = { type: 'message', from: { id: 'closeConnection' }} as Activity;
         directLine.postActivity(act).subscribe(res => console.log(res));
     }
 

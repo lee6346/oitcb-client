@@ -53,6 +53,7 @@ export class ChatWindowComponent implements OnInit, OnDestroy {
     private waitingActivity: Activity = { from: { id: 'Default' }, type: 'message', text: 'Waiting For Agent, Please Hold' };
     private unavailableActivity: Activity = { from: { id: 'Default' }, type: 'message', text: 'There are currently no agents available' };
     private availableActivity: Activity = { from: { id: 'Default' }, type: 'message', text: 'You are now disconnecting with the bot. An agent will be with you shortly' };
+    private closeConnectionActivity: Activity = { from: { id: 'Default' }, type: 'message', text: 'The agent has closed the connection' };
 
     constructor(private chatService: ChatBotActivityService, private liveService: LiveRequestService,
         private channelConnectionService: ChannelConnectionService,
@@ -105,8 +106,10 @@ export class ChatWindowComponent implements OnInit, OnDestroy {
 
     public closeWindow(): void {
         this.liveService.acceptRequest$(this.conversationObject.conversationId, this.myuid).subscribe(res => console.log(res));
+        this.chatService.sendCloseConnectionEvent(this.directLine, this.conversationObject.conversationId, 'student');
         this.channelConnectionService.closeChannel$(this.conversationObject.conversationId)
             .subscribe(res => { this.removeWindow.emit(false), console.log(res) });
+        
     }
 
     public makeLiveRequest() {
@@ -141,6 +144,7 @@ export class ChatWindowComponent implements OnInit, OnDestroy {
         console.log('here i am');
         if (act['from']['id'] === 'closeConnection') {
             act['text'] = 'Agent has closed the connection';
+
             console.log(act.id);
             this.Messages.push(act);
         }
@@ -164,6 +168,12 @@ export class ChatWindowComponent implements OnInit, OnDestroy {
                 'align-window-right': true,
                 'host-bubble': true,
             };
+        }
+        else if (id === 'closeConnection') {
+            return {
+                'align-window-right': true,
+                'default-bubble':true,
+            }
         }
         else return {
             'align-window-left': true,

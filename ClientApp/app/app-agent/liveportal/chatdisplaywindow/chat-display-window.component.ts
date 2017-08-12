@@ -46,7 +46,7 @@ export class ChatDisplayWindowComponent implements OnInit, OnDestroy {
     private activitySet: Activity[] = [];
     private ngUnsubscribe: Rx.Subject<void> = new Rx.Subject<void>();
     private displayWindow: boolean = true;
-
+    private closeConnectionActivity: Activity = { from: { id: 'Default' }, type: 'message', text: 'The student has closed the connection' };
     constructor(private injector: Injector,
         private channelService: ChannelConnectionService,
         private chatBotActivityService: ChatBotActivityService,
@@ -189,8 +189,12 @@ export class ChatDisplayWindowComponent implements OnInit, OnDestroy {
         if (this.channelType === 'watch') {
             this.processLiveWatch(this.messages, act);
         }
-        else
-            this.messages.push(act);
+        else {
+            if (act.from.id === 'closeConnection')
+                this.messages.push(this.closeConnectionActivity);
+            else
+                this.messages.push(act);
+        }
     }
 
 
